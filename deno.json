@@ -1,8 +1,9 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev:server": ""
   },
-  "imports": {
-    "@std/assert": "jsr:@std/assert@1"
-  }
+  "workspace": [
+    "./packages/film-source-golden-horse",
+    "./apps/film-scheduler"
+  ]
 }
