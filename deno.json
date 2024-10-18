@@ -1,9 +1,0 @@
-{
-  "tasks": {
-    "dev:server": ""
-  },
-  "workspace": [
-    "./packages/film-source-golden-horse",
-    "./apps/film-scheduler"
-  ]
-}
