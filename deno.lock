@@ -1,0 +1,12 @@
+{
+  "version": "4",
+  "remote": {
+    "https://deno.land/std@0.117.0/_util/assert.ts": "2f868145a042a11d5ad0a3c748dcf580add8a0dbc0e876eaa0026303a5488f58",
+    "https://deno.land/std@0.117.0/flags/mod.ts": "5bd80147c97e481efcc4c041096c6c1a1393248e2849ccd571269d62c2634cbe"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@1"
+    ]
+  }
+}
