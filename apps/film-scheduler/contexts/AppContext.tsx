@@ -13,7 +13,7 @@ export type AppContextType = {
   setPreviewFilmId: Dispatch<SetStateAction<string | undefined>>;
   onClickSession: (session: Session) => void;
   setCurrentDate: Dispatch<SetStateAction<Date>>;
-  starredFilmIds: Set<string>;
+  starredFilmIds: string[];
   starFilm: (film: Film) => void;
   unstarFilm: (film: Film) => void;
   addSession: (session: Session) => void;
@@ -35,7 +35,7 @@ export const AppContext = React.createContext<AppContextType>({
   setPreviewFilmId: noop,
   onClickSession: noop,
   setCurrentDate: noop,
-  starredFilmIds: new Set(),
+  starredFilmIds: [],
   starFilm: noop,
   unstarFilm: noop,
   addSession: noop,

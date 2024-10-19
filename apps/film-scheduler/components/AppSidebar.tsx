@@ -168,7 +168,7 @@ export function AppSidebar() {
   } = useAppContext();
   const [search, setSearch] = useState("");
   const sortedSeletectSession = selectedSessions.sort(
-    (a, b) => a.time.valueOf() - b.time.valueOf(),
+    (a, b) => a.time - b.time,
   );
 
   const handleFilmClick = (film: Film) => {
@@ -182,7 +182,7 @@ export function AppSidebar() {
   };
 
   const handleStarToggle = (film: Film) => {
-    if (starredFilmIds.has(film.id)) {
+    if (starredFilmIds.includes(film.id)) {
       unstarFilm(film);
     } else {
       starFilm(film);
@@ -201,7 +201,7 @@ export function AppSidebar() {
   }, [search, films]);
 
   const starredFilms = useMemo(() => {
-    return films.filter((f) => starredFilmIds.has(f.id));
+    return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
 
   return (
@@ -277,7 +277,7 @@ export function AppSidebar() {
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
                       onClickSession={onClickSession}
-                      isStarred={starredFilmIds.has(film.id)}
+                      isStarred={starredFilmIds.includes(film.id)}
                       onStarToggle={handleStarToggle}
                       onClickViewDetail={revealFilmDetail}
                     />
@@ -316,7 +316,7 @@ export function AppSidebar() {
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
                       onClickSession={onClickSession}
-                      isStarred={starredFilmIds.has(film.id)}
+                      isStarred={starredFilmIds.includes(film.id)}
                       onStarToggle={handleStarToggle}
                       onClickViewDetail={revealFilmDetail}
                     />

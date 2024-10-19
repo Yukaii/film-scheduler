@@ -3,21 +3,29 @@
 import React, { useMemo, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { FilmSidebar } from "@/components/FilmSidebar";
 import CalendarView from "@/components/CalendarView";
+import { FilmSidebar } from "@/components/FilmSidebar";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek"; // Ensures the week starts on Monday
 import { cn, scrollSessionIntoView } from "@/lib/utils";
-import { useToggle } from "@/lib/hooks";
+import { useToggle, useLocalStorageState } from "@/lib/hooks";
 dayjs.extend(isoWeek);
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
   );
-  const [selectedSessions, setSelectedSessions] = useState<Session[]>([]);
+
+  // Use localStorageState hook for selected sessions and starred films
+  const [selectedSessions, setSelectedSessions] = useLocalStorageState<
+    Session[]
+  >("selectedSessions", []);
+  const [starredFilmIds, setStarredFilmIds] = useLocalStorageState<string[]>(
+    "starredFilmIds",
+    [],
+  );
 
   // Preview sessions based on the selected film
   const previewSessions = useMemo(() => {
@@ -40,7 +48,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       const exists = prev.some(
         (s) =>
           s.filmId === session.filmId &&
-          dayjs(s.time).isSame(session.time) &&
+          dayjs(s.time).isSame(dayjs(session.time)) &&
           s.location === session.location,
       );
       if (!exists) {
@@ -57,7 +65,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         (s) =>
           !(
             s.filmId === session.filmId &&
-            dayjs(s.time).isSame(session.time) &&
+            dayjs(s.time).isSame(dayjs(session.time)) &&
             s.location === session.location
           ),
       );
@@ -79,17 +87,14 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     window.setTimeout(() => scrollSessionIntoView(session), 50);
   };
 
-  const [starredFilmIds, setStarredFilmIds] = useState<Set<string>>(new Set());
+  // Star/Unstar functionality
   const starFilm = (film: Film) => {
-    setStarredFilmIds((prev) => {
-      prev.add(film.id);
-      return new Set(prev);
-    });
+    setStarredFilmIds((prev) => [...prev, film.id]);
   };
+
   const unstarFilm = (film: Film) => {
     setStarredFilmIds((prev) => {
-      prev.delete(film.id);
-      return new Set(prev);
+      return prev.filter((id) => id !== film.id);
     });
   };
 
@@ -145,7 +150,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       </SidebarProvider>
 
       <FilmSidebar
-        open={panelOpen && !!previewFilmId}
+        open={panelOpen && !!viewingFilmId}
         setOpen={(open: boolean) => setPanelOpen(open)}
       />
     </AppContext.Provider>

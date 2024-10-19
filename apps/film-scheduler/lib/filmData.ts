@@ -8,7 +8,7 @@ function transformFilm([id, rawFilm]: [string, RawFilm]): Film {
     id,
     schedule: schedule.map(sch => ({
       filmId: id,
-      time: new Date(`2024-${sch.date.replace('.', '-')} ${sch.time} +8`),
+      time: new Date(`2024-${sch.date.replace('.', '-')} ${sch.time} +8`).valueOf(),
       location: sch.location,
     })),
     duration: parseInt(duration.replace(/[^\d]/, ''), 10)

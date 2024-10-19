@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function generateSessionId(session: Session): string {
   const { filmId, time, location } = session;
-  const sessionString = `${filmId}-${time.toISOString()}-${location}`;
+  const sessionString = `${filmId}-${new Date(time).toISOString()}-${location}`;
 
   // Simple hash function using bitwise operators
   let hash = 0;
