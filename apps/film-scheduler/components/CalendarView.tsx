@@ -43,7 +43,7 @@ function WeekView({
   );
 
   return (
-    <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] shadow rounded p-4">
+    <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] p-4">
       {/* Time Labels Column */}
       <div className="w-full py-4 bg-background mb-4 mt-7">
         <div className="relative h-[840px]">
