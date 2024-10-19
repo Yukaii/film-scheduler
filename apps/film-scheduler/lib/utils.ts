@@ -21,6 +21,10 @@ export function generateSessionId(session: Session): string {
   return `session-${Math.abs(hash)}`; // Return a positive hash as the id
 }
 
+export function includesSession(sessions: Session[], session: Session): boolean {
+  return sessions.some(s => generateSessionId(s) === generateSessionId(session))
+}
+
 export function scrollSessionIntoView(session: Session) {
   const sessionId = generateSessionId(session);
   const sessionElement = document.getElementById(sessionId);

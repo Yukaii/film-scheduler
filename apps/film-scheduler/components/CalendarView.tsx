@@ -6,7 +6,7 @@ import "dayjs/locale/en";
 import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
-import { cn, generateSessionId } from "@/lib/utils";
+import { cn, generateSessionId, includesSession } from "@/lib/utils";
 import { X } from "lucide-react";
 
 dayjs.extend(isBetween);
@@ -111,7 +111,8 @@ function WeekView({
                 const width = 100 / overlappingSessions.length;
                 const left = overlappingSessions.indexOf(session) * width;
 
-                const isPreviewSession = !selectedSessions.includes(session);
+                const isSelectedSession = includesSession(selectedSessions, session);
+                const isPreviewSession = includesSession(previewSessions, session);
 
                 return (
                   <div
@@ -122,9 +123,9 @@ function WeekView({
                       "border-4 border-solid border-transparent",
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
-                          isPreviewSession,
+                          !isSelectedSession,
                         "opacity-100 dark:bg-violet-900 bg-violet-600 dark:hover:border-white cursor-pointer hover:border-slate-700":
-                          !isPreviewSession,
+                          isSelectedSession,
                       },
                     )}
                     onClick={() => {
@@ -146,7 +147,7 @@ function WeekView({
                       <div className="text-sm font-medium">
                         {film.filmTitle}
                       </div>
-                      {!isPreviewSession && (
+                      {isSelectedSession && (
                         <button
                           className="absolute top-1 right-1"
                           onClick={(e) => {

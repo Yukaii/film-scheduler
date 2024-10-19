@@ -48,7 +48,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       const exists = prev.some(
         (s) =>
           s.filmId === session.filmId &&
-          dayjs(s.time).isSame(dayjs(session.time)) &&
+          s.time === session.time &&
           s.location === session.location,
       );
       if (!exists) {
