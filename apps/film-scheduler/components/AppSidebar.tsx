@@ -14,7 +14,7 @@ import { Film, Session } from "./types";
 import FilmModal from "./FilmModal";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Star, StarOff } from "lucide-react";
+import { ChevronDown, Star, StarOff, X } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -98,6 +98,35 @@ function FilmListItem({
   );
 }
 
+// SessionListItem component for rendering selected sessions
+function SessionListItem({
+  session,
+  removeSession,
+}: {
+  session: Session;
+  removeSession: (session: Session) => void;
+}) {
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    removeSession(session);
+  };
+
+  return (
+    <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+      <div>
+        {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+      </div>
+      <button
+        onClick={handleRemoveClick}
+        className="ml-2 p-1"
+        title="Remove session"
+      >
+        <X className="text-gray-500" />
+      </button>
+    </div>
+  );
+}
+
 export function AppSidebar() {
   const {
     films,
@@ -107,6 +136,8 @@ export function AppSidebar() {
     starredFilmIds,
     starFilm,
     unstarFilm,
+    selectedSessions,
+    removeSession,
   } = useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
@@ -153,6 +184,35 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* Selected Sessions Section */}
+        <Collapsible defaultOpen className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                已選擇場次
+                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+
+            <CollapsibleContent>
+              <SidebarGroupContent className="max-h-full">
+                {selectedSessions.length > 0 ? (
+                  selectedSessions.map((session, index) => (
+                    <SessionListItem
+                      key={index}
+                      session={session}
+                      removeSession={removeSession}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm p-4 text-gray-500">No sessions selected</p>
+                )}
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
+
+        {/* Starred Films Section */}
         <Collapsible className="group/collapsible">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
@@ -183,6 +243,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </Collapsible>
 
+        {/* All Films Section */}
         <Collapsible defaultOpen className="group/collapsible">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
