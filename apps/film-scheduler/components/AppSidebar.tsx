@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 
 export function AppSidebar() {
-  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession } = useAppContext();
+  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession } =
+    useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
@@ -35,7 +36,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
+      <SidebarHeader className="p-4">
         <Input
           placeholder="篩選影片"
           value={search}
@@ -44,7 +45,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <div className="flex flex-col gap-2" >
+          <div className="flex flex-col gap-2 px-2">
             {filteredFilms.map((film) => {
               const isPreviewing = previewFilmId === film.id;
               return (
@@ -55,12 +56,18 @@ export function AppSidebar() {
                   })}
                 >
                   <button
-                    onClick={() => handleFilmClick(film)}
+                    onClick={() => {
+                      handleFilmClick(film);
+                      onClickPreviewSession(film.schedule[0]);
+                    }}
                     className={cn(
-                      "text-left w-full py-2 px-4 rounded hover:bg-gray-200",
+                      "text-left w-full py-2 px-4 rounded hover:bg-gray-200 flex gap-1 items-center justify-between",
                     )}
                   >
                     {film.filmTitle}
+                    <span className="text-xs whitespace-nowrap">
+                      [{film.duration} 分鐘]
+                    </span>
                   </button>
 
                   {isPreviewing && (
@@ -70,11 +77,12 @@ export function AppSidebar() {
                           key={index}
                           className="cursor-pointer text-sm hover:underline"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            onClickPreviewSession(session)
+                            e.stopPropagation();
+                            onClickPreviewSession(session);
                           }}
                         >
-                          {dayjs(session.time).format('MM/DD HH:mm')} - {session.location}
+                          {dayjs(session.time).format("MM/DD HH:mm")} -{" "}
+                          {session.location}
                         </div>
                       ))}
                     </div>
