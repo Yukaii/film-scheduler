@@ -7,6 +7,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn } from "@/lib/utils";
+import { X } from 'lucide-react'
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -25,7 +26,7 @@ function WeekView({
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     currentWeekStart.add(i, "day"),
   );
-  const { filmsMap, addSession } = useAppContext();
+  const { filmsMap, addSession, removeSession } = useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
@@ -133,7 +134,22 @@ function WeekView({
                     }}
                     title={session.time.toLocaleString()}
                   >
-                    <div className="text-sm font-medium">{film.filmTitle}</div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm font-medium">
+                        {film.filmTitle}
+                      </div>
+                      {!isPreviewSession && (
+                        <button
+                          className="absolute top-1 right-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSession(session);
+                          }}
+                        >
+                          <X className="h-4 w-4 text-white" />
+                        </button>
+                      )}
+                    </div>
                     <p className="text-xs text-white/80">{session.location}</p>
                   </div>
                 );
