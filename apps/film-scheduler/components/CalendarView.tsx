@@ -117,15 +117,13 @@ function WeekView({
                       {
                         "opacity-70 hover:cursor-zoom-in bg-blue-500 ":
                           isPreviewSession,
-                        "opacity-100 bg-green-500 hover:cursor-zoom-out":
+                        "opacity-100 bg-green-500":
                           !isPreviewSession,
                       },
                     )}
                     onClick={() => {
                       if (isPreviewSession) {
                         addSession(session);
-                      } else {
-                        removeSession(session);
                       }
                     }}
                     style={{
