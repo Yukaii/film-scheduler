@@ -16,8 +16,14 @@ interface WeekViewProps {
   previewSessions: Session[];
 }
 
-function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekViewProps) {
-  const weekDays = Array.from({ length: 7 }, (_, i) => currentWeekStart.add(i, 'day'));
+function WeekView({
+  currentWeekStart,
+  selectedSessions,
+  previewSessions,
+}: WeekViewProps) {
+  const weekDays = Array.from({ length: 7 }, (_, i) =>
+    currentWeekStart.add(i, "day"),
+  );
   const { filmsMap } = useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
@@ -26,24 +32,29 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
   return (
     <div className="grid grid-cols-7 gap-4">
       {weekDays.map((day) => (
-        <div key={day.format('YYYY-MM-DD')} className="w-full p-4 bg-white shadow rounded mb-4 relative">
+        <div
+          key={day.format("YYYY-MM-DD")}
+          className="w-full p-4 bg-white shadow rounded mb-4 relative"
+        >
           <h4 className="text-lg font-semibold mb-2">
-            {day.format('dddd, MMMM D')}
+            {day.format("dddd, MMMM D")}
           </h4>
           <div className="relative h-[840px] border-t border-b border-gray-300">
             {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
                 key={hour}
                 className="absolute left-0 w-full border-t border-gray-200"
-                style={{ top: `${hour * 60}px`, height: '1px' }}
+                style={{ top: `${hour * 60}px`, height: "1px" }}
               >
                 <span className="absolute left-0 -top-2 text-xs">
-                  {dayjs().hour(startHour + hour).format('h A')}
+                  {dayjs()
+                    .hour(startHour + hour)
+                    .format("h A")}
                 </span>
               </div>
             ))}
             {[...selectedSessions, ...previewSessions]
-              .filter((session) => dayjs(session.time).isSame(day, 'day'))
+              .filter((session) => dayjs(session.time).isSame(day, "day"))
               .map((session) => {
                 const film = filmsMap.get(session.filmId);
                 if (!film) return null;
@@ -56,10 +67,18 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
                 const height = film.duration; // Duration in minutes
 
                 // Check for overlapping sessions and calculate width and left position
-                const overlappingSessions = [...selectedSessions, ...previewSessions].filter(
+                const overlappingSessions = [
+                  ...selectedSessions,
+                  ...previewSessions,
+                ].filter(
                   (s) =>
-                    dayjs(s.time).isSame(day, 'day') &&
-                    dayjs(s.time).isBetween(startTime, startTime.add(film.duration, 'minute'), null, '[]')
+                    dayjs(s.time).isSame(day, "day") &&
+                    dayjs(s.time).isBetween(
+                      startTime,
+                      startTime.add(film.duration, "minute"),
+                      null,
+                      "[]",
+                    ),
                 );
 
                 const width = 100 / overlappingSessions.length;
@@ -69,12 +88,15 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
                   <div
                     key={`${session.time}-${session.filmId}`}
                     className="absolute bg-blue-500 text-white p-2 rounded shadow"
-                    style={{ top: `${top}px`, height: `${height}px`, width: `${width}%`, left: `${left}%` }}
+                    style={{
+                      top: `${top}px`,
+                      height: `${height}px`,
+                      width: `${width}%`,
+                      left: `${left}%`,
+                    }}
                     title={session.time.toLocaleString()}
                   >
-                    <div className="text-sm font-medium">
-                      {film.filmTitle}
-                    </div>
+                    <div className="text-sm font-medium">{film.filmTitle}</div>
                     <p className="text-xs text-white/80">{session.location}</p>
                   </div>
                 );
