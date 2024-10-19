@@ -30,28 +30,42 @@ function WeekView({
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
 
   return (
-    <div className="grid grid-cols-7 gap-4">
+    <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] shadow rounded p-4">
+      {/* Time Labels Column */}
+      <div className="w-full py-4 bg-white mb-4 mt-7">
+        <div className="relative h-[840px]">
+          {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
+            <div
+              key={hour}
+              className="absolute left-0 w-full"
+              style={{ top: `${hour * 60}px`, height: "60px" }}
+            >
+              <span className="text-xs absolute p-1 -top-3 bg-white">
+                {dayjs()
+                  .hour(startHour + hour)
+                  .format("h A")}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Week Days Columns */}
       {weekDays.map((day) => (
         <div
           key={day.format("YYYY-MM-DD")}
-          className="w-full p-4 bg-white shadow rounded mb-4 relative"
+          className="w-full py-4 bg-white mb-4 relative"
         >
-          <h4 className="text-lg font-semibold mb-2">
-            {day.format("dddd, MMMM D")}
-          </h4>
+          <div className="font-semibold mb-2 text-sm text-center h-5">
+            {day.format("ddd D")}
+          </div>
           <div className="relative h-[840px] border-t border-b border-gray-300">
             {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
                 key={hour}
                 className="absolute left-0 w-full border-t border-gray-200"
-                style={{ top: `${hour * 60}px`, height: "1px" }}
-              >
-                <span className="absolute left-0 -top-2 text-xs">
-                  {dayjs()
-                    .hour(startHour + hour)
-                    .format("h A")}
-                </span>
-              </div>
+                style={{ top: `${hour * 60}px`, height: "60px" }}
+              />
             ))}
             {[...selectedSessions, ...previewSessions]
               .filter((session) => dayjs(session.time).isSame(day, "day"))
@@ -110,9 +124,7 @@ function WeekView({
 
 export default function CalendarView() {
   const { today, previewSessions, selectedSessions } = useAppContext();
-  const [currentWeekStart, setCurrentWeekStart] = useState(dayjs(today));
-
-  console.log(previewSessions, selectedSessions, "preview");
+  const [currentWeekStart, setCurrentWeekStart] = useState(dayjs(today).startOf('week').add(1, 'day'));
 
   const navigateWeek = (direction: "previous" | "next") => {
     setCurrentWeekStart((prev) =>
@@ -121,7 +133,7 @@ export default function CalendarView() {
   };
 
   return (
-    <div className="w-3/4 p-4">
+    <div className="w-full p-4">
       <div className="mb-4 flex justify-between items-center">
         <div className="flex items-center">
           <Button

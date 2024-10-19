@@ -36,9 +36,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     >
       <SidebarProvider>
         <AppSidebar />
-        <main>
-          <CalendarView />
-        </main>
+        <CalendarView />
       </SidebarProvider>
     </AppContext.Provider>
   );
