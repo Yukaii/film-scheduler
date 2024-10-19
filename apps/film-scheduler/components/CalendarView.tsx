@@ -25,10 +25,21 @@ function WeekView({
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     currentWeekStart.add(i, "day"),
   );
-  const { filmsMap } = useAppContext();
+  const { filmsMap, addSession, removeSession } = useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
+
+  const sessions = Array.from(
+    new Map(
+      [...selectedSessions, ...previewSessions].map(
+        (session) => [
+          session.filmId + session.time + session.location,
+          session,
+        ], // Create a unique key
+      ),
+    ).values(), // Get the values from the Map
+  );
 
   return (
     <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] shadow rounded p-4">
@@ -68,7 +79,7 @@ function WeekView({
                 style={{ top: `${hour * 60}px`, height: "60px" }}
               />
             ))}
-            {[...selectedSessions, ...previewSessions]
+            {sessions
               .filter((session) => dayjs(session.time).isSame(day, "day"))
               .map((session) => {
                 const film = filmsMap.get(session.filmId);
@@ -99,7 +110,7 @@ function WeekView({
                 const width = 100 / overlappingSessions.length;
                 const left = overlappingSessions.indexOf(session) * width;
 
-                const isPreviewSession = previewSessions.includes(session);
+                const isPreviewSession = !selectedSessions.includes(session);
 
                 return (
                   <div
@@ -107,11 +118,19 @@ function WeekView({
                     className={cn(
                       "absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100",
                       {
-                        "opacity-70 hover:cursor-copy bg-blue-500 ":
+                        "opacity-70 hover:cursor-zoom-in bg-blue-500 ":
                           isPreviewSession,
-                        "opacity-100 bg-bg-red-500": !isPreviewSession,
+                        "opacity-100 bg-green-500 hover:cursor-zoom-out":
+                          !isPreviewSession,
                       },
                     )}
+                    onClick={() => {
+                      if (isPreviewSession) {
+                        addSession(session);
+                      } else {
+                        removeSession(session);
+                      }
+                    }}
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,

@@ -14,6 +14,9 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
   );
+  const [selectedSessions, setSelectedSessions] = useState<Session[]>([]);
+
+  // Preview sessions based on the selected film
   const previewSessions = useMemo(() => {
     if (!previewFilmId) return [];
 
@@ -27,6 +30,38 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     }));
   }, [previewFilmId, props.filmsMap]);
 
+  // Add session to selectedSessions
+  const addSession = (session: Session) => {
+    setSelectedSessions((prev) => {
+      // Ensure session doesn't already exist
+      const exists = prev.some(
+        (s) =>
+          s.filmId === session.filmId &&
+          dayjs(s.time).isSame(session.time) &&
+          s.location === session.location,
+      );
+      if (!exists) {
+        return [...prev, session];
+      }
+      return prev;
+    });
+  };
+
+  // Remove session from selectedSessions
+  const removeSession = (session: Session) => {
+    setSelectedSessions((prev) => {
+      return prev.filter(
+        (s) =>
+          !(
+            s.filmId === session.filmId &&
+            dayjs(s.time).isSame(session.time) &&
+            s.location === session.location
+          ),
+      );
+    });
+  };
+
+  // Handle week view navigation
   const [currentDate, setCurrentDate] = useState(new Date());
   const onClickPreviewSession = (session: Session) => {
     const sessionDate = dayjs(session.time);
@@ -59,7 +94,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         films: props.films,
         filmsMap: props.filmsMap,
         previewSessions,
-        selectedSessions: [],
+        selectedSessions,
         today: currentDate,
         previewFilmId,
         setPreviewFilmId,
@@ -68,6 +103,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         starredFilmIds,
         starFilm,
         unstarFilm,
+        addSession,
+        removeSession,
       }}
     >
       <SidebarProvider>

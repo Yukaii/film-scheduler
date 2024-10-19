@@ -14,7 +14,7 @@ import { Film, Session } from "./types";
 import FilmModal from "./FilmModal";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Film, Star, StarOff } from "lucide-react";
+import { ChevronDown, Star, StarOff } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -112,7 +112,11 @@ export function AppSidebar() {
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
   const handleFilmClick = (film: Film) => {
-    setPreviewFilmId(film.id);
+    if (previewFilmId === film.id) {
+      setPreviewFilmId(undefined);
+    } else {
+      setPreviewFilmId(film.id);
+    }
   };
 
   const handleStarToggle = (film: Film) => {

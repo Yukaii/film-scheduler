@@ -7,14 +7,18 @@ export type AppContextType = {
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
-  today: Date; // Parent component can supply the start of the view week
+  today: Date;
   setPreviewFilmId: Dispatch<SetStateAction<string | undefined>>;
   onClickPreviewSession: (session: Session) => void;
   setCurrentDate: Dispatch<SetStateAction<Date>>;
   starredFilmIds: Set<string>;
   starFilm: (film: Film) => void;
   unstarFilm: (film: Film) => void;
+  addSession: (session: Session) => void;
+  removeSession: (session: Session) => void;
 };
+
+const noop = () => {}
 
 export const AppContext = React.createContext<AppContextType>({
   films: [],
@@ -23,12 +27,14 @@ export const AppContext = React.createContext<AppContextType>({
   previewSessions: [],
   previewFilmId: undefined,
   today: new Date(),
-  setPreviewFilmId: () => {},
-  onClickPreviewSession: () => {},
-  setCurrentDate: () => {},
+  setPreviewFilmId: noop,
+  onClickPreviewSession: noop,
+  setCurrentDate: noop,
   starredFilmIds: new Set(),
-  starFilm: () => {},
-  unstarFilm: () => {},
+  starFilm: noop,
+  unstarFilm: noop,
+  addSession: noop,
+  removeSession: noop
 });
 
 export const useAppContext = () => React.useContext(AppContext);
