@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -25,7 +25,7 @@ function WeekView({
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     currentWeekStart.add(i, "day"),
   );
-  const { filmsMap, addSession, removeSession } = useAppContext();
+  const { filmsMap, addSession } = useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
@@ -117,8 +117,7 @@ function WeekView({
                       {
                         "opacity-70 hover:cursor-zoom-in bg-blue-500 ":
                           isPreviewSession,
-                        "opacity-100 bg-green-500":
-                          !isPreviewSession,
+                        "opacity-100 bg-green-500": !isPreviewSession,
                       },
                     )}
                     onClick={() => {
