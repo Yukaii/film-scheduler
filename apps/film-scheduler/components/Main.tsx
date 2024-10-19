@@ -1,26 +1,23 @@
 'use client'
 
-import React, { useState } from 'react';
-import FilmSidebar from '../components/FilmSidebar';
-import CalendarView from '../components/CalendarView';
+import React from 'react';
+// import FilmSidebar from '../components/FilmSidebar';
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/AppSidebar"
+// import CalendarView from '@/components/CalendarView';
 import { Film } from './types';
+import { AppContext } from '@/contexts/AppContext';
 
-export default function Main ({ films }: { films: Film[] }) {
-  const [selectedSessions, setSelectedSessions] = useState<{
-    date: string;
-    time: string;
-    location: string;
-    filmTitle: string;
-  }[]>([]);
-
-  const handleSelectFilm = (film: Film, session: { date: string; time: string; location: string }) => {
-    setSelectedSessions((prev) => [...prev, { ...session, filmTitle: film.filmTitle }]);
-  };
-
+export default function Main (props: { films: Film[] }) {
   return (
-    <div className="flex min-h-screen">
-      <FilmSidebar films={films} onSelectFilm={handleSelectFilm} />
-      <CalendarView selectedSessions={selectedSessions} />
-    </div>
+    <AppContext.Provider value={{ films: props.films }}>
+      <SidebarProvider>
+        { /* <FilmSidebar films={films} onSelectFilm={handleSelectFilm} /> */ }
+        <AppSidebar />
+        <main>
+          { /* <CalendarView selectedSessions={selectedSessions} /> */ }
+        </main>
+      </SidebarProvider>
+    </AppContext.Provider>
   );
 }
