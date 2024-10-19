@@ -9,6 +9,8 @@ export type AppContextType = {
   previewFilmId: string | undefined;
   today: Date; // Parent component can supply the start of the view week
   setPreviewFilmId: Dispatch<SetStateAction<string | undefined>>
+  onClickPreviewSession: (session: Session) => void
+  setCurrentDate: Dispatch<SetStateAction<Date>>
 }
 
 export const AppContext = React.createContext<AppContextType>({
@@ -18,7 +20,9 @@ export const AppContext = React.createContext<AppContextType>({
   previewSessions: [],
   previewFilmId: undefined,
   today: new Date(),
-  setPreviewFilmId: () => {}
+  setPreviewFilmId: () => {},
+  onClickPreviewSession: () => {},
+  setCurrentDate: () => {}
 })
 
 export const useAppContext = () => React.useContext(AppContext)

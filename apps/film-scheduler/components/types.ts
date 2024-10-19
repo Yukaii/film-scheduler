@@ -4,7 +4,7 @@ export interface Film {
   filmOriginalTitle: string;
   directorName: string;
   directorOriginalName: string;
-  schedule: FilmSchedule[];
+  schedule: Session[];
   synopsis: string;
 
   // in minutes
@@ -12,11 +12,6 @@ export interface Film {
 }
 
 export type FilmsMap = Map<string, Film>;
-
-export interface FilmSchedule {
-  time: Date;
-  location: string
-}
 
 export interface Session {
   filmId: string;

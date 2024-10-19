@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 
 export function AppSidebar() {
-  const { films, setPreviewFilmId, previewFilmId } = useAppContext();
+  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession } = useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
@@ -69,7 +69,10 @@ export function AppSidebar() {
                         <div
                           key={index}
                           className="cursor-pointer text-sm hover:underline"
-                          onClick={() => {}}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onClickPreviewSession(session)
+                          }}
                         >
                           {dayjs(session.time).format('MM/DD HH:mm')} - {session.location}
                         </div>

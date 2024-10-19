@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -103,13 +103,14 @@ function WeekView({
 
                 return (
                   <div
-                    key={`${session.time}-${session.filmId}`}
+                    key={`${session.time}-${session.filmId}-${session.location}`}
                     className={cn(
-                      'absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100',
+                      "absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100",
                       {
-                        'opacity-70 hover:cursor-copy bg-blue-500 ': isPreviewSession,
-                        'opacity-100 bg-bg-red-500': !isPreviewSession
-                      }
+                        "opacity-70 hover:cursor-copy bg-blue-500 ":
+                          isPreviewSession,
+                        "opacity-100 bg-bg-red-500": !isPreviewSession,
+                      },
                     )}
                     style={{
                       top: `${top}px`,
@@ -132,15 +133,20 @@ function WeekView({
 }
 
 export default function CalendarView() {
-  const { today, previewSessions, selectedSessions } = useAppContext();
-  const [currentWeekStart, setCurrentWeekStart] = useState(
-    dayjs(today).startOf("week").add(1, "day"),
+  const { today, previewSessions, selectedSessions, setCurrentDate } =
+    useAppContext();
+  const currentWeekStart = useMemo(
+    () => dayjs(today).startOf("week").add(1, "day"),
+    [today],
   );
 
   const navigateWeek = (direction: "previous" | "next") => {
-    setCurrentWeekStart((prev) =>
-      direction === "next" ? prev.add(1, "week") : prev.subtract(1, "week"),
-    );
+    setCurrentDate((prev) => {
+      const currentDayjs = dayjs(prev);
+      return direction === "next"
+        ? currentDayjs.add(1, "week").toDate()
+        : currentDayjs.subtract(1, "week").toDate();
+    });
   };
 
   return (
