@@ -78,7 +78,7 @@ function FilmListItem({
 }
 
 export function AppSidebar() {
-  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession } =
+  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession, starredFilmIds, starFilm, unstarFilm } =
     useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
@@ -98,6 +98,10 @@ export function AppSidebar() {
     });
   }, [search, films]);
 
+  const starredFilms = useMemo(() => {
+    return films.filter(f => starredFilmIds.has(f.id))
+  }, [starredFilmIds, films])
+
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
@@ -108,6 +112,34 @@ export function AppSidebar() {
         />
       </SidebarHeader>
       <SidebarContent>
+        <Collapsible className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                已追蹤影片
+                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+
+            <CollapsibleContent>
+              <SidebarGroupContent className="max-h-full">
+                {starredFilms.map((film) => {
+                  const isPreviewing = previewFilmId === film.id;
+                  return (
+                    <FilmListItem
+                      key={film.id}
+                      film={film}
+                      isPreviewing={isPreviewing}
+                      handleFilmClick={handleFilmClick}
+                      onClickPreviewSession={onClickPreviewSession}
+                    />
+                  );
+                })}
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
+
         <Collapsible defaultOpen className="group/collapsible">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
