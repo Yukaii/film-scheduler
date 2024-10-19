@@ -93,10 +93,7 @@ function WeekView({
                 const height = film.duration; // Duration in minutes
 
                 // Check for overlapping sessions and calculate width and left position
-                const overlappingSessions = [
-                  ...selectedSessions,
-                  ...previewSessions,
-                ].filter(
+                const overlappingSessions = sessions.filter(
                   (s) =>
                     dayjs(s.time).isSame(day, "day") &&
                     dayjs(s.time).isBetween(
