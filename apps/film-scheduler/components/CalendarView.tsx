@@ -117,11 +117,11 @@ function WeekView({
                     id={sessionId}
                     key={sessionId}
                     className={cn(
-                      "absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100",
+                      "absolute p-2 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
                       {
-                        "opacity-70 hover:cursor-zoom-in bg-blue-500 ":
+                        "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800":
                           isPreviewSession,
-                        "opacity-100 bg-green-500": !isPreviewSession,
+                        "opacity-100 dark:bg-violet-900 bg-violet-600": !isPreviewSession,
                       },
                     )}
                     onClick={() => {

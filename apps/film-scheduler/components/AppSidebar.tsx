@@ -41,9 +41,12 @@ function FilmListItem({
   return (
     <div
       key={film.id}
-      className={cn("py-2 px-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 mb-2", {
-        "bg-gray-200 dark:bg-gray-800": isPreviewing,
-      })}
+      className={cn(
+        "py-2 px-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 mb-2",
+        {
+          "bg-gray-200 dark:bg-gray-800": isPreviewing,
+        },
+      )}
     >
       <div className="flex justify-between items-center">
         <button
@@ -71,11 +74,13 @@ function FilmListItem({
           className="ml-2 p-2"
           title={isStarred ? "Unstar this film" : "Star this film"}
         >
-          {isStarred ? (
-            <Star className="text-yellow-500" />
-          ) : (
-            <StarOff className="text-gray-500" />
-          )}
+          <Star
+            className={cn({
+              "text-yellow-500": isStarred,
+              "text-gray-500": !isStarred,
+            })}
+            size={16}
+          />
         </button>
       </div>
 
@@ -131,7 +136,7 @@ function SessionListItem({
         className="ml-2 p-1"
         title="Remove session"
       >
-        <X className="text-gray-500" />
+        <X className="text-gray-500" size={16} />
       </button>
     </div>
   );
@@ -236,7 +241,7 @@ export function AppSidebar() {
         </Collapsible>
 
         {/* Starred Films Section */}
-        <Collapsible className="group/collapsible">
+        <Collapsible className="group/collapsible sticky">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
               <CollapsibleTrigger>
@@ -261,6 +266,10 @@ export function AppSidebar() {
                     />
                   );
                 })}
+
+                {starredFilms.length === 0 && (
+                  <p className="text-sm p-4 text-gray-500">沒有追蹤的影片</p>
+                )}
               </SidebarGroupContent>
             </CollapsibleContent>
           </SidebarGroup>
