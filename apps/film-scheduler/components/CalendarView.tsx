@@ -6,6 +6,7 @@ import "dayjs/locale/en";
 import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
+import { cn } from "@/lib/utils";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -98,10 +99,18 @@ function WeekView({
                 const width = 100 / overlappingSessions.length;
                 const left = overlappingSessions.indexOf(session) * width;
 
+                const isPreviewSession = previewSessions.includes(session);
+
                 return (
                   <div
                     key={`${session.time}-${session.filmId}`}
-                    className="absolute bg-blue-500 text-white p-2 rounded shadow"
+                    className={cn(
+                      'absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100',
+                      {
+                        'opacity-70 hover:cursor-copy bg-blue-500 ': isPreviewSession,
+                        'opacity-100 bg-bg-red-500': !isPreviewSession
+                      }
+                    )}
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,
@@ -124,7 +133,9 @@ function WeekView({
 
 export default function CalendarView() {
   const { today, previewSessions, selectedSessions } = useAppContext();
-  const [currentWeekStart, setCurrentWeekStart] = useState(dayjs(today).startOf('week').add(1, 'day'));
+  const [currentWeekStart, setCurrentWeekStart] = useState(
+    dayjs(today).startOf("week").add(1, "day"),
+  );
 
   const navigateWeek = (direction: "previous" | "next") => {
     setCurrentWeekStart((prev) =>
