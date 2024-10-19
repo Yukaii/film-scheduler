@@ -1,20 +1,5 @@
-import { Film } from '@/components/types';
+import { Film, RawFilm } from '@/components/types';
 import filmsData from '../data/filmsData.json';
-
-interface RawFilm {
-  filmTitle: string;
-  filmOriginalTitle: string;
-  directorName: string;
-  directorOriginalName: string;
-  synopsis: string;
-  schedule: ScheduleItem[];
-  duration: string;
-}
-interface ScheduleItem {
-  date: string;
-  time: string;
-  location: string;
-}
 
 function transformFilm([id, rawFilm]: [string, RawFilm]): Film {
   const { schedule, duration, ...rest } = rawFilm

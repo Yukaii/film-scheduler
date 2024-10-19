@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button'; // Assuming Button from shadcn ui
-import { ChevronLeft, ChevronRight } from '@/components/Icons'; // Icons for navigation
-import dayjs from 'dayjs'; // Utility for date manipulation
-import 'dayjs/locale/en';
-import isBetween from 'dayjs/plugin/isBetween';
-import { Session } from './types';
-import { useAppContext } from '@/contexts/AppContext';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "@/components/Icons";
+import dayjs from "dayjs";
+import "dayjs/locale/en";
+import isBetween from "dayjs/plugin/isBetween";
+import { Session } from "./types";
+import { useAppContext } from "@/contexts/AppContext";
 
 dayjs.extend(isBetween);
-dayjs.locale('en');
+dayjs.locale("en");
 
 interface WeekViewProps {
   currentWeekStart: dayjs.Dayjs;
@@ -18,7 +18,10 @@ interface WeekViewProps {
 
 function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekViewProps) {
   const weekDays = Array.from({ length: 7 }, (_, i) => currentWeekStart.add(i, 'day'));
-  const { filmsMap } = useAppContext()
+  const { filmsMap } = useAppContext();
+
+  const startHour = 10; // New start hour at 10:00 AM
+  const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
 
   return (
     <div className="grid grid-cols-7 gap-4">
@@ -27,29 +30,38 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
           <h4 className="text-lg font-semibold mb-2">
             {day.format('dddd, MMMM D')}
           </h4>
-          <div className="relative h-[1440px] border-t border-b border-gray-300">
-            {Array.from({ length: 24 }, (_, hour) => (
+          <div className="relative h-[840px] border-t border-b border-gray-300">
+            {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
                 key={hour}
                 className="absolute left-0 w-full border-t border-gray-200"
                 style={{ top: `${hour * 60}px`, height: '1px' }}
-              />
+              >
+                <span className="absolute left-0 -top-2 text-xs">
+                  {dayjs().hour(startHour + hour).format('h A')}
+                </span>
+              </div>
             ))}
-            {selectedSessions.concat(previewSessions)
+            {[...selectedSessions, ...previewSessions]
               .filter((session) => dayjs(session.time).isSame(day, 'day'))
               .map((session) => {
-                const film = filmsMap.get(session.filmId)
-                if (!film) return null
-                const startTime = dayjs(`${session.time} ${session.time}`, 'MM.DD HH:mm');
-                const endTime = startTime.add(film.duration, 'minute');
+                const film = filmsMap.get(session.filmId);
+                if (!film) return null;
+
+                // Parse session time and calculate positioning relative to 10:00 AM
+                const startTime = dayjs(session.time);
+                const startHourOffset = startTime.hour() - startHour;
+                const startMinute = startTime.minute();
+                const top = startHourOffset * 60 + startMinute; // Adjust start time relative to 10:00 AM
+                const height = film.duration; // Duration in minutes
+
+                // Check for overlapping sessions and calculate width and left position
                 const overlappingSessions = [...selectedSessions, ...previewSessions].filter(
                   (s) =>
                     dayjs(s.time).isSame(day, 'day') &&
-                    dayjs(s.time).isBetween(startTime, endTime, null, '[]')
+                    dayjs(s.time).isBetween(startTime, startTime.add(film.duration, 'minute'), null, '[]')
                 );
 
-                const top = startTime.hour() * 60 + startTime.minute();
-                const height = film.duration;
                 const width = 100 / overlappingSessions.length;
                 const left = overlappingSessions.indexOf(session) * width;
 
@@ -58,9 +70,10 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
                     key={`${session.time}-${session.filmId}`}
                     className="absolute bg-blue-500 text-white p-2 rounded shadow"
                     style={{ top: `${top}px`, height: `${height}px`, width: `${width}%`, left: `${left}%` }}
+                    title={session.time.toLocaleString()}
                   >
                     <div className="text-sm font-medium">
-                      {session.time} - {film.filmTitle}
+                      {film.filmTitle}
                     </div>
                     <p className="text-xs text-white/80">{session.location}</p>
                   </div>
@@ -74,14 +87,14 @@ function WeekView({ currentWeekStart, selectedSessions, previewSessions }: WeekV
 }
 
 export default function CalendarView() {
-  const { today, previewSessions, selectedSessions } = useAppContext()
+  const { today, previewSessions, selectedSessions } = useAppContext();
   const [currentWeekStart, setCurrentWeekStart] = useState(dayjs(today));
 
-  console.log(previewSessions, selectedSessions, 'preview')
+  console.log(previewSessions, selectedSessions, "preview");
 
-  const navigateWeek = (direction: 'previous' | 'next') => {
+  const navigateWeek = (direction: "previous" | "next") => {
     setCurrentWeekStart((prev) =>
-      direction === 'next' ? prev.add(1, 'week') : prev.subtract(1, 'week')
+      direction === "next" ? prev.add(1, "week") : prev.subtract(1, "week"),
     );
   };
 
@@ -91,17 +104,17 @@ export default function CalendarView() {
         <div className="flex items-center">
           <Button
             variant="ghost"
-            onClick={() => navigateWeek('previous')}
+            onClick={() => navigateWeek("previous")}
             className="mr-2"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h2 className="text-lg font-bold">
-            Week of {currentWeekStart.format('MMMM D, YYYY')}
+            Week of {currentWeekStart.format("MMMM D, YYYY")}
           </h2>
           <Button
             variant="ghost"
-            onClick={() => navigateWeek('next')}
+            onClick={() => navigateWeek("next")}
             className="ml-2"
           >
             <ChevronRight className="h-5 w-5" />

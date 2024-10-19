@@ -20,6 +20,21 @@ export interface FilmSchedule {
 
 export interface Session {
   filmId: string;
+  time: Date;
+  location: string;
+}
+
+export interface RawFilm {
+  filmTitle: string;
+  filmOriginalTitle: string;
+  directorName: string;
+  directorOriginalName: string;
+  synopsis: string;
+  schedule: RawScheduleItem[];
+  duration: string;
+}
+interface RawScheduleItem {
+  date: string;
   time: string;
   location: string;
 }

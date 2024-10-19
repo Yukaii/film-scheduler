@@ -17,7 +17,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
 
     return film.schedule.map((schedule) => ({
       filmId: film.id,
-      time: schedule.time.toISOString(),
+      time: schedule.time,
       location: schedule.location,
     }));
   }, [previewFilmId, props.filmsMap]);
