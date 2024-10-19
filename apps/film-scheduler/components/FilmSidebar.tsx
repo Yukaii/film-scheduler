@@ -19,7 +19,7 @@ export function FilmSidebar(props: FilmSidebarProps) {
   return (
     <div
       className={cn(
-        "w-[16rem] max-h-full h-full right-0 top-0 bg-sidebar border border-b border-sidebar-border",
+        "w-[calc(16rem-10px)] max-h-full h-[calc(100%-20px)] right-2.5 top-2.5 bg-sidebar border border-b border-sidebar-border",
         {
           fixed: isOpen,
           hidden: !isOpen,

@@ -232,7 +232,7 @@ export function AppSidebar() {
         >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky bg-sidebar">
+              <CollapsibleTrigger className="sticky bg-sidebar top-0">
                 已選擇場次
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -260,7 +260,7 @@ export function AppSidebar() {
         <Collapsible className="group/collapsible max-h-[240px] overflow-y-auto">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky bg-sidebar">
+              <CollapsibleTrigger className="sticky bg-sidebar top-0">
                 已追蹤影片
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -299,7 +299,7 @@ export function AppSidebar() {
         >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky bg-sidebar">
+              <CollapsibleTrigger className="sticky top-0 bg-sidebar">
                 影片列表
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>

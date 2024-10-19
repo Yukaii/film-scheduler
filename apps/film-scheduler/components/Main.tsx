@@ -9,7 +9,7 @@ import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek"; // Ensures the week starts on Monday
-import { scrollSessionIntoView } from "@/lib/utils";
+import { cn, scrollSessionIntoView } from "@/lib/utils";
 import { useToggle } from "@/lib/hooks";
 dayjs.extend(isoWeek);
 
@@ -137,7 +137,11 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     >
       <SidebarProvider>
         <AppSidebar />
-        <CalendarView />
+        <CalendarView
+          className={cn({
+            "pr-[16rem]": panelOpen && !!previewFilmId,
+          })}
+        />
       </SidebarProvider>
 
       <FilmSidebar

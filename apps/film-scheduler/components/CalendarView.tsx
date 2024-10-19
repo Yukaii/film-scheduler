@@ -26,7 +26,8 @@ function WeekView({
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     currentWeekStart.add(i, "day"),
   );
-  const { filmsMap, addSession, removeSession } = useAppContext();
+  const { filmsMap, addSession, removeSession, revealFilmDetail } =
+    useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
@@ -117,17 +118,20 @@ function WeekView({
                     id={sessionId}
                     key={sessionId}
                     className={cn(
-                      "absolute p-2 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+                      "absolute p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+                      "border-4 border-solid border-transparent",
                       {
-                        "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800":
+                        "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
                           isPreviewSession,
-                        "opacity-100 dark:bg-violet-900 bg-violet-600":
+                        "opacity-100 dark:bg-violet-900 bg-violet-600 dark:hover:border-white cursor-pointer hover:border-slate-700":
                           !isPreviewSession,
                       },
                     )}
                     onClick={() => {
                       if (isPreviewSession) {
                         addSession(session);
+                      } else {
+                        revealFilmDetail(film);
                       }
                     }}
                     style={{
@@ -165,7 +169,7 @@ function WeekView({
   );
 }
 
-export default function CalendarView() {
+export default function CalendarView(props: { className?: string }) {
   const { today, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(
@@ -183,7 +187,7 @@ export default function CalendarView() {
   };
 
   return (
-    <div className="w-full p-4">
+    <div className={cn("w-full p-4", props.className)}>
       <div className="mb-4 flex justify-between items-center">
         <div className="flex items-center">
           <Button
