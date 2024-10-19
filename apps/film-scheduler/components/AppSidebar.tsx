@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAppContext } from "@/contexts/AppContext";
 import { Input } from "@/components/ui/input";
+import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
 import FilmModal from "./FilmModal";
 import { cn } from "@/lib/utils";
@@ -40,8 +41,8 @@ function FilmListItem({
   return (
     <div
       key={film.id}
-      className={cn("py-2 px-1 rounded hover:bg-gray-200 mb-2", {
-        "bg-gray-200": isPreviewing,
+      className={cn("py-2 px-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 mb-2", {
+        "bg-gray-200 dark:bg-gray-800": isPreviewing,
       })}
     >
       <div className="flex justify-between items-center">
@@ -114,7 +115,7 @@ function SessionListItem({
   const film = filmsMap.get(session.filmId);
 
   return (
-    <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+    <div className="flex justify-between items-center py-2 px-4 border-b border-border">
       <a
         onClick={(e) => {
           e.preventDefault();
@@ -296,7 +297,10 @@ export function AppSidebar() {
           </SidebarGroup>
         </Collapsible>
       </SidebarContent>
-      <SidebarFooter />
+
+      <SidebarFooter>
+        <ModeToggle />
+      </SidebarFooter>
 
       {selectedFilm && (
         <FilmModal film={selectedFilm} onClose={() => setSelectedFilm(null)} />

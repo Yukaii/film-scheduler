@@ -45,7 +45,7 @@ function WeekView({
   return (
     <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] shadow rounded p-4">
       {/* Time Labels Column */}
-      <div className="w-full py-4 bg-white mb-4 mt-7">
+      <div className="w-full py-4 bg-background mb-4 mt-7">
         <div className="relative h-[840px]">
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
@@ -53,7 +53,7 @@ function WeekView({
               className="absolute left-0 w-full"
               style={{ top: `${hour * 60}px`, height: "60px" }}
             >
-              <span className="text-xs absolute p-1 -top-3 bg-white">
+              <span className="text-xs absolute p-1 -top-3 bg-background">
                 {dayjs()
                   .hour(startHour + hour)
                   .format("h A")}
@@ -67,16 +67,16 @@ function WeekView({
       {weekDays.map((day) => (
         <div
           key={day.format("YYYY-MM-DD")}
-          className="w-full py-4 bg-white mb-4 relative"
+          className="w-full py-4 bg-background mb-4 relative"
         >
           <div className="font-semibold mb-2 text-sm text-center h-5">
             {day.format("ddd D")}
           </div>
-          <div className="relative h-[840px] border-t border-b border-gray-300">
+          <div className="relative h-[840px] border-t border-b border-border">
             {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
                 key={hour}
-                className="absolute left-0 w-full border-t border-gray-200"
+                className="absolute left-0 w-full border-t border-border"
                 style={{ top: `${hour * 60}px`, height: "60px" }}
               />
             ))}
