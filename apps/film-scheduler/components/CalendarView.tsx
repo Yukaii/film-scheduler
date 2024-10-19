@@ -26,8 +26,13 @@ function WeekView({
   const weekDays = Array.from({ length: 7 }, (_, i) =>
     currentWeekStart.add(i, "day"),
   );
-  const { filmsMap, addSession, removeSession, revealFilmDetail } =
-    useAppContext();
+  const {
+    filmsMap,
+    addSession,
+    removeSession,
+    revealFilmDetail,
+    viewingFilmId,
+  } = useAppContext();
 
   const startHour = 10; // New start hour at 10:00 AM
   const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
@@ -111,8 +116,14 @@ function WeekView({
                 const width = 100 / overlappingSessions.length;
                 const left = overlappingSessions.indexOf(session) * width;
 
-                const isSelectedSession = includesSession(selectedSessions, session);
-                const isPreviewSession = includesSession(previewSessions, session);
+                const isSelectedSession = includesSession(
+                  selectedSessions,
+                  session,
+                );
+                const isPreviewSession = includesSession(
+                  previewSessions,
+                  session,
+                );
 
                 return (
                   <div
@@ -126,12 +137,15 @@ function WeekView({
                           !isSelectedSession,
                         "opacity-100 dark:bg-violet-900 bg-violet-600 dark:hover:border-white cursor-pointer hover:border-slate-700":
                           isSelectedSession,
+                        "z-10": viewingFilmId === session.filmId,
                       },
                     )}
                     onClick={() => {
                       if (isPreviewSession) {
                         addSession(session);
-                      } else {
+                      }
+
+                      if (isSelectedSession) {
                         revealFilmDetail(film);
                       }
                     }}
