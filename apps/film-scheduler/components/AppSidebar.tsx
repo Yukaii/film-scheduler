@@ -14,24 +14,28 @@ import { Film, Session } from "./types";
 import FilmModal from "./FilmModal";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Film, Star, StarOff } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-// FilmListItem component
+// FilmListItem component kept in the same file
 function FilmListItem({
   film,
   isPreviewing,
   handleFilmClick,
   onClickPreviewSession,
+  isStarred,
+  onStarToggle,
 }: {
   film: Film;
   isPreviewing: boolean;
   handleFilmClick: (film: Film) => void;
   onClickPreviewSession: (session: Session) => void;
+  isStarred: boolean;
+  onStarToggle: (film: Film) => void;
 }) {
   return (
     <div
@@ -40,22 +44,39 @@ function FilmListItem({
         "bg-gray-200": isPreviewing,
       })}
     >
-      <button
-        onClick={() => {
-          handleFilmClick(film);
-          if (film.schedule.length > 0) {
-            onClickPreviewSession(film.schedule[0]);
-          }
-        }}
-        className={cn(
-          "text-left w-full py-2 px-4 rounded flex gap-1 items-center justify-between",
-        )}
-      >
-        {film.filmTitle}
-        <span className="text-xs whitespace-nowrap">
-          [{film.duration} 分鐘]
-        </span>
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => {
+            handleFilmClick(film);
+            if (film.schedule.length > 0) {
+              onClickPreviewSession(film.schedule[0]);
+            }
+          }}
+          className={cn(
+            "text-left w-full py-2 px-4 rounded flex gap-1 items-center justify-between",
+          )}
+        >
+          {film.filmTitle}
+          <span className="text-xs whitespace-nowrap">
+            [{film.duration} 分鐘]
+          </span>
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onStarToggle(film);
+          }}
+          className="ml-2 p-2"
+          title={isStarred ? "Unstar this film" : "Star this film"}
+        >
+          {isStarred ? (
+            <Star className="text-yellow-500" />
+          ) : (
+            <StarOff className="text-gray-500" />
+          )}
+        </button>
+      </div>
 
       {isPreviewing && (
         <div className="ml-4 mt-2">
@@ -78,13 +99,28 @@ function FilmListItem({
 }
 
 export function AppSidebar() {
-  const { films, setPreviewFilmId, previewFilmId, onClickPreviewSession, starredFilmIds, starFilm, unstarFilm } =
-    useAppContext();
+  const {
+    films,
+    setPreviewFilmId,
+    previewFilmId,
+    onClickPreviewSession,
+    starredFilmIds,
+    starFilm,
+    unstarFilm,
+  } = useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
   const handleFilmClick = (film: Film) => {
     setPreviewFilmId(film.id);
+  };
+
+  const handleStarToggle = (film: Film) => {
+    if (starredFilmIds.has(film.id)) {
+      unstarFilm(film);
+    } else {
+      starFilm(film);
+    }
   };
 
   const filteredFilms = useMemo(() => {
@@ -99,8 +135,8 @@ export function AppSidebar() {
   }, [search, films]);
 
   const starredFilms = useMemo(() => {
-    return films.filter(f => starredFilmIds.has(f.id))
-  }, [starredFilmIds, films])
+    return films.filter((f) => starredFilmIds.has(f.id));
+  }, [starredFilmIds, films]);
 
   return (
     <Sidebar>
@@ -111,6 +147,7 @@ export function AppSidebar() {
           onChange={(e) => setSearch(e.target.value)}
         />
       </SidebarHeader>
+
       <SidebarContent>
         <Collapsible className="group/collapsible">
           <SidebarGroup>
@@ -132,6 +169,8 @@ export function AppSidebar() {
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
                       onClickPreviewSession={onClickPreviewSession}
+                      isStarred={starredFilmIds.has(film.id)}
+                      onStarToggle={handleStarToggle}
                     />
                   );
                 })}
@@ -160,6 +199,8 @@ export function AppSidebar() {
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
                       onClickPreviewSession={onClickPreviewSession}
+                      isStarred={starredFilmIds.has(film.id)}
+                      onStarToggle={handleStarToggle}
                     />
                   );
                 })}
