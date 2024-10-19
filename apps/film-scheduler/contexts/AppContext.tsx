@@ -7,6 +7,8 @@ export type AppContextType = {
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
+  viewingFilmId: string | undefined;
+  revealFilmDetail: (film?: Film) => void;
   today: Date;
   setPreviewFilmId: Dispatch<SetStateAction<string | undefined>>;
   onClickSession: (session: Session) => void;
@@ -16,6 +18,8 @@ export type AppContextType = {
   unstarFilm: (film: Film) => void;
   addSession: (session: Session) => void;
   removeSession: (session: Session) => void;
+  setPanelOpen: Dispatch<SetStateAction<boolean>>;
+  togglePanelOpen: () => void;
 };
 
 const noop = () => {};
@@ -26,6 +30,7 @@ export const AppContext = React.createContext<AppContextType>({
   selectedSessions: [],
   previewSessions: [],
   previewFilmId: undefined,
+  viewingFilmId: undefined,
   today: new Date(),
   setPreviewFilmId: noop,
   onClickSession: noop,
@@ -35,6 +40,9 @@ export const AppContext = React.createContext<AppContextType>({
   unstarFilm: noop,
   addSession: noop,
   removeSession: noop,
+  revealFilmDetail: noop,
+  setPanelOpen: noop,
+  togglePanelOpen: noop,
 });
 
 export const useAppContext = () => React.useContext(AppContext);

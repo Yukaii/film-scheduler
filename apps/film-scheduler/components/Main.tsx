@@ -3,12 +3,14 @@
 import React, { useMemo, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { FilmSidebar } from "@/components/FilmSidebar";
 import CalendarView from "@/components/CalendarView";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek"; // Ensures the week starts on Monday
 import { scrollSessionIntoView } from "@/lib/utils";
+import { useToggle } from "@/lib/hooks";
 dayjs.extend(isoWeek);
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
@@ -74,7 +76,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       setCurrentDate(sessionWeekStart.toDate()); // Set currentDate to the session's week start (Monday)
     }
 
-    window.setTimeout(() => scrollSessionIntoView(session), 50)
+    window.setTimeout(() => scrollSessionIntoView(session), 50);
   };
 
   const [starredFilmIds, setStarredFilmIds] = useState<Set<string>>(new Set());
@@ -89,6 +91,25 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       prev.delete(film.id);
       return new Set(prev);
     });
+  };
+
+  const {
+    open: panelOpen,
+    setOpen: setPanelOpen,
+    toggle: togglePanelOpen,
+  } = useToggle(false);
+  const [viewingFilmId, setViewingFilmId] = useState<undefined | string>(
+    undefined,
+  );
+
+  const revealFilmDetail = (film: Film | undefined) => {
+    if (film) {
+      setViewingFilmId(film.id);
+      setPanelOpen(true);
+    } else {
+      setViewingFilmId(undefined);
+      setPanelOpen(false);
+    }
   };
 
   return (
@@ -108,12 +129,21 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         unstarFilm,
         addSession,
         removeSession,
+        viewingFilmId,
+        revealFilmDetail,
+        setPanelOpen,
+        togglePanelOpen,
       }}
     >
       <SidebarProvider>
         <AppSidebar />
         <CalendarView />
       </SidebarProvider>
+
+      <FilmSidebar
+        open={panelOpen && !!previewFilmId}
+        setOpen={(open: boolean) => setPanelOpen(open)}
+      />
     </AppContext.Provider>
   );
 }

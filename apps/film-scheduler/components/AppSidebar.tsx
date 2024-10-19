@@ -12,10 +12,9 @@ import { useAppContext } from "@/contexts/AppContext";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
-import FilmModal from "./FilmModal";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Star, StarOff, X } from "lucide-react";
+import { ChevronDown, Eye, Star, X } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -30,6 +29,7 @@ function FilmListItem({
   onClickSession,
   isStarred,
   onStarToggle,
+  onClickViewDetail,
 }: {
   film: Film;
   isPreviewing: boolean;
@@ -37,6 +37,7 @@ function FilmListItem({
   onClickSession: (session: Session) => void;
   isStarred: boolean;
   onStarToggle: (film: Film) => void;
+  onClickViewDetail: (film: Film) => void;
 }) {
   return (
     <div
@@ -64,6 +65,16 @@ function FilmListItem({
           <span className="text-xs whitespace-nowrap">
             [{film.duration} 分鐘]
           </span>
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClickViewDetail(film);
+          }}
+          className="ml-2 p-2"
+        >
+          <Eye size={16} />
         </button>
 
         <button
@@ -153,9 +164,9 @@ export function AppSidebar() {
     unstarFilm,
     selectedSessions,
     removeSession,
+    revealFilmDetail,
   } = useAppContext();
   const [search, setSearch] = useState("");
-  const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
   const sortedSeletectSession = selectedSessions.sort(
     (a, b) => a.time.valueOf() - b.time.valueOf(),
   );
@@ -163,8 +174,10 @@ export function AppSidebar() {
   const handleFilmClick = (film: Film) => {
     if (previewFilmId === film.id) {
       setPreviewFilmId(undefined);
+      revealFilmDetail(undefined);
     } else {
       setPreviewFilmId(film.id);
+      revealFilmDetail(film);
     }
   };
 
@@ -213,10 +226,13 @@ export function AppSidebar() {
 
       <SidebarContent>
         {/* Selected Sessions Section */}
-        <Collapsible defaultOpen className="group/collapsible">
+        <Collapsible
+          defaultOpen
+          className="group/collapsible overflow-y-auto max-h-[240px] "
+        >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
+              <CollapsibleTrigger className="sticky bg-sidebar">
                 已選擇場次
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -241,10 +257,10 @@ export function AppSidebar() {
         </Collapsible>
 
         {/* Starred Films Section */}
-        <Collapsible className="group/collapsible sticky">
+        <Collapsible className="group/collapsible max-h-[240px] overflow-y-auto">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
+              <CollapsibleTrigger className="sticky bg-sidebar">
                 已追蹤影片
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -263,6 +279,7 @@ export function AppSidebar() {
                       onClickSession={onClickSession}
                       isStarred={starredFilmIds.has(film.id)}
                       onStarToggle={handleStarToggle}
+                      onClickViewDetail={revealFilmDetail}
                     />
                   );
                 })}
@@ -276,10 +293,13 @@ export function AppSidebar() {
         </Collapsible>
 
         {/* All Films Section */}
-        <Collapsible defaultOpen className="group/collapsible">
+        <Collapsible
+          defaultOpen
+          className="group/collapsible max-h-full overflow-y-auto flex-1"
+        >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
+              <CollapsibleTrigger className="sticky bg-sidebar">
                 影片列表
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -298,6 +318,7 @@ export function AppSidebar() {
                       onClickSession={onClickSession}
                       isStarred={starredFilmIds.has(film.id)}
                       onStarToggle={handleStarToggle}
+                      onClickViewDetail={revealFilmDetail}
                     />
                   );
                 })}
@@ -310,10 +331,6 @@ export function AppSidebar() {
       <SidebarFooter>
         <ModeToggle />
       </SidebarFooter>
-
-      {selectedFilm && (
-        <FilmModal film={selectedFilm} onClose={() => setSelectedFilm(null)} />
-      )}
     </Sidebar>
   );
 }

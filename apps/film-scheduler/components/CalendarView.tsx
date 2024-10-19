@@ -7,7 +7,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn, generateSessionId } from "@/lib/utils";
-import { X } from 'lucide-react'
+import { X } from "lucide-react";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -121,7 +121,8 @@ function WeekView({
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800":
                           isPreviewSession,
-                        "opacity-100 dark:bg-violet-900 bg-violet-600": !isPreviewSession,
+                        "opacity-100 dark:bg-violet-900 bg-violet-600":
+                          !isPreviewSession,
                       },
                     )}
                     onClick={() => {
