@@ -26,14 +26,14 @@ function FilmListItem({
   film,
   isPreviewing,
   handleFilmClick,
-  onClickPreviewSession,
+  onClickSession,
   isStarred,
   onStarToggle,
 }: {
   film: Film;
   isPreviewing: boolean;
   handleFilmClick: (film: Film) => void;
-  onClickPreviewSession: (session: Session) => void;
+  onClickSession: (session: Session) => void;
   isStarred: boolean;
   onStarToggle: (film: Film) => void;
 }) {
@@ -49,7 +49,7 @@ function FilmListItem({
           onClick={() => {
             handleFilmClick(film);
             if (film.schedule.length > 0) {
-              onClickPreviewSession(film.schedule[0]);
+              onClickSession(film.schedule[0]);
             }
           }}
           className={cn(
@@ -86,7 +86,7 @@ function FilmListItem({
               className="cursor-pointer text-sm hover:underline"
               onClick={(e) => {
                 e.stopPropagation();
-                onClickPreviewSession(session);
+                onClickSession(session);
               }}
             >
               {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
@@ -135,7 +135,7 @@ export function AppSidebar() {
     films,
     setPreviewFilmId,
     previewFilmId,
-    onClickPreviewSession,
+    onClickSession,
     starredFilmIds,
     starFilm,
     unstarFilm,
@@ -248,7 +248,7 @@ export function AppSidebar() {
                       film={film}
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
-                      onClickPreviewSession={onClickPreviewSession}
+                      onClickSession={onClickSession}
                       isStarred={starredFilmIds.has(film.id)}
                       onStarToggle={handleStarToggle}
                     />
@@ -279,7 +279,7 @@ export function AppSidebar() {
                       film={film}
                       isPreviewing={isPreviewing}
                       handleFilmClick={handleFilmClick}
-                      onClickPreviewSession={onClickPreviewSession}
+                      onClickSession={onClickSession}
                       isStarred={starredFilmIds.has(film.id)}
                       onStarToggle={handleStarToggle}
                     />

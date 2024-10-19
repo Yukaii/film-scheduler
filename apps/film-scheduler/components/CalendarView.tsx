@@ -6,7 +6,7 @@ import "dayjs/locale/en";
 import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
-import { cn } from "@/lib/utils";
+import { cn, generateSessionId } from "@/lib/utils";
 import { X } from 'lucide-react'
 
 dayjs.extend(isBetween);
@@ -86,6 +86,8 @@ function WeekView({
                 const film = filmsMap.get(session.filmId);
                 if (!film) return null;
 
+                const sessionId = generateSessionId(session);
+
                 // Parse session time and calculate positioning relative to 10:00 AM
                 const startTime = dayjs(session.time);
                 const startHourOffset = startTime.hour() - startHour;
@@ -112,7 +114,8 @@ function WeekView({
 
                 return (
                   <div
-                    key={`${session.time}-${session.filmId}-${session.location}`}
+                    id={sessionId}
+                    key={sessionId}
                     className={cn(
                       "absolute text-white p-2 rounded shadow transition-opacity duration-200 hover:opacity-100",
                       {
