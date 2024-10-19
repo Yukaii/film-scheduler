@@ -10,9 +10,11 @@ import { useAppContext } from "@/contexts/AppContext";
 import { Input } from "@/components/ui/input";
 import { Film } from "./types";
 import FilmModal from "./FilmModal";
+import { cn } from "@/lib/utils";
+import dayjs from "dayjs";
 
 export function AppSidebar() {
-  const { films, setPreviewFilmId } = useAppContext();
+  const { films, setPreviewFilmId, previewFilmId } = useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
@@ -42,30 +44,42 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          {filteredFilms.map((film) => (
-            <div key={film.id} className="mb-3">
-              <button
-                onClick={() => handleFilmClick(film)}
-                className="text-left w-full py-2 px-4 rounded hover:bg-gray-200"
-              >
-                {film.filmTitle} ({film.schedule.length} sessions)
-              </button>
+          <div className="flex flex-col gap-2" >
+            {filteredFilms.map((film) => {
+              const isPreviewing = previewFilmId === film.id;
+              return (
+                <div
+                  key={film.id}
+                  className={cn("py-2 px-1 rounded", {
+                    "bg-gray-200": isPreviewing,
+                  })}
+                >
+                  <button
+                    onClick={() => handleFilmClick(film)}
+                    className={cn(
+                      "text-left w-full py-2 px-4 rounded hover:bg-gray-200",
+                    )}
+                  >
+                    {film.filmTitle}
+                  </button>
 
-              {selectedFilm?.id === film.id && (
-                <div className="ml-4 mt-2">
-                  {film.schedule.map((session, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer text-sm hover:underline"
-                      onClick={() => {}}
-                    >
-                      {session.time.toISOString()} - {session.location}
+                  {isPreviewing && (
+                    <div className="ml-4 mt-2">
+                      {film.schedule.map((session, index) => (
+                        <div
+                          key={index}
+                          className="cursor-pointer text-sm hover:underline"
+                          onClick={() => {}}
+                        >
+                          {dayjs(session.time).format('MM/DD HH:mm')} - {session.location}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })}
+          </div>
           {selectedFilm && (
             <FilmModal
               film={selectedFilm}
