@@ -106,15 +106,18 @@ function SessionListItem({
   session: Session;
   removeSession: (session: Session) => void;
 }) {
+  const { filmsMap } = useAppContext();
   const handleRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     removeSession(session);
   };
+  const film = filmsMap.get(session.filmId);
 
   return (
     <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
       <div>
-        {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+        {film?.filmTitle} {dayjs(session.time).format("MM/DD HH:mm")} -{" "}
+        {session.location}
       </div>
       <button
         onClick={handleRemoveClick}
@@ -141,6 +144,9 @@ export function AppSidebar() {
   } = useAppContext();
   const [search, setSearch] = useState("");
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
+  const sortedSeletectSession = selectedSessions.sort(
+    (a, b) => a.time.valueOf() - b.time.valueOf(),
+  );
 
   const handleFilmClick = (film: Film) => {
     if (previewFilmId === film.id) {
@@ -176,11 +182,21 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <Input
-          placeholder="篩選影片"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="relative">
+          <Input
+            placeholder="篩選影片"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search.length > 0 && (
+            <div
+              onClick={() => setSearch("")}
+              className="cursor-pointer absolute right-2 top-2"
+            >
+              <X />
+            </div>
+          )}
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -197,7 +213,7 @@ export function AppSidebar() {
             <CollapsibleContent>
               <SidebarGroupContent className="max-h-full">
                 {selectedSessions.length > 0 ? (
-                  selectedSessions.map((session, index) => (
+                  sortedSeletectSession.map((session, index) => (
                     <SessionListItem
                       key={index}
                       session={session}
@@ -205,7 +221,7 @@ export function AppSidebar() {
                     />
                   ))
                 ) : (
-                  <p className="text-sm p-4 text-gray-500">No sessions selected</p>
+                  <p className="text-sm p-4 text-gray-500">沒有選擇的場次</p>
                 )}
               </SidebarGroupContent>
             </CollapsibleContent>
