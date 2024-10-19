@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
 import { X } from "lucide-react";
 
 export type FilmSidebarProps = {
@@ -12,15 +11,20 @@ export type FilmSidebarProps = {
 export function FilmSidebar(props: FilmSidebarProps) {
   const { filmsMap, viewingFilmId } = useAppContext();
   const viewingFilm = useMemo(() => {
-    return viewingFilmId ? filmsMap.get(viewingFilmId) : null
-  }, [filmsMap, viewingFilmId])
+    return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
+  }, [filmsMap, viewingFilmId]);
+
+  const isOpen = props.open && viewingFilm;
 
   return (
     <div
-      className={cn("w-[16rem] h-full right-0 top-0 bg-sidebar border border-b border-sidebar-border", {
-        fixed: props.open,
-        hidden: !props.open,
-      })}
+      className={cn(
+        "w-[16rem] max-h-full h-full right-0 top-0 bg-sidebar border border-b border-sidebar-border",
+        {
+          fixed: isOpen,
+          hidden: !isOpen,
+        },
+      )}
     >
       <div className="absolute w-full top-0 h-10">
         <button
@@ -31,8 +35,33 @@ export function FilmSidebar(props: FilmSidebarProps) {
         </button>
       </div>
 
-      <div className="pt-10">
-        {viewingFilm?.filmTitle}
+      <div className="py-10 px-4 flex flex-col gap-4 overflow-y-auto max-h-full">
+        <h3 className="text-lg font-semibold">
+          {viewingFilm?.filmTitle}
+
+          <span className="text-base ml-3">
+            {viewingFilm?.filmOriginalTitle}
+          </span>
+        </h3>
+
+        <h4 className="text-base font-semibold">
+          {viewingFilm?.directorName}
+
+          <span className="text-xs ml-3">
+            {viewingFilm?.directorOriginalName}
+          </span>
+        </h4>
+
+        <a
+          href={`https://www.goldenhorse.org.tw/film/programme/films/detail/${viewingFilmId}`}
+          className="text-slate-500 underline cursor-pointer"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          完整頁面
+        </a>
+
+        <p className="whitespace-pre-wrap">{viewingFilm?.synopsis}</p>
       </div>
     </div>
   );
