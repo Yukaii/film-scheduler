@@ -106,7 +106,7 @@ function SessionListItem({
   session: Session;
   removeSession: (session: Session) => void;
 }) {
-  const { filmsMap } = useAppContext();
+  const { filmsMap, onClickSession } = useAppContext();
   const handleRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     removeSession(session);
@@ -115,10 +115,16 @@ function SessionListItem({
 
   return (
     <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
-      <div>
+      <a
+        onClick={(e) => {
+          e.preventDefault();
+          onClickSession(session);
+        }}
+        className="hover:underline hover:cursor-pointer"
+      >
         {film?.filmTitle} {dayjs(session.time).format("MM/DD HH:mm")} -{" "}
         {session.location}
-      </div>
+      </a>
       <button
         onClick={handleRemoveClick}
         className="ml-2 p-1"
