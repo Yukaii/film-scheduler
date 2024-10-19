@@ -35,11 +35,22 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     const sessionWeekStart = sessionDate.startOf("isoWeek"); // Start of session's week (Monday)
 
     if (!sessionWeekStart.isSame(currentWeekStart, "day")) {
-      console.log('noop')
       setCurrentDate(sessionWeekStart.toDate()); // Set currentDate to the session's week start (Monday)
-    } else {
-      console.log('???')
     }
+  };
+
+  const [starredFilmIds, setStarredFilmIds] = useState<Set<string>>(new Set());
+  const starFilm = (film: Film) => {
+    setStarredFilmIds((prev) => {
+      prev.add(film.id);
+      return new Set(prev);
+    });
+  };
+  const unstarFilm = (film: Film) => {
+    setStarredFilmIds((prev) => {
+      prev.delete(film.id);
+      return new Set(prev);
+    });
   };
 
   return (
@@ -54,6 +65,9 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         setPreviewFilmId,
         onClickPreviewSession,
         setCurrentDate,
+        starredFilmIds,
+        starFilm,
+        unstarFilm,
       }}
     >
       <SidebarProvider>
