@@ -17,9 +17,13 @@ https://github.com/user-attachments/assets/1900be74-d6ad-4fe3-a109-ea61851e3ad4
 
 ## FAQ
 
-### 你為何要做這個專案？
+### 為何要做這個專案？
 
 我愛木須龍啦！
+
+### 都 2024 年了怎麼還在弄行事曆啊？
+
+窩不知道 Q_Q
 
 ## Credits
 
