@@ -106,6 +106,15 @@ async function parseFilmDetails(filmId: string, detailsCache: Record<string, any
       const synopsisElements = document.querySelectorAll("div.margin-top.zero p");
       const synopsis = Array.from(synopsisElements).map(p => p.textContent.replace(/<br\s*\/?>/g, '\n').trim()).join('\n\n') || "No synopsis available.";
 
+      const infoTable = Array.from(document.querySelectorAll('.films-detail .col-xs-3 table.none.format'))[1]
+      let duration
+      for (let tr of Array.from(infoTable.querySelectorAll('tr'))) {
+        const rowTexts = Array.from(tr.childNodes).map(n => n.textContent?.trim())
+        if (rowTexts.includes('片長')) {
+          duration = tr.querySelectorAll('td')[2].textContent
+        }
+      }
+
       // Extract schedule
       const scheduleRows = document.querySelectorAll("table#scheduleList tr");
       const schedule = Array.from(scheduleRows).map(row => {
@@ -129,7 +138,8 @@ async function parseFilmDetails(filmId: string, detailsCache: Record<string, any
         directorName,
         directorOriginalName,
         synopsis,
-        schedule
+        schedule,
+        duration,
       };
 
       detailsCache[filmId] = filmDetails;
