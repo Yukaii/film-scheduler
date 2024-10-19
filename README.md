@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/1900be74-d6ad-4fe3-a109-ea61851e3ad4
 - [ ] Calendar 細節：today、時間線等等
 - [ ] 電影資訊 Panel
 
-## FAQ
+## FAQs
 
 ### 為何要做這個專案？
 
