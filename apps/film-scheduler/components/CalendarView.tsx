@@ -10,6 +10,7 @@ import {
   cn,
   findSessionIndex,
   generateSessionId,
+  getSessionDuration,
   includesSession,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
@@ -181,15 +182,18 @@ function SessionBlock({
           targetEndTime.isBetween(startTime, endTime, null, "[]"))
       );
     })
-    .sort((a, b) => generateSessionId(a).localeCompare(generateSessionId(b)));
+    .sort((a, b) => getSessionDuration(a, filmsMap) - getSessionDuration(b, filmsMap));
 
+  const overlapLength = overlappingSessions.length
   const overlappedIndex = findSessionIndex(overlappingSessions, session);
-  const offset = overlappedIndex * 10;
+  const offset = (overlapLength - overlappedIndex - 1) * 10;
   const width = `calc(100% - ${offset + 10}px)`;
   const left = `${10 + offset}px`;
 
   const isSelectedSession = includesSession(selectedSessions, session);
   const isPreviewSession = includesSession(previewSessions, session);
+
+  const zIndex = viewingFilmId === session.filmId ? 5 : 4 - overlappedIndex
 
   return (
     <div
@@ -219,7 +223,7 @@ function SessionBlock({
         height: `${height}px`,
         width,
         left,
-        zIndex: viewingFilmId === session.filmId ? 5 : 4 - overlappedIndex,
+        zIndex,
       }}
       title={film.filmTitle}
     >

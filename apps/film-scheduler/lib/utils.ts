@@ -1,4 +1,4 @@
-import { Session } from "@/components/types";
+import { Session, FilmsMap } from "@/components/types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -40,3 +40,5 @@ export function scrollSessionIntoView(session: Session) {
     });
   }
 }
+
+export const getSessionDuration = (s: Session, filmsMap: FilmsMap) => filmsMap.get(s.filmId)?.duration || 0
