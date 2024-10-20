@@ -157,12 +157,13 @@ function SessionBlock({
   const startHourOffset = startTime.hour() - startHour;
   const startMinute = startTime.minute();
   const top = startHourOffset * 60 + startMinute;
+  const isTinyCard = film.duration < 20;
 
   let height: number;
   if (viewingFilmId === session.filmId && film.duration < 60) {
     height = 60;
   } else {
-    height = film.duration;
+    height = isTinyCard ? 20 : film.duration;
   }
 
   const overlappingSessions = sessions
@@ -182,9 +183,12 @@ function SessionBlock({
           targetEndTime.isBetween(startTime, endTime, null, "[]"))
       );
     })
-    .sort((a, b) => getSessionDuration(a, filmsMap) - getSessionDuration(b, filmsMap));
+    .sort(
+      (a, b) =>
+        getSessionDuration(a, filmsMap) - getSessionDuration(b, filmsMap),
+    );
 
-  const overlapLength = overlappingSessions.length
+  const overlapLength = overlappingSessions.length;
   const overlappedIndex = findSessionIndex(overlappingSessions, session);
   const offset = (overlapLength - overlappedIndex - 1) * 10;
   const width = `calc(100% - ${offset + 10}px)`;
@@ -193,20 +197,22 @@ function SessionBlock({
   const isSelectedSession = includesSession(selectedSessions, session);
   const isPreviewSession = includesSession(previewSessions, session);
 
-  const zIndex = viewingFilmId === session.filmId ? 5 : 4 - overlappedIndex
+  const zIndex = viewingFilmId === session.filmId ? 5 : 4 - overlappedIndex;
 
   return (
     <div
       id={sessionId}
       key={sessionId}
       className={cn(
-        "absolute max-w-[calc(100%-10px)] p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
-        "border-4 border-solid border-transparent overflow-hidden",
+        "absolute max-w-[calc(100%-10px)] text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+        "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
         {
           "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
             !isSelectedSession,
           "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-violet-700":
             isSelectedSession,
+          "p-0": isTinyCard,
+          "p-1": !isTinyCard,
         },
       )}
       onClick={() => {
@@ -229,13 +235,16 @@ function SessionBlock({
     >
       {isSelectedSession && (
         <button
-          className="absolute top-1 right-1"
+          className={cn("absolute md:hidden md:group-hover/sessionblock:block", {
+            "top-1 right-1": !isTinyCard,
+            "top-0.5 right-0.5": isTinyCard,
+          })}
           onClick={(e) => {
             e.stopPropagation();
             removeSession(session);
           }}
         >
-          <X className="h-4 w-4 text-white" />
+          <X className="text-white" size={isTinyCard ? 10 : 16}  />
         </button>
       )}
 
