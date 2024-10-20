@@ -221,9 +221,9 @@ export function AppSidebar() {
           {search.length > 0 && (
             <div
               onClick={() => setSearch("")}
-              className="cursor-pointer absolute right-2 top-2"
+              className="cursor-pointer absolute right-2 top-3"
             >
-              <X />
+              <X size={14} />
             </div>
           )}
         </div>
