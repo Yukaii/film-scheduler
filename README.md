@@ -10,11 +10,11 @@ https://github.com/user-attachments/assets/1900be74-d6ad-4fe3-a109-ea61851e3ad4
 
 - [x] persistent with local storage
 - [x] 電影資訊 Panel
+- [x] Mobile version，畢竟排完不會用電腦看，如果要放到脆上面炫耀勢必得做，真是愛慕虛榮呢（還在 go）
 - [ ] Search syntax, 類似 GitHub issues 那種
     - [ ] 點擊日期會自動幫你填入做影片篩選
 - [ ] Calendar 細節：today、時間線等等
 - [ ] export to ICS calendar: 老本行了
-- [ ] Mobile version，畢竟排完不會用電腦看，如果要放到脆上面炫耀勢必得做，真是愛慕虛榮呢（還在 go）
 - [ ] Printing（OG project moovee 的功能）
 
 ## FAQs
