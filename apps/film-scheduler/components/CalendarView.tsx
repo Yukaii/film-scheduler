@@ -185,7 +185,7 @@ function WeekView({
                       left,
                       zIndex:
                         viewingFilmId === session.filmId
-                          ? 10
+                          ? 5
                           : 5 - overlappedIndex,
                     }}
                     title={film.filmTitle}

@@ -97,7 +97,7 @@ function FilmListItem({
       </div>
 
       {isPreviewing && (
-        <div className="ml-4 mt-2">
+        <div className="pl-8 mt-2">
           {film.schedule.map((session, index) => (
             <div
               key={index}
