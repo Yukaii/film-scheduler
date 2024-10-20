@@ -211,13 +211,13 @@ function SessionBlock({
   const startHourOffset = startTime.hour() - startHour;
   const startMinute = startTime.minute();
   const top = startHourOffset * 60 + startMinute;
-  const isTinyCard = film.duration < 20;
+  const isTinyCard = film.duration <= 25;
 
   let height: number;
   if (viewingFilmId === session.filmId && film.duration < 60) {
     height = 60;
   } else {
-    height = isTinyCard ? 20 : film.duration;
+    height = isTinyCard ? 25 : film.duration;
   }
 
   const overlappingSessions = sessions
