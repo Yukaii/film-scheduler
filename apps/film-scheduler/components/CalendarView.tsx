@@ -130,7 +130,7 @@ function WeekView({
                     id={sessionId}
                     key={sessionId}
                     className={cn(
-                      "absolute p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+                      "absolute max-w-[calc(100%-10px)] p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
                       "border-4 border-solid border-transparent",
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
