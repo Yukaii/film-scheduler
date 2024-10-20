@@ -60,7 +60,7 @@ function WeekView({
               className="absolute left-0 w-full"
               style={{ top: `${hour * 60}px`, height: "60px" }}
             >
-              <span className="text-xs absolute p-1 -top-3 bg-background">
+              <span className="md:text-xs text-[10px] absolute p-1 -top-3 bg-background">
                 {dayjs()
                   .hour(startHour + hour)
                   .format("h A")}
@@ -76,8 +76,10 @@ function WeekView({
           key={day.format("YYYY-MM-DD")}
           className="w-full py-4 bg-background mb-4 relative"
         >
-          <div className="font-semibold mb-2 text-sm text-center h-5">
-            {day.format("ddd D")}
+          <div className="font-semibold mb-2 md:text-sm text-xs text-center h-5">
+            {day.format("ddd")}
+            {" "}
+            {day.format("D")}
           </div>
           <div className="relative h-[840px] border-t border-b border-border">
             {Array.from({ length: hoursInDay }, (_, hour) => (
