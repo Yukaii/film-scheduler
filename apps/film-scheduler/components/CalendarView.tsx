@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
 import isBetween from "dayjs/plugin/isBetween";
-import { Session } from "./types";
+import { Film, Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
 import {
   cn,
@@ -99,134 +99,148 @@ function WeekView({
             ))}
             {sessions
               .filter((session) => dayjs(session.time).isSame(day, "day"))
-              .map((session) => {
-                const film = filmsMap.get(session.filmId);
-                if (!film) return null;
-
-                const sessionId = generateSessionId(session);
-
-                const startTime = dayjs(session.time);
-                const endTime = startTime.add(film.duration, "minute");
-                const startHourOffset = startTime.hour() - startHour;
-                const startMinute = startTime.minute();
-                const top = startHourOffset * 60 + startMinute;
-
-                let height: number
-                if (viewingFilmId === session.filmId && film.duration < 60) {
-                  height = 60
-                } else {
-                  height = film.duration;
-                }
-
-                const overlappingSessions = sessions
-                  .filter((s) => {
-                    const targetSessionFilm = filmsMap.get(s.filmId);
-                    if (!targetSessionFilm) return false;
-
-                    const targetStartTime = dayjs(s.time);
-                    const targetEndTime = dayjs(s.time).add(
-                      targetSessionFilm.duration,
-                      "minute",
-                    );
-
-                    return (
-                      targetStartTime.isSame(day, "day") &&
-                      (targetStartTime.isBetween(
-                        startTime,
-                        endTime,
-                        null,
-                        "[]",
-                      ) ||
-                        targetEndTime.isBetween(startTime, endTime, null, "[]"))
-                    );
-                  })
-                  .sort((a, b) =>
-                    generateSessionId(a).localeCompare(generateSessionId(b)),
-                  );
-
-                const overlappedIndex = findSessionIndex(
-                  overlappingSessions,
-                  session,
-                );
-                const offset = overlappedIndex * 10;
-                const width = `calc(100% - ${offset + 10}px)`;
-                const left = `${10 + offset}px`;
-
-                const isSelectedSession = includesSession(
-                  selectedSessions,
-                  session,
-                );
-                const isPreviewSession = includesSession(
-                  previewSessions,
-                  session,
-                );
-
-                return (
-                  <div
-                    id={sessionId}
-                    key={sessionId}
-                    className={cn(
-                      "absolute max-w-[calc(100%-10px)] p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
-                      "border-4 border-solid border-transparent overflow-hidden",
-                      {
-                        "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
-                          !isSelectedSession,
-                        "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-violet-700":
-                          isSelectedSession,
-                      },
-                    )}
-                    onClick={() => {
-                      if (isPreviewSession) {
-                        addSession(session);
-                      }
-
-                      if (isSelectedSession) {
-                        revealFilmDetail(film);
-                      }
-                    }}
-                    style={{
-                      top: `${top}px`,
-                      height: `${height}px`,
-                      width,
-                      left,
-                      zIndex:
-                        viewingFilmId === session.filmId
-                          ? 5
-                          : 4 - overlappedIndex,
-                    }}
-                    title={film.filmTitle}
-                  >
-                    {isSelectedSession && (
-                      <button
-                        className="absolute top-1 right-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSession(session);
-                        }}
-                      >
-                        <X className="h-4 w-4 text-white" />
-                      </button>
-                    )}
-
-                    <div className="text-xs font-medium w-full pr-4">
-                      {film.filmTitle}
-                    </div>
-                    <p className="text-[10px] text-white/60 mb-1">
-                      {startTime.format(
-                        startTime.minute() === 0 ? "HH" : "HH:mm",
-                      )}
-                      {' '}‒{' '}
-                      {endTime.format(
-                        endTime.minute() === 0 ? "HH A" : "HH:mm A",
-                      )}
-                    </p>
-                    <p className="text-[10px] text-white/80">{session.location}</p>
-                  </div>
-                );
-              })}
+              .map((session) => (
+                <SessionBlock
+                  key={generateSessionId(session)}
+                  session={session}
+                  filmsMap={filmsMap}
+                  selectedSessions={selectedSessions}
+                  previewSessions={previewSessions}
+                  sessions={sessions}
+                  viewingFilmId={viewingFilmId}
+                  startHour={startHour}
+                  addSession={addSession}
+                  removeSession={removeSession}
+                  revealFilmDetail={revealFilmDetail}
+                />
+              ))}
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+interface SessionBlockProps {
+  session: Session;
+  filmsMap: Map<string, Film>;
+  selectedSessions: Session[];
+  previewSessions: Session[];
+  viewingFilmId: string | undefined;
+  startHour: number;
+  addSession: (session: Session) => void;
+  removeSession: (session: Session) => void;
+  revealFilmDetail: (film: Film) => void;
+  sessions: Session[];
+}
+
+function SessionBlock({
+  session,
+  filmsMap,
+  selectedSessions,
+  previewSessions,
+  viewingFilmId,
+  startHour,
+  addSession,
+  sessions,
+  removeSession,
+  revealFilmDetail,
+}: SessionBlockProps) {
+  const film = filmsMap.get(session.filmId);
+  if (!film) return null;
+
+  const sessionId = generateSessionId(session);
+
+  const startTime = dayjs(session.time);
+  const endTime = startTime.add(film.duration, "minute");
+  const startHourOffset = startTime.hour() - startHour;
+  const startMinute = startTime.minute();
+  const top = startHourOffset * 60 + startMinute;
+
+  let height: number;
+  if (viewingFilmId === session.filmId && film.duration < 60) {
+    height = 60;
+  } else {
+    height = film.duration;
+  }
+
+  const overlappingSessions = sessions
+    .filter((s) => {
+      const targetSessionFilm = filmsMap.get(s.filmId);
+      if (!targetSessionFilm) return false;
+
+      const targetStartTime = dayjs(s.time);
+      const targetEndTime = dayjs(s.time).add(
+        targetSessionFilm.duration,
+        "minute",
+      );
+
+      return (
+        targetStartTime.isSame(startTime, "day") &&
+        (targetStartTime.isBetween(startTime, endTime, null, "[]") ||
+          targetEndTime.isBetween(startTime, endTime, null, "[]"))
+      );
+    })
+    .sort((a, b) => generateSessionId(a).localeCompare(generateSessionId(b)));
+
+  const overlappedIndex = findSessionIndex(overlappingSessions, session);
+  const offset = overlappedIndex * 10;
+  const width = `calc(100% - ${offset + 10}px)`;
+  const left = `${10 + offset}px`;
+
+  const isSelectedSession = includesSession(selectedSessions, session);
+  const isPreviewSession = includesSession(previewSessions, session);
+
+  return (
+    <div
+      id={sessionId}
+      key={sessionId}
+      className={cn(
+        "absolute max-w-[calc(100%-10px)] p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+        "border-4 border-solid border-transparent overflow-hidden",
+        {
+          "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
+            !isSelectedSession,
+          "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-violet-700":
+            isSelectedSession,
+        },
+      )}
+      onClick={() => {
+        if (isPreviewSession) {
+          addSession(session);
+        }
+
+        if (isSelectedSession) {
+          revealFilmDetail(film);
+        }
+      }}
+      style={{
+        top: `${top}px`,
+        height: `${height}px`,
+        width,
+        left,
+        zIndex: viewingFilmId === session.filmId ? 5 : 4 - overlappedIndex,
+      }}
+      title={film.filmTitle}
+    >
+      {isSelectedSession && (
+        <button
+          className="absolute top-1 right-1"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeSession(session);
+          }}
+        >
+          <X className="h-4 w-4 text-white" />
+        </button>
+      )}
+
+      <div className="text-xs font-medium w-full pr-4">{film.filmTitle}</div>
+      <p className="text-[10px] text-white/60 mb-1">
+        {startTime.format(startTime.minute() === 0 ? "HH" : "HH:mm")} ‒{" "}
+        {endTime.format(endTime.minute() === 0 ? "HH A" : "HH:mm A")}
+      </p>
+      <p className="text-[10px] text-white/80">{session.location}</p>
     </div>
   );
 }
