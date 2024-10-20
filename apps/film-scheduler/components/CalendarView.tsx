@@ -110,7 +110,13 @@ function WeekView({
                 const startHourOffset = startTime.hour() - startHour;
                 const startMinute = startTime.minute();
                 const top = startHourOffset * 60 + startMinute;
-                const height = film.duration;
+
+                let height: number
+                if (viewingFilmId === session.filmId && film.duration < 60) {
+                  height = 60
+                } else {
+                  height = film.duration;
+                }
 
                 const overlappingSessions = sessions
                   .filter((s) => {
