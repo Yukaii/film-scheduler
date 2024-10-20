@@ -194,21 +194,20 @@ function WeekView({
                     }}
                     title={session.time.toLocaleString()}
                   >
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm font-medium">
-                        {film.filmTitle}
-                      </div>
-                      {isSelectedSession && (
-                        <button
-                          className="absolute top-1 right-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeSession(session);
-                          }}
-                        >
-                          <X className="h-4 w-4 text-white" />
-                        </button>
-                      )}
+                    {isSelectedSession && (
+                      <button
+                        className="absolute top-1 right-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSession(session);
+                        }}
+                      >
+                        <X className="h-4 w-4 text-white" />
+                      </button>
+                    )}
+
+                    <div className="text-sm font-medium w-full pr-4">
+                      {film.filmTitle}
                     </div>
                     <p className="text-xs text-white/80">{session.location}</p>
                   </div>
