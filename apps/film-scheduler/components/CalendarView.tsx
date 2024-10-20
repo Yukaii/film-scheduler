@@ -106,6 +106,7 @@ function WeekView({
                 const sessionId = generateSessionId(session);
 
                 const startTime = dayjs(session.time);
+                const endTime = startTime.add(film.duration, "minute");
                 const startHourOffset = startTime.hour() - startHour;
                 const startMinute = startTime.minute();
                 const top = startHourOffset * 60 + startMinute;
@@ -126,16 +127,11 @@ function WeekView({
                       targetStartTime.isSame(day, "day") &&
                       (targetStartTime.isBetween(
                         startTime,
-                        startTime.add(film.duration, "minute"),
+                        endTime,
                         null,
                         "[]",
                       ) ||
-                        targetEndTime.isBetween(
-                          startTime,
-                          startTime.add(film.duration, "minute"),
-                          null,
-                          "[]",
-                        ))
+                        targetEndTime.isBetween(startTime, endTime, null, "[]"))
                     );
                   })
                   .sort((a, b) =>
@@ -169,7 +165,7 @@ function WeekView({
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
                           !isSelectedSession,
-                        "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-slate-700":
+                        "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-violet-700":
                           isSelectedSession,
                       },
                     )}
@@ -192,7 +188,7 @@ function WeekView({
                           ? 10
                           : 5 - overlappedIndex,
                     }}
-                    title={session.time.toLocaleString()}
+                    title={film.filmTitle}
                   >
                     {isSelectedSession && (
                       <button
@@ -209,6 +205,15 @@ function WeekView({
                     <div className="text-sm font-medium w-full pr-4">
                       {film.filmTitle}
                     </div>
+                    <p className="text-[10px] text-white/60">
+                      {startTime.format(
+                        startTime.minute() === 0 ? "HH A" : "HH:mm A",
+                      )}
+                      -
+                      {endTime.format(
+                        endTime.minute() === 0 ? "HH A" : "HH:mm A",
+                      )}
+                    </p>
                     <p className="text-xs text-white/80">{session.location}</p>
                   </div>
                 );
