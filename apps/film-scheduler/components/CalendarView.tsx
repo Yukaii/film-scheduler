@@ -6,7 +6,12 @@ import "dayjs/locale/en";
 import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
-import { cn, generateSessionId, includesSession } from "@/lib/utils";
+import {
+  cn,
+  findSessionIndex,
+  generateSessionId,
+  includesSession,
+} from "@/lib/utils";
 import { X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useSidebar } from "./ui/sidebar";
 
@@ -77,9 +82,7 @@ function WeekView({
           className="w-full pb-4 bg-background mb-4 relative"
         >
           <div className="font-semibold mb-2 md:text-sm text-xs text-center h-5 sticky top-10 bg-background z-10">
-            {day.format("ddd")}
-            {" "}
-            {day.format("D")}
+            {day.format("ddd")} {day.format("D")}
           </div>
 
           <div className="relative h-[840px] border-t border-b border-border">
@@ -106,19 +109,44 @@ function WeekView({
                 const height = film.duration; // Duration in minutes
 
                 // Check for overlapping sessions and calculate width and left position
-                const overlappingSessions = sessions.filter(
-                  (s) =>
-                    dayjs(s.time).isSame(day, "day") &&
-                    dayjs(s.time).isBetween(
-                      startTime,
-                      startTime.add(film.duration, "minute"),
-                      null,
-                      "[]",
-                    ),
-                );
+                const overlappingSessions = sessions
+                  .filter((s) => {
+                    const targetSessionFilm = filmsMap.get(s.filmId);
+                    if (!targetSessionFilm) return false;
 
-                const width = 100 / overlappingSessions.length;
-                const left = overlappingSessions.indexOf(session) * width;
+                    const targetStartTime = dayjs(s.time);
+                    const targetEndTime = dayjs(s.time).add(
+                      targetSessionFilm.duration,
+                      "minute",
+                    );
+
+                    return (
+                      targetStartTime.isSame(day, "day") &&
+                      (targetStartTime.isBetween(
+                        startTime,
+                        startTime.add(film.duration, "minute"),
+                        null,
+                        "[]",
+                      ) ||
+                        targetEndTime.isBetween(
+                          startTime,
+                          startTime.add(film.duration, "minute"),
+                          null,
+                          "[]",
+                        ))
+                    );
+                  })
+                  .sort((a, b) =>
+                    generateSessionId(a).localeCompare(generateSessionId(b)),
+                  );
+
+                const overlappedIndex = findSessionIndex(
+                  overlappingSessions,
+                  session,
+                );
+                const offset = overlappedIndex * 10;
+                const width = `calc(100% - ${offset + 10}px)`;
+                const left = `${10 + offset}px`;
 
                 const isSelectedSession = includesSession(
                   selectedSessions,
@@ -141,7 +169,6 @@ function WeekView({
                           !isSelectedSession,
                         "opacity-100 dark:bg-violet-900 bg-violet-600 dark:hover:border-white cursor-pointer hover:border-slate-700":
                           isSelectedSession,
-                        "z-10": viewingFilmId === session.filmId,
                       },
                     )}
                     onClick={() => {
@@ -156,8 +183,12 @@ function WeekView({
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,
-                      width: `${width}%`,
-                      left: `${left}%`,
+                      width,
+                      left,
+                      zIndex:
+                        viewingFilmId === session.filmId
+                          ? 10
+                          : 5 - overlappedIndex,
                     }}
                     title={session.time.toLocaleString()}
                   >
