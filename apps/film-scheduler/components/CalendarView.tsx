@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -59,8 +59,26 @@ function WeekView({
     ).values(),
   );
 
+  // Current time state to track "now"
+  const [now, setNow] = useState(dayjs());
+
+  // Update the current time every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(dayjs());
+    }, 60000); // Update every 60 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate the position of the current time indicator
+  const nowHourOffset = now.hour() - startHour;
+  const nowMinute = now.minute();
+  const nowPosition = nowHourOffset * 60 + nowMinute; // Position of the current time in pixels
+
   return (
-    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1">
+    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative">
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
         <div className="relative h-[840px]">
@@ -80,6 +98,18 @@ function WeekView({
         </div>
       </div>
 
+      {/* Current Time Indicator Line */}
+      {nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
+        <div
+          className="absolute left-0 w-full h-[1px] bg-red-500 z-[3]"
+          style={{ top: `${nowPosition}px` }}
+        >
+          <span className="absolute bg-red-500 text-white text-xs px-1 rounded-b left-2">
+            Now {now.format("HH:mm")}
+          </span>
+        </div>
+      )}
+
       {/* Week Days Columns */}
       {weekDays.map((day) => (
         <div
@@ -98,6 +128,7 @@ function WeekView({
                 style={{ top: `${hour * 60}px`, height: "60px" }}
               />
             ))}
+
             {sessions
               .filter((session) => dayjs(session.time).isSame(day, "day"))
               .map((session) => (
@@ -235,16 +266,19 @@ function SessionBlock({
     >
       {isSelectedSession && (
         <button
-          className={cn("absolute md:hidden md:group-hover/sessionblock:block", {
-            "top-1 right-1": !isTinyCard,
-            "top-0.5 right-0.5": isTinyCard,
-          })}
+          className={cn(
+            "absolute md:hidden md:group-hover/sessionblock:block",
+            {
+              "top-1 right-1": !isTinyCard,
+              "top-0.5 right-0.5": isTinyCard,
+            },
+          )}
           onClick={(e) => {
             e.stopPropagation();
             removeSession(session);
           }}
         >
-          <X className="text-white" size={isTinyCard ? 10 : 16}  />
+          <X className="text-white" size={isTinyCard ? 10 : 16} />
         </button>
       )}
 
