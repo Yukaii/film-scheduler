@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -12,8 +12,14 @@ import {
   generateSessionId,
   includesSession,
 } from "@/lib/utils";
-import { X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useSidebar } from "./ui/sidebar";
+import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -40,22 +46,20 @@ function WeekView({
     viewingFilmId,
   } = useAppContext();
 
-  const startHour = 10; // New start hour at 10:00 AM
-  const hoursInDay = 14; // Display 14 hours (from 10:00 AM to 12:00 AM)
+  const startHour = 10;
+  const hoursInDay = 14;
 
   const sessions = Array.from(
     new Map(
-      [...selectedSessions, ...previewSessions].map(
-        (session) => [
-          session.filmId + session.time + session.location,
-          session,
-        ], // Create a unique key
-      ),
-    ).values(), // Get the values from the Map
+      [...selectedSessions, ...previewSessions].map((session) => [
+        session.filmId + session.time + session.location,
+        session,
+      ]),
+    ).values(),
   );
 
   return (
-    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:p-4 p-1">
+    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1">
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
         <div className="relative h-[840px]">
@@ -81,7 +85,7 @@ function WeekView({
           key={day.format("YYYY-MM-DD")}
           className="w-full pb-4 bg-background mb-4 relative"
         >
-          <div className="font-semibold mb-2 md:text-sm text-xs text-center h-5 sticky top-10 bg-background z-10">
+          <div className="font-semibold md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border">
             {day.format("ddd")} {day.format("D")}
           </div>
 
@@ -101,14 +105,12 @@ function WeekView({
 
                 const sessionId = generateSessionId(session);
 
-                // Parse session time and calculate positioning relative to 10:00 AM
                 const startTime = dayjs(session.time);
                 const startHourOffset = startTime.hour() - startHour;
                 const startMinute = startTime.minute();
-                const top = startHourOffset * 60 + startMinute; // Adjust start time relative to 10:00 AM
-                const height = film.duration; // Duration in minutes
+                const top = startHourOffset * 60 + startMinute;
+                const height = film.duration;
 
-                // Check for overlapping sessions and calculate width and left position
                 const overlappingSessions = sessions
                   .filter((s) => {
                     const targetSessionFilm = filmsMap.get(s.filmId);
@@ -226,6 +228,7 @@ export default function CalendarView(props: { className?: string }) {
     () => dayjs(today).startOf("week").add(1, "day"),
     [today],
   );
+  const [selectedDate, setSelectedDate] = useState(currentWeekStart.toDate());
 
   const navigateWeek = (direction: "previous" | "next") => {
     setCurrentDate((prev) => {
@@ -237,10 +240,14 @@ export default function CalendarView(props: { className?: string }) {
   };
 
   const { isMobile, openMobile, toggleSidebar } = useSidebar();
+  const goToToday = () => {
+    setCurrentDate(new Date());
+    setSelectedDate(new Date());
+  };
 
   return (
-    <div className={cn("w-full p-2 md:p-4", props.className)}>
-      <div className="md:mb-4 flex justify-between items-center sticky top-2 bg-background z-10">
+    <div className={cn("w-full md:px-4", props.className)}>
+      <div className="md:mb-4 py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-10">
         <div className="flex items-center">
           {isMobile && (
             <Button variant="ghost" onClick={toggleSidebar}>
@@ -251,7 +258,6 @@ export default function CalendarView(props: { className?: string }) {
               )}
             </Button>
           )}
-
           <Button
             variant="ghost"
             onClick={() => navigateWeek("previous")}
@@ -259,9 +265,31 @@ export default function CalendarView(props: { className?: string }) {
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h2 className="text-lg font-bold">
-            {currentWeekStart.format("YYYY/MM")}
-          </h2>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="mx-2">
+                {dayjs(selectedDate).format("YYYY/MM")}{" "}
+                <CalendarIcon className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  if (date) {
+                    setSelectedDate(date);
+                    setCurrentDate(
+                      dayjs(date).startOf("week").add(1, "day").toDate(),
+                    );
+                  }
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+
           <Button
             variant="ghost"
             onClick={() => navigateWeek("next")}
@@ -270,6 +298,10 @@ export default function CalendarView(props: { className?: string }) {
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
+
+        <Button variant="ghost" onClick={goToToday}>
+          Today
+        </Button>
       </div>
 
       <WeekView
