@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
-import timezone from "dayjs/plugin/timezone"
+import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
 import { Film, Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
@@ -13,6 +13,7 @@ import {
   generateSessionId,
   getSessionDuration,
   includesSession,
+  scrollNowIndicatorIntoView,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
 import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -25,9 +26,9 @@ import {
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
-dayjs.extend(timezone)
+dayjs.extend(timezone);
 
-dayjs.tz.setDefault("Asia/Taipei")
+dayjs.tz.setDefault("Asia/Taipei");
 
 interface WeekViewProps {
   currentWeekStart: dayjs.Dayjs;
@@ -106,6 +107,7 @@ function WeekView({
       {nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
         <div
           className="absolute left-0 w-full h-[1px] bg-red-500 z-[3]"
+          id="now-indicator"
           style={{ top: `${nowPosition}px` }}
         >
           <span className="absolute bg-red-500 text-white text-xs px-1 rounded-b left-2">
@@ -131,9 +133,13 @@ function WeekView({
               >
                 {day.format("ddd")}
               </span>{" "}
-              <span className={cn('p-0.5', {
-                "bg-red-500 text-white rounded": isSameDay
-              })}>{day.format("D")}</span>
+              <span
+                className={cn("p-0.5", {
+                  "bg-red-500 text-white rounded": isSameDay,
+                })}
+              >
+                {day.format("D")}
+              </span>
             </div>
 
             <div className="relative h-[840px] border-t border-b border-border">
@@ -312,10 +318,7 @@ function SessionBlock({
 export default function CalendarView(props: { className?: string }) {
   const { today, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
-  const currentWeekStart = useMemo(
-    () => dayjs(today).startOf("week"),
-    [today],
-  );
+  const currentWeekStart = useMemo(() => dayjs(today).startOf("week"), [today]);
   const [selectedDate, setSelectedDate] = useState(currentWeekStart.toDate());
 
   const navigateWeek = (direction: "previous" | "next") => {
@@ -331,6 +334,7 @@ export default function CalendarView(props: { className?: string }) {
   const goToToday = () => {
     setCurrentDate(new Date());
     setSelectedDate(new Date());
+    scrollNowIndicatorIntoView();
   };
 
   return (

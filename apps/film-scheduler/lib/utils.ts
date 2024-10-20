@@ -41,4 +41,14 @@ export function scrollSessionIntoView(session: Session) {
   }
 }
 
+export function scrollNowIndicatorIntoView() {
+  const element = document.getElementById("now-indicator")
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+}
+
 export const getSessionDuration = (s: Session, filmsMap: FilmsMap) => filmsMap.get(s.filmId)?.duration || 0
