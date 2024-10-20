@@ -7,6 +7,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAppContext } from "@/contexts/AppContext";
 import { Input } from "@/components/ui/input";
@@ -154,6 +155,7 @@ function SessionListItem({
 }
 
 export function AppSidebar() {
+  const { isMobile } = useSidebar()
   const {
     films,
     setPreviewFilmId,
@@ -177,7 +179,10 @@ export function AppSidebar() {
       revealFilmDetail(undefined);
     } else {
       setPreviewFilmId(film.id);
-      revealFilmDetail(film);
+
+      if (!isMobile) {
+        revealFilmDetail(film);
+      }
     }
   };
 
