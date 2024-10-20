@@ -214,6 +214,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="relative">
           <Input
+            autoFocus={false}
             placeholder="篩選影片"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
