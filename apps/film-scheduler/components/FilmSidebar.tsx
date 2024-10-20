@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import dayjs from "dayjs";
 
 export type FilmSidebarProps = {
   open: boolean;
@@ -9,7 +10,7 @@ export type FilmSidebarProps = {
 };
 
 export function FilmSidebar(props: FilmSidebarProps) {
-  const { filmsMap, viewingFilmId } = useAppContext();
+  const { filmsMap, viewingFilmId, onClickSession } = useAppContext();
   const viewingFilm = useMemo(() => {
     return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
   }, [filmsMap, viewingFilmId]);
@@ -64,6 +65,27 @@ export function FilmSidebar(props: FilmSidebarProps) {
         </a>
 
         <p className="whitespace-pre-wrap">{viewingFilm?.synopsis}</p>
+
+        {/* Schedule Section */}
+        {viewingFilm?.schedule && viewingFilm.schedule.length > 0 && (
+          <div className="mt-4">
+            <h5 className="text-base font-semibold mb-2">場次時間表</h5>
+            <div className="flex flex-col gap-2">
+              {viewingFilm.schedule.map((session, index) => (
+                <div
+                  key={index}
+                  className="cursor-pointer text-sm hover:underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClickSession(session);
+                  }}
+                >
+                  {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
