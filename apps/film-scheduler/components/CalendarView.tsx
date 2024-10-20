@@ -52,7 +52,7 @@ function WeekView({
   return (
     <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:p-4 p-1">
       {/* Time Labels Column */}
-      <div className="w-full py-4 bg-background mb-4 mt-[30px]">
+      <div className="w-full pb-4 py-7 bg-background mb-4">
         <div className="relative h-[840px]">
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
@@ -74,13 +74,14 @@ function WeekView({
       {weekDays.map((day) => (
         <div
           key={day.format("YYYY-MM-DD")}
-          className="w-full py-4 bg-background mb-4 relative"
+          className="w-full pb-4 bg-background mb-4 relative"
         >
-          <div className="font-semibold mb-2 md:text-sm text-xs text-center h-5">
+          <div className="font-semibold mb-2 md:text-sm text-xs text-center h-5 sticky top-10 bg-background z-10">
             {day.format("ddd")}
             {" "}
             {day.format("D")}
           </div>
+
           <div className="relative h-[840px] border-t border-b border-border">
             {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
@@ -208,7 +209,7 @@ export default function CalendarView(props: { className?: string }) {
 
   return (
     <div className={cn("w-full p-2 md:p-4", props.className)}>
-      <div className="md:mb-4 flex justify-between items-center">
+      <div className="md:mb-4 flex justify-between items-center sticky top-2 bg-background z-10">
         <div className="flex items-center">
           {isMobile && (
             <Button variant="ghost" onClick={toggleSidebar}>
