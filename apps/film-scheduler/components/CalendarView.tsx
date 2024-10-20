@@ -202,19 +202,19 @@ function WeekView({
                       </button>
                     )}
 
-                    <div className="text-sm font-medium w-full pr-4">
+                    <div className="text-xs font-medium w-full pr-4">
                       {film.filmTitle}
                     </div>
                     <p className="text-[10px] text-white/60 mb-1">
                       {startTime.format(
-                        startTime.minute() === 0 ? "HH A" : "HH:mm A",
+                        startTime.minute() === 0 ? "HH" : "HH:mm",
                       )}
-                      -
+                      {' '}‒{' '}
                       {endTime.format(
                         endTime.minute() === 0 ? "HH A" : "HH:mm A",
                       )}
                     </p>
-                    <p className="text-xs text-white/80">{session.location}</p>
+                    <p className="text-[10px] text-white/80">{session.location}</p>
                   </div>
                 );
               })}
