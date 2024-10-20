@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
+import timezone from "dayjs/plugin/timezone"
 import isBetween from "dayjs/plugin/isBetween";
 import { Film, Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
@@ -24,6 +25,9 @@ import {
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
+dayjs.extend(timezone)
+
+dayjs.tz.setDefault("Asia/Taipei")
 
 interface WeekViewProps {
   currentWeekStart: dayjs.Dayjs;
@@ -75,7 +79,7 @@ function WeekView({
   // Calculate the position of the current time indicator
   const nowHourOffset = now.hour() - startHour;
   const nowMinute = now.minute();
-  const nowPosition = nowHourOffset * 60 + nowMinute; // Position of the current time in pixels
+  const nowPosition = nowHourOffset * 60 + nowMinute + 30; // Position of the current time in pixels
 
   return (
     <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative">
@@ -111,44 +115,57 @@ function WeekView({
       )}
 
       {/* Week Days Columns */}
-      {weekDays.map((day) => (
-        <div
-          key={day.format("YYYY-MM-DD")}
-          className="w-full pb-4 bg-background mb-4 relative"
-        >
-          <div className="font-semibold md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border">
-            {day.format("ddd")} {day.format("D")}
-          </div>
+      {weekDays.map((day) => {
+        const isSameDay = now.isSame(day, "day");
 
-          <div className="relative h-[840px] border-t border-b border-border">
-            {Array.from({ length: hoursInDay }, (_, hour) => (
-              <div
-                key={hour}
-                className="absolute left-0 w-full border-t border-border"
-                style={{ top: `${hour * 60}px`, height: "60px" }}
-              />
-            ))}
+        return (
+          <div
+            key={day.format("YYYY-MM-DD")}
+            className="w-full pb-4 bg-background mb-4 relative"
+          >
+            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap">
+              <span
+                className={cn({
+                  "font-semibold": isSameDay,
+                })}
+              >
+                {day.format("ddd")}
+              </span>{" "}
+              <span className={cn('p-0.5', {
+                "bg-red-500 text-white rounded": isSameDay
+              })}>{day.format("D")}</span>
+            </div>
 
-            {sessions
-              .filter((session) => dayjs(session.time).isSame(day, "day"))
-              .map((session) => (
-                <SessionBlock
-                  key={generateSessionId(session)}
-                  session={session}
-                  filmsMap={filmsMap}
-                  selectedSessions={selectedSessions}
-                  previewSessions={previewSessions}
-                  sessions={sessions}
-                  viewingFilmId={viewingFilmId}
-                  startHour={startHour}
-                  addSession={addSession}
-                  removeSession={removeSession}
-                  revealFilmDetail={revealFilmDetail}
+            <div className="relative h-[840px] border-t border-b border-border">
+              {Array.from({ length: hoursInDay }, (_, hour) => (
+                <div
+                  key={hour}
+                  className="absolute left-0 w-full border-t border-border"
+                  style={{ top: `${hour * 60}px`, height: "60px" }}
                 />
               ))}
+
+              {sessions
+                .filter((session) => dayjs(session.time).isSame(day, "day"))
+                .map((session) => (
+                  <SessionBlock
+                    key={generateSessionId(session)}
+                    session={session}
+                    filmsMap={filmsMap}
+                    selectedSessions={selectedSessions}
+                    previewSessions={previewSessions}
+                    sessions={sessions}
+                    viewingFilmId={viewingFilmId}
+                    startHour={startHour}
+                    addSession={addSession}
+                    removeSession={removeSession}
+                    revealFilmDetail={revealFilmDetail}
+                  />
+                ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -296,7 +313,7 @@ export default function CalendarView(props: { className?: string }) {
   const { today, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(
-    () => dayjs(today).startOf("week").add(1, "day"),
+    () => dayjs(today).startOf("week"),
     [today],
   );
   const [selectedDate, setSelectedDate] = useState(currentWeekStart.toDate());

@@ -8,10 +8,8 @@ import { FilmSidebar } from "@/components/FilmSidebar";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek"; // Ensures the week starts on Monday
 import { cn, scrollSessionIntoView } from "@/lib/utils";
 import { useToggle, useLocalStorageState } from "@/lib/hooks";
-dayjs.extend(isoWeek);
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
@@ -77,8 +75,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const onClickSession = (session: Session) => {
     const sessionDate = dayjs(session.time);
 
-    const currentWeekStart = dayjs(currentDate).startOf("isoWeek"); // Start of current week (Monday)
-    const sessionWeekStart = sessionDate.startOf("isoWeek"); // Start of session's week (Monday)
+    const currentWeekStart = dayjs(currentDate).startOf("week"); // Start of current week (Monday)
+    const sessionWeekStart = sessionDate.startOf("week"); // Start of session's week (Monday)
 
     if (!sessionWeekStart.isSame(currentWeekStart, "day")) {
       setCurrentDate(sessionWeekStart.toDate()); // Set currentDate to the session's week start (Monday)
