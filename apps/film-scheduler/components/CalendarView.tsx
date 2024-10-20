@@ -169,7 +169,7 @@ function WeekView({
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
                           !isSelectedSession,
-                        "opacity-100 dark:bg-violet-900 bg-violet-600 dark:hover:border-white cursor-pointer hover:border-slate-700":
+                        "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-slate-700":
                           isSelectedSession,
                       },
                     )}
