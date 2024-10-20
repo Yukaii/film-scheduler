@@ -7,7 +7,8 @@ import isBetween from "dayjs/plugin/isBetween";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn, generateSessionId, includesSession } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useSidebar } from "./ui/sidebar";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -49,9 +50,9 @@ function WeekView({
   );
 
   return (
-    <div className="grid grid-cols-[60px_repeat(7,_minmax(0,1fr))] p-4">
+    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:p-4 p-1">
       {/* Time Labels Column */}
-      <div className="w-full py-4 bg-background mb-4 mt-7">
+      <div className="w-full py-4 bg-background mb-4 mt-[30px]">
         <div className="relative h-[840px]">
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
@@ -131,7 +132,7 @@ function WeekView({
                     key={sessionId}
                     className={cn(
                       "absolute max-w-[calc(100%-10px)] p-1 text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
-                      "border-4 border-solid border-transparent",
+                      "border-4 border-solid border-transparent overflow-hidden",
                       {
                         "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
                           !isSelectedSession,
@@ -201,10 +202,22 @@ export default function CalendarView(props: { className?: string }) {
     });
   };
 
+  const { isMobile, openMobile, toggleSidebar } = useSidebar();
+
   return (
-    <div className={cn("w-full p-4", props.className)}>
-      <div className="mb-4 flex justify-between items-center">
+    <div className={cn("w-full p-2 md:p-4", props.className)}>
+      <div className="md:mb-4 flex justify-between items-center">
         <div className="flex items-center">
+          {isMobile && (
+            <Button variant="ghost" onClick={toggleSidebar}>
+              {openMobile ? (
+                <PanelLeftClose size={16} />
+              ) : (
+                <PanelLeftOpen size={16} />
+              )}
+            </Button>
+          )}
+
           <Button
             variant="ghost"
             onClick={() => navigateWeek("previous")}
@@ -213,7 +226,7 @@ export default function CalendarView(props: { className?: string }) {
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <h2 className="text-lg font-bold">
-            Week of {currentWeekStart.format("MMMM D, YYYY")}
+            {currentWeekStart.format("YYYY/MM")}
           </h2>
           <Button
             variant="ghost"

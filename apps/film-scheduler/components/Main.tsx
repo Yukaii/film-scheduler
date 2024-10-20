@@ -144,7 +144,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         <AppSidebar />
         <CalendarView
           className={cn({
-            "pr-[16rem]": panelOpen && !!viewingFilmId,
+            "md:pr-[16rem]": panelOpen && !!viewingFilmId,
           })}
         />
       </SidebarProvider>

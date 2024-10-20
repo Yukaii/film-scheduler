@@ -19,7 +19,9 @@ export function FilmSidebar(props: FilmSidebarProps) {
   return (
     <div
       className={cn(
-        "w-[calc(16rem-10px)] max-h-full h-[calc(100%-20px)] right-2.5 top-2.5 bg-sidebar border border-b border-sidebar-border z-50",
+        "z-50 bg-sidebar border border-b border-sidebar-border",
+        "w-[calc(100%-40px)] max-h-full h-[70%] left-5 bottom-4",
+        "md:w-[calc(16rem-10px)] md:max-h-full md:h-[calc(100%-20px)] md:left-auto md:bottom-auto md:right-2.5 md:top-2.5",
         {
           fixed: isOpen,
           hidden: !isOpen,
@@ -54,7 +56,7 @@ export function FilmSidebar(props: FilmSidebarProps) {
 
         <a
           href={`https://www.goldenhorse.org.tw/film/programme/films/detail/${viewingFilmId}`}
-          className="text-slate-500 underline cursor-pointer"
+          className="text-slate-500 dark:text-slate-300 underline cursor-pointer hover:opacity-70"
           target="_blank"
           rel="noreferrer noopener"
         >
