@@ -205,7 +205,7 @@ function WeekView({
                     <div className="text-sm font-medium w-full pr-4">
                       {film.filmTitle}
                     </div>
-                    <p className="text-[10px] text-white/60">
+                    <p className="text-[10px] text-white/60 mb-1">
                       {startTime.format(
                         startTime.minute() === 0 ? "HH A" : "HH:mm A",
                       )}
