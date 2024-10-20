@@ -10,7 +10,7 @@ export type FilmSidebarProps = {
 };
 
 export function FilmSidebar(props: FilmSidebarProps) {
-  const { filmsMap, viewingFilmId, onClickSession } = useAppContext();
+  const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail } = useAppContext();
   const viewingFilm = useMemo(() => {
     return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
   }, [filmsMap, viewingFilmId]);
@@ -32,7 +32,10 @@ export function FilmSidebar(props: FilmSidebarProps) {
       <div className="absolute w-full top-0 h-10">
         <button
           className="absolute right-4 top-4"
-          onClick={() => props.setOpen(false)}
+          onClick={() => {
+            revealFilmDetail(undefined)
+            props.setOpen(false)
+          }}
         >
           <X size={16} />
         </button>
