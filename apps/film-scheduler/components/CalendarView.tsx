@@ -106,7 +106,7 @@ function WeekView({
       {/* Current Time Indicator Line */}
       {nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
         <div
-          className="absolute left-0 w-full h-[1px] bg-red-500 z-[3]"
+          className="absolute left-0 w-full h-[1px] bg-red-500 z-10"
           id="now-indicator"
           style={{ top: `${nowPosition}px` }}
         >
