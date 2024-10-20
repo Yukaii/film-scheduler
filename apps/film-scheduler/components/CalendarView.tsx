@@ -330,7 +330,7 @@ export default function CalendarView(props: { className?: string }) {
     });
   };
 
-  const { isMobile, openMobile, toggleSidebar } = useSidebar();
+  const { open, isMobile, openMobile, toggleSidebar } = useSidebar();
   const goToToday = () => {
     setCurrentDate(new Date());
     setSelectedDate(new Date());
@@ -341,15 +341,14 @@ export default function CalendarView(props: { className?: string }) {
     <div className={cn("w-full md:px-4", props.className)}>
       <div className="md:mb-4 py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-10">
         <div className="flex items-center">
-          {isMobile && (
-            <Button variant="ghost" onClick={toggleSidebar}>
-              {openMobile ? (
-                <PanelLeftClose size={16} />
-              ) : (
-                <PanelLeftOpen size={16} />
-              )}
-            </Button>
-          )}
+          <Button variant="ghost" onClick={toggleSidebar}>
+            {(isMobile ? openMobile : open) ? (
+              <PanelLeftClose size={16} />
+            ) : (
+              <PanelLeftOpen size={16} />
+            )}
+          </Button>
+
           <Button
             variant="ghost"
             onClick={() => navigateWeek("previous")}
