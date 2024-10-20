@@ -10,6 +10,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAppContext } from "@/contexts/AppContext";
+import { AppDropdownMenu } from "@/components/AppDropdownMenu";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
@@ -155,7 +156,7 @@ function SessionListItem({
 }
 
 export function AppSidebar() {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const {
     films,
     setPreviewFilmId,
@@ -334,7 +335,10 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <ModeToggle />
+        <div className="flex gap-2 justify-end">
+          <ModeToggle />
+          <AppDropdownMenu />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
