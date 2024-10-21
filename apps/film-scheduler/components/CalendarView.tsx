@@ -242,9 +242,8 @@ function SessionBlock({
         getSessionDuration(a, filmsMap) - getSessionDuration(b, filmsMap),
     );
 
-  const overlapLength = overlappingSessions.length;
   const overlappedIndex = findSessionIndex(overlappingSessions, session);
-  const offset = (overlapLength - overlappedIndex - 1) * 10;
+  const offset = (overlappedIndex + 1) * 10;
   const width = `calc(100% - ${offset + 10}px)`;
   const left = `${10 + offset}px`;
 
