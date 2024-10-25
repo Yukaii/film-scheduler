@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import CalendarView from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
+import { ShareModal } from "@/components/ShareModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
@@ -115,6 +116,11 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     }
   };
 
+  const { open: isShareModalOpen, setOpen: setShareModalOpen } =
+    useToggle(false);
+  const openShareModal = () => setShareModalOpen(true);
+  const closeShareModal = () => setShareModalOpen(false);
+
   return (
     <AppContext.Provider
       value={{
@@ -136,6 +142,9 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         revealFilmDetail,
         setPanelOpen,
         togglePanelOpen,
+        isShareModalOpen,
+        closeShareModal,
+        openShareModal,
       }}
     >
       <SidebarProvider>
@@ -151,6 +160,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         open={panelOpen && !!viewingFilmId}
         setOpen={(open: boolean) => setPanelOpen(open)}
       />
+
+      <ShareModal open={isShareModalOpen} sessions={selectedSessions} close={closeShareModal} />
     </AppContext.Provider>
   );
 }

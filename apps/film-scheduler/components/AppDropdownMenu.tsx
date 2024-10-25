@@ -6,9 +6,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Menu, ExternalLink, Download } from "lucide-react";
+import { Menu, Download, ExternalLink } from "lucide-react";
+import { useAppContext } from "@/contexts/AppContext";
 
 export function AppDropdownMenu() {
+  const { openShareModal } = useAppContext();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -18,7 +21,7 @@ export function AppDropdownMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={openShareModal}>
           <ExternalLink />
           分享片單
         </DropdownMenuItem>

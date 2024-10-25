@@ -20,6 +20,9 @@ export type AppContextType = {
   removeSession: (session: Session) => void;
   setPanelOpen: Dispatch<SetStateAction<boolean>>;
   togglePanelOpen: () => void;
+  isShareModalOpen: boolean;
+  openShareModal: () => void;
+  closeShareModal: () => void;
 };
 
 const noop = () => {};
@@ -43,6 +46,9 @@ export const AppContext = React.createContext<AppContextType>({
   revealFilmDetail: noop,
   setPanelOpen: noop,
   togglePanelOpen: noop,
+  isShareModalOpen: false,
+  openShareModal: noop,
+  closeShareModal: noop,
 });
 
 export const useAppContext = () => React.useContext(AppContext);
