@@ -1,17 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import React, { useMemo, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import CalendarView from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
-import { ShareModal } from "@/components/ShareModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
 import { cn, scrollSessionIntoView, joinSessions } from "@/lib/utils";
 import { useToggle, useLocalStorageState, useSessionImport } from "@/lib/hooks";
+
+const ShareModal = dynamic(() => import("@/components/ShareModal").then(m => m.ShareModal));
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
@@ -132,8 +134,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     useSessionImport(availableSessions);
 
   const handleImport = (sessionsToImport: Session[]) => {
-    setSelectedSessions(joinSessions(sessionsToImport, selectedSessions))
-  }
+    setSelectedSessions(joinSessions(sessionsToImport, selectedSessions));
+  };
 
   return (
     <AppContext.Provider

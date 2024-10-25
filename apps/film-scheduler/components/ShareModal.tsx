@@ -25,7 +25,11 @@ export function ShareModal({ sessions, open, close }: ShareModalProps) {
   const [state, copyToClipboard] = useCopyToClipboard();
 
   const shareUrl = useMemo(() => {
-    return generateShareableUrlWithSessionIds(sessions);
+    if (typeof window !== 'undefined') {
+      return generateShareableUrlWithSessionIds(sessions);
+    } else {
+      return ''
+    }
   }, [sessions]);
 
   return (
