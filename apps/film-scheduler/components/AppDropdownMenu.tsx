@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Menu, Download, ExternalLink } from "lucide-react";
+import { Menu, ExternalLink } from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 
 export function AppDropdownMenu() {
@@ -25,10 +25,13 @@ export function AppDropdownMenu() {
           <ExternalLink />
           分享片單
         </DropdownMenuItem>
+
+        {/*
         <DropdownMenuItem>
           <Download />
           匯入匯出
         </DropdownMenuItem>
+       */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
