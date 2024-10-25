@@ -1,9 +1,9 @@
 import { Session, FilmsMap } from "@/components/types";
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function generateSessionId(session: Session): string {
@@ -21,12 +21,55 @@ export function generateSessionId(session: Session): string {
   return `session-${Math.abs(hash)}`; // Return a positive hash as the id
 }
 
-export function includesSession(sessions: Session[], session: Session): boolean {
-  return sessions.some(s => generateSessionId(s) === generateSessionId(session))
+export function includesSession(
+  sessions: Session[],
+  session: Session,
+): boolean {
+  return sessions.some(
+    (s) => generateSessionId(s) === generateSessionId(session),
+  );
 }
 
-export function findSessionIndex(sessions: Session[], session: Session): number {
-  return sessions.findIndex(s => generateSessionId(s) === generateSessionId(session))
+export function findSessionIndex(
+  sessions: Session[],
+  session: Session,
+): number {
+  return sessions.findIndex(
+    (s) => generateSessionId(s) === generateSessionId(session),
+  );
+}
+
+/**
+ * Joins two arrays of sessions, ensuring there are no duplicate records.
+ * Duplicate records are identified by their generated session ID.
+ *
+ * @param {Session[]} array1 - First array of sessions.
+ * @param {Session[]} array2 - Second array of sessions.
+ * @returns {Session[]} - A new array containing unique sessions from both arrays.
+ */
+export function joinSessions(array1: Session[], array2: Session[]): Session[] {
+  const sessionIdSet = new Set<string>();
+
+  // Add all sessions from the first array
+  const resultArray = array1.filter((session) => {
+    const sessionId = generateSessionId(session);
+    if (!sessionIdSet.has(sessionId)) {
+      sessionIdSet.add(sessionId);
+      return true;
+    }
+    return false;
+  });
+
+  // Add all sessions from the second array that are not duplicates
+  array2.forEach((session) => {
+    const sessionId = generateSessionId(session);
+    if (!sessionIdSet.has(sessionId)) {
+      sessionIdSet.add(sessionId);
+      resultArray.push(session);
+    }
+  });
+
+  return resultArray;
 }
 
 export function scrollSessionIntoView(session: Session) {
@@ -36,13 +79,13 @@ export function scrollSessionIntoView(session: Session) {
   if (sessionElement) {
     sessionElement.scrollIntoView({
       behavior: "smooth", // Smooth scrolling
-      block: "center",    // Center the session in view
+      block: "center", // Center the session in view
     });
   }
 }
 
 export function scrollNowIndicatorIntoView() {
-  const element = document.getElementById("now-indicator")
+  const element = document.getElementById("now-indicator");
   if (element) {
     element.scrollIntoView({
       behavior: "smooth",
@@ -51,4 +94,65 @@ export function scrollNowIndicatorIntoView() {
   }
 }
 
-export const getSessionDuration = (s: Session, filmsMap: FilmsMap) => filmsMap.get(s.filmId)?.duration || 0
+export const getSessionDuration = (s: Session, filmsMap: FilmsMap) =>
+  filmsMap.get(s.filmId)?.duration || 0;
+
+/**
+ * Serialize an array of sessions into a URL-safe string of session IDs.
+ * This will store only the session IDs in the URL.
+ */
+export function serializeSessionIds(sessions: Session[]): string {
+  const sessionIds = sessions.map((session) => generateSessionId(session));
+  return btoa(encodeURIComponent(JSON.stringify(sessionIds)));
+}
+
+/**
+ * Deserialize a list of session IDs from a URL-safe string.
+ * This function will return session objects by looking them up from available sessions.
+ */
+export function deserializeSessionIds(
+  encodedString: string,
+  availableSessions: Session[],
+): Session[] {
+  try {
+    // Decode the session IDs from the URL
+    const decodedString = decodeURIComponent(atob(encodedString));
+    const sessionIds = JSON.parse(decodedString) as string[];
+
+    // Filter and return sessions that match the session IDs
+    return availableSessions.filter((session) =>
+      sessionIds.includes(generateSessionId(session)),
+    );
+  } catch (error) {
+    console.error("Failed to deserialize session IDs:", error);
+    return [];
+  }
+}
+
+/**
+ * Load session IDs from the URL query params and return matching sessions from available data.
+ * @param {Session[]} availableSessions - The list of available sessions to match against the session IDs.
+ * @returns {Session[]} - An array of matching sessions if present in the URL, or an empty array.
+ */
+export function loadSessionIdsFromUrl(availableSessions: Session[]): Session[] {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedSessionIds = urlParams.get("sessions");
+  if (encodedSessionIds) {
+    return deserializeSessionIds(encodedSessionIds, availableSessions);
+  }
+  return [];
+}
+
+/**
+ * Generate a shareable URL with serialized session IDs in the query params.
+ * @param {Session[]} sessions - The array of sessions to serialize into the URL (only session IDs will be included).
+ * @returns {string} - A shareable URL containing the session IDs.
+ */
+export function generateShareableUrlWithSessionIds(
+  sessions: Session[],
+): string {
+  const url = new URL(window.location.href);
+  const serializedSessionIds = serializeSessionIds(sessions);
+  url.searchParams.set("sessions", serializedSessionIds);
+  return url.toString();
+}
