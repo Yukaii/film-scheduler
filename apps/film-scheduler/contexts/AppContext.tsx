@@ -23,6 +23,10 @@ export type AppContextType = {
   isShareModalOpen: boolean;
   openShareModal: () => void;
   closeShareModal: () => void;
+  importSessions: Session[];
+  importModalOpen: boolean;
+  closeImportModal: () => void;
+  openImportModal: () => void;
 };
 
 const noop = () => {};
@@ -49,6 +53,10 @@ export const AppContext = React.createContext<AppContextType>({
   isShareModalOpen: false,
   openShareModal: noop,
   closeShareModal: noop,
+  importSessions: [],
+  importModalOpen: false,
+  closeImportModal: noop,
+  openImportModal: noop,
 });
 
 export const useAppContext = () => React.useContext(AppContext);

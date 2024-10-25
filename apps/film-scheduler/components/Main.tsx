@@ -6,11 +6,12 @@ import { AppSidebar } from "@/components/AppSidebar";
 import CalendarView from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
 import { ShareModal } from "@/components/ShareModal";
+import { ImportModal } from "@/components/ImportModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
-import { cn, scrollSessionIntoView } from "@/lib/utils";
-import { useToggle, useLocalStorageState } from "@/lib/hooks";
+import { cn, scrollSessionIntoView, joinSessions } from "@/lib/utils";
+import { useToggle, useLocalStorageState, useSessionImport } from "@/lib/hooks";
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
@@ -25,6 +26,12 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     "starredFilmIds",
     [],
   );
+
+  const availableSessions = useMemo(() => {
+    return props.films.reduce((prev, film) => {
+      return [...prev, ...film.schedule];
+    }, [] as Session[]);
+  }, [props.films]);
 
   // Preview sessions based on the selected film
   const previewSessions = useMemo(() => {
@@ -121,6 +128,13 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const openShareModal = () => setShareModalOpen(true);
   const closeShareModal = () => setShareModalOpen(false);
 
+  const { importSessions, importModalOpen, closeImportModal, openImportModal } =
+    useSessionImport(availableSessions);
+
+  const handleImport = (sessionsToImport: Session[]) => {
+    setSelectedSessions(joinSessions(sessionsToImport, selectedSessions))
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -142,9 +156,17 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         revealFilmDetail,
         setPanelOpen,
         togglePanelOpen,
+
+        // share related
         isShareModalOpen,
         closeShareModal,
         openShareModal,
+
+        // Import related
+        importSessions,
+        importModalOpen,
+        closeImportModal,
+        openImportModal,
       }}
     >
       <SidebarProvider>
@@ -161,7 +183,19 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         setOpen={(open: boolean) => setPanelOpen(open)}
       />
 
-      <ShareModal open={isShareModalOpen} sessions={selectedSessions} close={closeShareModal} />
+      <ShareModal
+        open={isShareModalOpen}
+        sessions={selectedSessions}
+        close={closeShareModal}
+      />
+
+      <ImportModal
+        sessions={importSessions}
+        open={importModalOpen}
+        onClose={closeImportModal}
+        onImport={handleImport}
+        filmsMap={props.filmsMap}
+      />
     </AppContext.Provider>
   );
 }

@@ -5,7 +5,6 @@ import { useCopyToClipboard } from "react-use";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -15,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { generateShareableUrlWithSessionIds } from "@/lib/utils"; // Assuming this is the function from the previous step
 import { Session } from "@/components/types";
-import { ExternalLink } from "lucide-react";
 
 interface ShareModalProps {
   sessions: Session[];
@@ -32,12 +30,6 @@ export function ShareModal({ sessions, open, close }: ShareModalProps) {
 
   return (
     <Dialog open={open}>
-      <DialogTrigger asChild>
-        <div>
-          <ExternalLink />
-          分享片單
-        </div>
-      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Share Your Sessions</DialogTitle>
