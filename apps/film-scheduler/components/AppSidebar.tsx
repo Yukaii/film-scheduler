@@ -340,7 +340,7 @@ export function AppSidebar() {
         <div className="flex gap-2 justify-end">
           <ModeToggle />
 
-          <Button variant='ghost'  onClick={openShareModal} title="分享片單">
+          <Button variant="ghost" onClick={openShareModal} title="分享片單">
             <ExternalLink />
           </Button>
         </div>
