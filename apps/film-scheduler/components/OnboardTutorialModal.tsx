@@ -55,7 +55,7 @@ export function OnboardTutorialModal({
         {" "}
         {/* Responsive width */}
         <DialogHeader>
-          <DialogTitle>歡迎使用導覽</DialogTitle>
+          <DialogTitle>使用教學</DialogTitle>
         </DialogHeader>
         <Carousel className="w-full max-w-full mx-auto">
           {" "}
