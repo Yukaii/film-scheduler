@@ -58,7 +58,7 @@ export function ImportModal({
     return sessions.filter((session) =>
       selectedSessionIds.has(generateSessionId(session)),
     );
-  }, [selectedSessionIds]);
+  }, [selectedSessionIds, sessions]);
 
   const handleImport = () => {
     onImport(selectedSessions);

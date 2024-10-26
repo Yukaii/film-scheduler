@@ -15,7 +15,7 @@ export function useToggle(defaultValue = false) {
 
 // Function to dehydrate the state before storing it in localStorage
 function dehydrate<T>(value: T): string {
-  return JSON.stringify(value, (key, val) => {
+  return JSON.stringify(value, (_, val) => {
     if (val instanceof Set) {
       return { dataType: "Set", value: Array.from(val) }; // Convert Set to an array
     }
@@ -28,7 +28,7 @@ function dehydrate<T>(value: T): string {
 
 // Function to rehydrate the state when loading it from localStorage
 function rehydrate<T>(value: string): T {
-  return JSON.parse(value, (key, val) => {
+  return JSON.parse(value, (_, val) => {
     if (val && val.dataType === "Set") {
       return new Set(val.value); // Convert back to Set
     }
