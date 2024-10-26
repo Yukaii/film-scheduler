@@ -146,7 +146,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         filmsMap: props.filmsMap,
         previewSessions,
         selectedSessions,
-        today: currentDate,
+        currentDate,
         previewFilmId,
         setPreviewFilmId,
         onClickSession,

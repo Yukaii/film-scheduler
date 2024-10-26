@@ -315,7 +315,7 @@ function SessionBlock({
 }
 
 export default function CalendarView(props: { className?: string }) {
-  const { today, previewSessions, selectedSessions, setCurrentDate } =
+  const { currentDate: today, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(() => dayjs(today).startOf("week"), [today]);
   const [selectedDate, setSelectedDate] = useState(currentWeekStart.toDate());

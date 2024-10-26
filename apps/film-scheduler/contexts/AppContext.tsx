@@ -9,7 +9,7 @@ export type AppContextType = {
   previewFilmId: string | undefined;
   viewingFilmId: string | undefined;
   revealFilmDetail: (film?: Film) => void;
-  today: Date;
+  currentDate: Date;
   setPreviewFilmId: Dispatch<SetStateAction<string | undefined>>;
   onClickSession: (session: Session) => void;
   setCurrentDate: Dispatch<SetStateAction<Date>>;
@@ -38,7 +38,7 @@ export const AppContext = React.createContext<AppContextType>({
   previewSessions: [],
   previewFilmId: undefined,
   viewingFilmId: undefined,
-  today: new Date(),
+  currentDate: new Date(),
   setPreviewFilmId: noop,
   onClickSession: noop,
   setCurrentDate: noop,
