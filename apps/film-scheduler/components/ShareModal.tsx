@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { generateShareableUrlWithSessionIds } from "@/lib/utils"; // Assuming this is the function from the previous step
+import { generateShareableUrlWithSessionIds } from "@/lib/utils";
 import { Session } from "@/components/types";
 
 interface ShareModalProps {
@@ -36,28 +36,28 @@ export function ShareModal({ sessions, open, close }: ShareModalProps) {
     <Dialog open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share Your Sessions</DialogTitle>
+          <DialogTitle>分享你的場次</DialogTitle>
           <DialogDescription>
-            Copy the URL below to share your selected sessions with others.
+            複製下方的網址以分享你選擇的場次給其他人。
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Input value={shareUrl} readOnly className="w-full" />
           <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
-            Copy to Clipboard
+            複製到剪貼簿
           </Button>
           {state.error ? (
             <p className="text-red-500">
-              Unable to copy value: {state.error.message}
+              無法複製值: {state.error.message}
             </p>
           ) : (
             state.value && (
-              <p className="text-green-500">Copied to clipboard!</p>
+              <p className="text-green-500">已複製到剪貼簿！</p>
             )
           )}
         </div>
         <DialogFooter>
-          <Button variant="secondary" onClick={close} >Close</Button>
+          <Button variant="secondary" onClick={close}>關閉</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
