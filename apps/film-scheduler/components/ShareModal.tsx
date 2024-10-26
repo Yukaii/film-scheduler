@@ -38,7 +38,7 @@ export function ShareModal({ sessions, open, setOpen }: ShareModalProps) {
         <DialogHeader>
           <DialogTitle>分享你的場次</DialogTitle>
           <DialogDescription>
-            複製下方的網址以分享你選擇的場次給其他人。
+            複製下方的網址，分享你選擇的場次給其他人
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
