@@ -10,7 +10,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAppContext } from "@/contexts/AppContext";
-import { AppDropdownMenu } from "@/components/AppDropdownMenu";
+import {
+  TooltipTrigger,
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
@@ -340,9 +345,18 @@ export function AppSidebar() {
         <div className="flex gap-2 justify-end">
           <ModeToggle />
 
-          <Button variant="ghost" onClick={openShareModal} title="分享片單">
-            <ExternalLink />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={openShareModal} variant="outline" size="icon">
+                  <ExternalLink />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>分享片單</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </SidebarFooter>
     </Sidebar>
