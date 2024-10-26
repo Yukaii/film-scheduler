@@ -76,10 +76,6 @@ export function useSessionImport(availableSessions: Session[]) {
       setImportSessions(sessionsFromUrl);
       setImportModalOpen(true); // Open modal if there are valid sessions to import
 
-      // Clean the URL query params after extracting sessions
-      const url = new URL(window.location.href);
-      url.searchParams.delete("sessions");
-      window.history.replaceState({}, document.title, url.toString());
     }
   }, [availableSessions, setImportModalOpen]);
 
@@ -87,6 +83,11 @@ export function useSessionImport(availableSessions: Session[]) {
   const closeImportModal = () => {
     setImportModalOpen(false);
     setImportSessions([]);
+
+    // Clean the URL query params after extracting sessions
+    const url = new URL(window.location.href);
+    url.searchParams.delete("sessions");
+    window.history.replaceState({}, document.title, url.toString());
   };
 
   const openImportModal = () => setImportModalOpen(true);
