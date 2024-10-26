@@ -99,7 +99,7 @@ export function useSessionImport(availableSessions: Session[]) {
   };
 }
 
-const getOnboardingStatus = () => localStorage.getItem("hasViewedOnboarding") === "true"
+const getOnboardingStatus = () => typeof localStorage !== 'undefined' &&  localStorage.getItem("hasViewedOnboarding") === "true"
 
 export function useOnboardingStatus() {
   const [hasViewedOnboarding, setHasViewedOnboarding] = useState(getOnboardingStatus());
