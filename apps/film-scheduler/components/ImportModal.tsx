@@ -15,21 +15,23 @@ import { generateSessionId } from "@/lib/utils";
 interface ImportModalProps {
   sessions: Session[];
   open: boolean;
-  onClose: () => void;
   onImport: (sessions: Session[]) => void;
   filmsMap: FilmsMap;
+  setOpen: (open: boolean) => void;
 }
 
 export function ImportModal({
   sessions,
   open,
-  onClose,
   onImport,
   filmsMap,
+  setOpen,
 }: ImportModalProps) {
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(
     new Set(),
   );
+
+  const onClose = () => setOpen(false);
 
   const toggleSessionSelection = (sessionId: string) => {
     setSelectedSessions((prev) => {
@@ -60,7 +62,7 @@ export function ImportModal({
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>匯入場次</DialogTitle>

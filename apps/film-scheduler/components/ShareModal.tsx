@@ -18,10 +18,10 @@ import { Session } from "@/components/types";
 interface ShareModalProps {
   sessions: Session[];
   open: boolean
-  close: () => void
+  setOpen: (open: boolean) => void
 }
 
-export function ShareModal({ sessions, open, close }: ShareModalProps) {
+export function ShareModal({ sessions, open, setOpen }: ShareModalProps) {
   const [state, copyToClipboard] = useCopyToClipboard();
 
   const shareUrl = useMemo(() => {
@@ -33,7 +33,7 @@ export function ShareModal({ sessions, open, close }: ShareModalProps) {
   }, [sessions]);
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>分享你的場次</DialogTitle>
@@ -57,7 +57,7 @@ export function ShareModal({ sessions, open, close }: ShareModalProps) {
           )}
         </div>
         <DialogFooter>
-          <Button variant="secondary" onClick={close}>關閉</Button>
+          <Button variant="secondary" onClick={() => setOpen(false)}>關閉</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

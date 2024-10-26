@@ -13,7 +13,9 @@ import dayjs from "dayjs";
 import { cn, scrollSessionIntoView, joinSessions } from "@/lib/utils";
 import { useToggle, useLocalStorageState, useSessionImport } from "@/lib/hooks";
 
-const ShareModal = dynamic(() => import("@/components/ShareModal").then(m => m.ShareModal));
+const ShareModal = dynamic(() =>
+  import("@/components/ShareModal").then((m) => m.ShareModal),
+);
 
 export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
@@ -188,13 +190,19 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       <ShareModal
         open={isShareModalOpen}
         sessions={selectedSessions}
-        close={closeShareModal}
+        setOpen={setShareModalOpen}
       />
 
       <ImportModal
         sessions={importSessions}
         open={importModalOpen}
-        onClose={closeImportModal}
+        setOpen={(open: boolean) => {
+          if (open) {
+            openImportModal();
+          } else {
+            closeImportModal();
+          }
+        }}
         onImport={handleImport}
         filmsMap={props.filmsMap}
       />
