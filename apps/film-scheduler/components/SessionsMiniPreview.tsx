@@ -64,7 +64,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
         }),
       };
     });
-  }, [sessions]);
+  }, [sessions, filmsMap]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -81,11 +81,10 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
             <div key={day.format('YYYY-MM-DD')} className="border border-gray-200 p-1">
               <div className="font-bold text-sm mb-1">{display}</div>
               {sessions.map((session) => (
-                <TooltipProvider delayDuration={0}>
+                <TooltipProvider key={session.id} delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div
-                        key={session.id}
                         onClick={() => onSelectSession(session.id)}
                         className={clsx(
                           "h-4 rounded mb-1 cursor-pointer",
