@@ -1,6 +1,10 @@
-import { Session, FilmsMap } from "@/components/types";
+import { Session, FilmsMap, Film } from "@/components/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc)
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -169,4 +173,22 @@ export function highlightSession(session: Session) {
       sessionElement.classList.remove("session-highlight-effect");
     }, 1000);
   }
+}
+
+export function generateGoogleCalendarUrl(film: Film, session: Session): string {
+  const title = encodeURIComponent(film.filmTitle);
+  const location = encodeURIComponent(session.location);
+
+  // Format start and end dates in UTC to ensure compatibility with Google Calendar
+  const startDate = dayjs(session.time).utc().format("YYYYMMDDTHHmmss[Z]");
+  const endDate = dayjs(session.time)
+    .utc()
+    .add(film.duration, "minute")
+    .format("YYYYMMDDTHHmmss[Z]");
+
+  const details = encodeURIComponent(`Directed by: ${film.directorName}\n\n${film.synopsis}`);
+
+  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}`;
+
+  return googleCalendarUrl;
 }

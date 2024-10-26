@@ -1,21 +1,23 @@
 import React, { useMemo } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X, CalendarIcon } from "lucide-react";
 import dayjs from "dayjs";
+import { generateGoogleCalendarUrl } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export type FilmSidebarProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
 };
 
-export function FilmSidebar(props: FilmSidebarProps) {
+export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
   const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail } = useAppContext();
   const viewingFilm = useMemo(() => {
     return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
   }, [filmsMap, viewingFilmId]);
 
-  const isOpen = props.open && viewingFilm;
+  const isOpen = open && viewingFilm;
 
   return (
     <div
@@ -33,8 +35,8 @@ export function FilmSidebar(props: FilmSidebarProps) {
         <button
           className="absolute right-4 top-4"
           onClick={() => {
-            revealFilmDetail(undefined)
-            props.setOpen(false)
+            revealFilmDetail(undefined);
+            setOpen(false);
           }}
         >
           <X size={16} />
@@ -44,18 +46,12 @@ export function FilmSidebar(props: FilmSidebarProps) {
       <div className="py-10 px-4 flex flex-col gap-4 overflow-y-auto max-h-full">
         <h3 className="text-lg font-semibold">
           {viewingFilm?.filmTitle}
-
-          <span className="text-base ml-3">
-            {viewingFilm?.filmOriginalTitle}
-          </span>
+          <span className="text-base ml-3">{viewingFilm?.filmOriginalTitle}</span>
         </h3>
 
         <h4 className="text-base font-semibold">
           {viewingFilm?.directorName}
-
-          <span className="text-xs ml-3">
-            {viewingFilm?.directorOriginalName}
-          </span>
+          <span className="text-xs ml-3">{viewingFilm?.directorOriginalName}</span>
         </h4>
 
         <a
@@ -75,15 +71,29 @@ export function FilmSidebar(props: FilmSidebarProps) {
             <h5 className="text-base font-semibold mb-2">場次時間表</h5>
             <div className="flex flex-col gap-2">
               {viewingFilm.schedule.map((session, index) => (
-                <div
-                  key={index}
-                  className="cursor-pointer text-sm hover:underline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onClickSession(session);
-                  }}
-                >
-                  {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+                <div key={index} className="flex items-center justify-between">
+                  <div
+                    className="cursor-pointer text-sm hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClickSession(session);
+                    }}
+                  >
+                    {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const url = generateGoogleCalendarUrl(viewingFilm, session);
+                      window.open(url, "_blank");
+                    }}
+                    className="ml-2 hover:no-underline"
+                  >
+                    <CalendarIcon className="h-4 w-4 mr-1" />
+                    加入日曆
+                  </Button>
                 </div>
               ))}
             </div>
