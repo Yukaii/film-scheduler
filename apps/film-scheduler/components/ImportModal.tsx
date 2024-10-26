@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SessionsMiniPreview } from "@/components/SessionsMiniPreview"
+import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import { Session, FilmsMap } from "@/components/types";
 import { generateSessionId } from "@/lib/utils";
 
@@ -58,7 +58,7 @@ export function ImportModal({
     return sessions.filter((session) =>
       selectedSessionIds.has(generateSessionId(session)),
     );
-  }, [selectedSessionIds])
+  }, [selectedSessionIds]);
 
   const handleImport = () => {
     onImport(selectedSessions);
@@ -87,7 +87,12 @@ export function ImportModal({
           </div>
 
           <div className="max-h-[320px] overflow-auto">
-            <SessionsMiniPreview sessions={sessions} selectedSessionIds={selectedSessionIds} />
+            {/* Pass toggleSessionSelection to SessionsMiniPreview */}
+            <SessionsMiniPreview
+              sessions={sessions}
+              selectedSessionIds={selectedSessionIds}
+              onSelectSession={toggleSessionSelection}
+            />
 
             {sessions.map((session) => {
               const film = filmsMap.get(session.filmId);

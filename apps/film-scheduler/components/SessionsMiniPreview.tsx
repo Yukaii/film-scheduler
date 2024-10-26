@@ -7,24 +7,25 @@ import { Session } from "@/components/types";
 interface MonthViewProps {
   sessions: Session[];
   selectedSessionIds: Set<string>;
+  onSelectSession: (sessionId: string) => void;
 }
 
-type SessionWithId = Session & { id: string }
+type SessionWithId = Session & { id: string };
 interface WeekWithSessions {
   days: {
-    day: dayjs.Dayjs
-    display: string
+    day: dayjs.Dayjs;
+    display: string;
     sessions: SessionWithId[];
-  }[]
+  }[];
 }
 
-export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, selectedSessionIds }) => {
+export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, selectedSessionIds, onSelectSession }) => {
   const weeksWithSessions = useMemo(() => {
-    const sortedSession = sessions.sort((a, b) => a.time - b.time)
-    const firstSession = sortedSession.at(0)
-    const lastSession = sortedSession.at(-1)
-    const firstDisplayDay = dayjs(firstSession?.time).startOf('week')
-    const lastDisplayDay = dayjs(lastSession?.time).endOf('week')
+    const sortedSession = sessions.sort((a, b) => a.time - b.time);
+    const firstSession = sortedSession.at(0);
+    const lastSession = sortedSession.at(-1);
+    const firstDisplayDay = dayjs(firstSession?.time).startOf('week');
+    const lastDisplayDay = dayjs(lastSession?.time).endOf('week');
 
     const sessionsByDate = sessions.reduce<Record<string, SessionWithId[]>>((acc, session) => {
       const dateKey = dayjs(session.time).format('YYYY-MM-DD');
@@ -36,20 +37,19 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
     }, {});
 
     return Array.from<unknown, WeekWithSessions>({ length: lastDisplayDay.diff(firstDisplayDay, 'week') + 1 }, (_, i) => {
-      const firstWeekDay = firstDisplayDay.add(i, 'week')
+      const firstWeekDay = firstDisplayDay.add(i, 'week');
       return {
-        showMonth: firstWeekDay.isSame(firstWeekDay.startOf('month')) || i === 0,
         days: Array.from({ length: 7 }, (_, j) => {
-          const day = firstWeekDay.add(j, 'day')
+          const day = firstWeekDay.add(j, 'day');
           return {
             day,
             display: day.format(day.isSame(day.startOf('month')) ? 'MMM/D' : 'D'),
             sessions: sessionsByDate[day.format('YYYY-MM-DD')] ?? []
-          }
-        })
-      }
+          };
+        }),
+      };
     });
-  }, [sessions])
+  }, [sessions]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -66,7 +66,14 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
             <div key={day.format('YYYY-MM-DD')} className="border border-gray-200 p-1">
               <div className="font-bold text-sm mb-1">{display}</div>
               {sessions.map((session) => (
-                <div key={session.filmId} className={clsx("h-4 rounded mb-1", selectedSessionIds.has(session.id) ? 'bg-violet-900' : 'bg-slate-800')} />
+                <div
+                  key={session.id}
+                  onClick={() => onSelectSession(session.id)}
+                  className={clsx(
+                    "h-4 rounded mb-1 cursor-pointer",
+                    selectedSessionIds.has(session.id) ? 'bg-violet-900' : 'bg-slate-800'
+                  )}
+                />
               ))}
             </div>
           ))}
