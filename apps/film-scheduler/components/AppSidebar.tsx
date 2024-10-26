@@ -16,12 +16,13 @@ import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Eye, Star, X } from "lucide-react";
+import { ChevronDown, Eye, Star, X, ExternalLink } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Button } from "./ui/button";
 
 // FilmListItem component kept in the same file
 function FilmListItem({
@@ -168,6 +169,7 @@ export function AppSidebar() {
     selectedSessions,
     removeSession,
     revealFilmDetail,
+    openShareModal,
   } = useAppContext();
   const [search, setSearch] = useState("");
   const sortedSeletectSession = selectedSessions.sort(
@@ -337,7 +339,10 @@ export function AppSidebar() {
       <SidebarFooter>
         <div className="flex gap-2 justify-end">
           <ModeToggle />
-          <AppDropdownMenu />
+
+          <Button variant='ghost'  onClick={openShareModal} title="分享片單">
+            <ExternalLink />
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
