@@ -23,9 +23,10 @@ pnpm install
 - [x] 電影資訊 Panel
 - [x] Mobile version，畢竟排完不會用電腦看，如果要放到脆上面炫耀勢必得做，真是愛慕虛榮呢（還在 go）
 - [x] Calendar 細節：today、時間線等等
+- [x] Share/export/import via link
+- [x] Add to google calendar
 - [ ] Search syntax, 類似 GitHub issues 那種
     - [ ] 點擊日期會自動幫你填入做影片篩選
-- [ ] export to ICS calendar: 老本行了
 - [ ] Printing（OG project moovee 的功能）
 
 ## Roadmap
@@ -39,6 +40,7 @@ pnpm install
 - [ ] Better navigation across different film festival
 - [ ] User account
 - [ ] Google Calendar syncing
+- [ ] export to ICS calendar
 
 ### Long Term
 
