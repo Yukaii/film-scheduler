@@ -1,17 +1,23 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import CalendarView from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
 import { ImportModal } from "@/components/ImportModal";
+import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
 import { cn, scrollSessionIntoView, joinSessions } from "@/lib/utils";
-import { useToggle, useLocalStorageState, useSessionImport } from "@/lib/hooks";
+import {
+  useToggle,
+  useLocalStorageState,
+  useSessionImport,
+  useOnboardingStatus,
+} from "@/lib/hooks";
 
 const ShareModal = dynamic(() =>
   import("@/components/ShareModal").then((m) => m.ShareModal),
@@ -139,6 +145,20 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     setSelectedSessions(joinSessions(sessionsToImport, selectedSessions));
   };
 
+  const { hasViewedOnboarding, markOnboardingAsViewed } = useOnboardingStatus();
+  const { open: isTutorialModalOpen, setOpen: setTutorialModalOpen } =
+    useToggle(!hasViewedOnboarding);
+  useEffect(() => {
+    if (!hasViewedOnboarding) {
+      setTutorialModalOpen(true);
+    }
+  }, [hasViewedOnboarding, setTutorialModalOpen]);
+
+  const handleTutorialClose = () => {
+    markOnboardingAsViewed();
+    setTutorialModalOpen(false);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -205,6 +225,11 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         }}
         onImport={handleImport}
         filmsMap={props.filmsMap}
+      />
+
+      <OnboardTutorialModal
+        open={isTutorialModalOpen}
+        onClose={handleTutorialClose}
       />
     </AppContext.Provider>
   );

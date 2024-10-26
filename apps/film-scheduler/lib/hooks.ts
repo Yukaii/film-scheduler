@@ -98,3 +98,21 @@ export function useSessionImport(availableSessions: Session[]) {
     openImportModal,
   };
 }
+
+const getOnboardingStatus = () => localStorage.getItem("hasViewedOnboarding") === "true"
+
+export function useOnboardingStatus() {
+  const [hasViewedOnboarding, setHasViewedOnboarding] = useState(getOnboardingStatus());
+
+  useEffect(() => {
+    const viewed = getOnboardingStatus();
+    setHasViewedOnboarding(viewed);
+  }, []);
+
+  const markOnboardingAsViewed = () => {
+    localStorage.setItem("hasViewedOnboarding", "true");
+    setHasViewedOnboarding(true);
+  };
+
+  return { hasViewedOnboarding, markOnboardingAsViewed };
+}
