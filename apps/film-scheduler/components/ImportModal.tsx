@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import { Session, FilmsMap } from "@/components/types";
 import { generateSessionId } from "@/lib/utils";
 
@@ -27,14 +28,14 @@ export function ImportModal({
   filmsMap,
   setOpen,
 }: ImportModalProps) {
-  const [selectedSessions, setSelectedSessions] = useState<Set<string>>(
+  const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(
     new Set(),
   );
 
   const onClose = () => setOpen(false);
 
   const toggleSessionSelection = (sessionId: string) => {
-    setSelectedSessions((prev) => {
+    setSelectedSessionIds((prev) => {
       const updated = new Set(prev);
       if (updated.has(sessionId)) {
         updated.delete(sessionId);
@@ -47,17 +48,20 @@ export function ImportModal({
 
   const selectAllSessions = (isSelected?: boolean) => {
     if (isSelected) {
-      setSelectedSessions(new Set(sessions.map((s) => generateSessionId(s))));
+      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
     } else {
-      setSelectedSessions(new Set());
+      setSelectedSessionIds(new Set());
     }
   };
 
-  const handleImport = () => {
-    const selected = sessions.filter((session) =>
-      selectedSessions.has(generateSessionId(session)),
+  const selectedSessions = useMemo(() => {
+    return sessions.filter((session) =>
+      selectedSessionIds.has(generateSessionId(session)),
     );
-    onImport(selected);
+  }, [selectedSessionIds]);
+
+  const handleImport = () => {
+    onImport(selectedSessions);
     onClose();
   };
 
@@ -75,14 +79,20 @@ export function ImportModal({
             <Checkbox
               id="select-all"
               onCheckedChange={(checked) => selectAllSessions(Boolean(checked))}
-              checked={selectedSessions.size === sessions.length}
+              checked={selectedSessionIds.size === sessions.length}
             />
             <label htmlFor="select-all" className="ml-2">
               全選
             </label>
           </div>
 
-          <div className="max-h-[320px] overflow-auto">
+          <div className="max-h-[65vh] overflow-auto">
+            <SessionsMiniPreview
+              sessions={sessions}
+              selectedSessionIds={selectedSessionIds}
+              onSelectSession={toggleSessionSelection}
+            />
+
             {sessions.map((session) => {
               const film = filmsMap.get(session.filmId);
               const sessionId = generateSessionId(session);
@@ -93,7 +103,7 @@ export function ImportModal({
                   <Checkbox
                     id={`checkbox-${sessionId}`}
                     onCheckedChange={() => toggleSessionSelection(sessionId)}
-                    checked={selectedSessions.has(sessionId)}
+                    checked={selectedSessionIds.has(sessionId)}
                   />
                   <label htmlFor={`checkbox-${sessionId}`}>
                     {film.filmTitle} {session.location} -{" "}
