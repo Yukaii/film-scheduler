@@ -388,7 +388,7 @@ export default function CalendarView(props: { className?: string }) {
         </div>
 
         <Button variant="ghost" onClick={goToToday}>
-          Today
+          今天
         </Button>
       </div>
 
