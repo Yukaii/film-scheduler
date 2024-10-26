@@ -11,6 +11,12 @@
 
 https://github.com/user-attachments/assets/1900be74-d6ad-4fe3-a109-ea61851e3ad4
 
+## Development
+
+```bash
+pnpm install
+```
+
 ## TODOs
 
 - [x] persistent with local storage
