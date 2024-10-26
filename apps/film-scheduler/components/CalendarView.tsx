@@ -315,10 +315,12 @@ function SessionBlock({
 }
 
 export default function CalendarView(props: { className?: string }) {
-  const { currentDate: today, previewSessions, selectedSessions, setCurrentDate } =
+  const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
-  const currentWeekStart = useMemo(() => dayjs(today).startOf("week"), [today]);
-  const [selectedDate, setSelectedDate] = useState(currentWeekStart.toDate());
+  const currentWeekStart = useMemo(
+    () => dayjs(currentDate).startOf("week"),
+    [currentDate],
+  );
 
   const navigateWeek = (direction: "previous" | "next") => {
     setCurrentDate((prev) => {
@@ -332,7 +334,6 @@ export default function CalendarView(props: { className?: string }) {
   const { open, isMobile, openMobile, toggleSidebar } = useSidebar();
   const goToToday = () => {
     setCurrentDate(new Date());
-    setSelectedDate(new Date());
     scrollNowIndicatorIntoView();
   };
 
@@ -359,20 +360,17 @@ export default function CalendarView(props: { className?: string }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="mx-2">
-                {dayjs(selectedDate).format("YYYY/MM")}{" "}
+                {dayjs(currentDate).format("YYYY/MM")}{" "}
                 <CalendarIcon className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={selectedDate}
+                selected={currentDate}
                 onSelect={(date) => {
                   if (date) {
-                    setSelectedDate(date);
-                    setCurrentDate(
-                      dayjs(date).startOf("week").add(1, "day").toDate(),
-                    );
+                    setCurrentDate(date);
                   }
                 }}
                 initialFocus
