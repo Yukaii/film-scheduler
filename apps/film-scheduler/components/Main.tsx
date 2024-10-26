@@ -223,6 +223,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         open={isShareModalOpen}
         sessions={selectedSessions}
         setOpen={setShareModalOpen}
+        filmsMap={props.filmsMap}
       />
 
       <ImportModal

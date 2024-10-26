@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useCopyToClipboard } from "react-use";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,53 +12,176 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { generateShareableUrlWithSessionIds } from "@/lib/utils";
-import { Session } from "@/components/types";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
+import {
+  generateShareableUrlWithSessionIds,
+  generateSessionId,
+} from "@/lib/utils";
+import { Session, FilmsMap } from "@/components/types";
+import { ChevronDown } from "lucide-react";
 
 interface ShareModalProps {
   sessions: Session[];
-  open: boolean
-  setOpen: (open: boolean) => void
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  filmsMap: FilmsMap;
 }
 
-export function ShareModal({ sessions, open, setOpen }: ShareModalProps) {
+export function ShareModal({
+  sessions,
+  open,
+  setOpen,
+  filmsMap,
+}: ShareModalProps) {
+  const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [state, copyToClipboard] = useCopyToClipboard();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const onClose = () => setOpen(false);
+
+  useEffect(() => {
+    // Select all sessions by default when modal opens
+    if (open) {
+      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
+    }
+  }, [open, sessions]);
+
+  const toggleSessionSelection = (sessionId: string) => {
+    setSelectedSessionIds((prev) => {
+      const updated = new Set(prev);
+      if (updated.has(sessionId)) {
+        updated.delete(sessionId);
+      } else {
+        updated.add(sessionId);
+      }
+      return updated;
+    });
+  };
+
+  const selectAllSessions = (isSelected?: boolean) => {
+    if (isSelected) {
+      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
+    } else {
+      setSelectedSessionIds(new Set());
+    }
+  };
+
+  const selectedSessions = useMemo(() => {
+    return sessions.filter((session) =>
+      selectedSessionIds.has(generateSessionId(session)),
+    );
+  }, [selectedSessionIds, sessions]);
 
   const shareUrl = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      return generateShareableUrlWithSessionIds(sessions);
-    } else {
-      return ''
+    if (typeof window !== "undefined") {
+      return generateShareableUrlWithSessionIds(selectedSessions);
     }
-  }, [sessions]);
+    return "";
+  }, [selectedSessions]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-h-[85%] grid-rows-[auto_1fr_auto]">
+        <DialogHeader className="sticky top-0 bg-background">
           <DialogTitle>分享你的場次</DialogTitle>
           <DialogDescription>
-            複製下方的網址，分享你選擇的場次給其他人
+            請選擇您想分享的場次並複製生成的連結。
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+
+        <div className="space-y-4 overflow-auto">
+          <Collapsible
+            open={isExpanded}
+            onOpenChange={setIsExpanded}
+            className="mb-2"
+          >
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-between"
+              >
+                展開預覽以選擇場次
+                <ChevronDown
+                  className={`ml-2 ${isExpanded ? "rotate-180" : ""}`}
+                />
+              </Button>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent>
+              <div className="p-2">
+                <div className="flex items-center mb-2">
+                  <Checkbox
+                    id="select-all"
+                    onCheckedChange={(checked) =>
+                      selectAllSessions(Boolean(checked))
+                    }
+                    checked={selectedSessionIds.size === sessions.length}
+                  />
+                  <label htmlFor="select-all" className="ml-2">
+                    全選
+                  </label>
+                </div>
+
+                <SessionsMiniPreview
+                  sessions={sessions}
+                  selectedSessionIds={selectedSessionIds}
+                  onSelectSession={toggleSessionSelection}
+                />
+
+                {sessions.map((session) => {
+                  const film = filmsMap.get(session.filmId);
+                  const sessionId = generateSessionId(session);
+                  if (!film) return null;
+
+                  return (
+                    <div
+                      key={sessionId}
+                      className="flex items-center space-x-2 mt-1"
+                    >
+                      <Checkbox
+                        id={`checkbox-${sessionId}`}
+                        onCheckedChange={() =>
+                          toggleSessionSelection(sessionId)
+                        }
+                        checked={selectedSessionIds.has(sessionId)}
+                      />
+                      <label htmlFor={`checkbox-${sessionId}`}>
+                        {film.filmTitle} {session.location} -{" "}
+                        {new Date(session.time).toLocaleString()}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        <DialogFooter className="gap-2">
           <Input value={shareUrl} readOnly className="w-full" />
           <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
             複製到剪貼簿
           </Button>
+          <Button variant="secondary" onClick={onClose}>
+            關閉
+          </Button>
+        </DialogFooter>
+
+        <div>
           {state.error ? (
-            <p className="text-red-500">
-              無法複製值: {state.error.message}
-            </p>
+            <p className="text-red-500">無法複製值: {state.error.message}</p>
           ) : (
-            state.value && (
-              <p className="text-green-500">已複製到剪貼簿！</p>
-            )
+            state.value && <p className="text-green-500">已複製到剪貼簿！</p>
           )}
         </div>
-        <DialogFooter>
-          <Button variant="secondary" onClick={() => setOpen(false)}>關閉</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
