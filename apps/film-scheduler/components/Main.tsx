@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import CalendarView from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
+import { AboutModal } from "@/components/AboutModal";
 import { ImportModal } from "@/components/ImportModal";
 import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
 import { Film, FilmsMap, Session } from "./types";
@@ -159,6 +160,10 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     setTutorialModalOpen(false);
   };
 
+  const { open: isAboutModalOpen, setOpen: setAboutModalOpen } = useToggle(false)
+  const openAboutModal = () => setAboutModalOpen(true)
+  const closeAboutModal = () => setAboutModalOpen(false)
+
   return (
     <AppContext.Provider
       value={{
@@ -191,6 +196,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         importModalOpen,
         closeImportModal,
         openImportModal,
+
+        openAboutModal,
       }}
     >
       <SidebarProvider>
@@ -230,6 +237,11 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       <OnboardTutorialModal
         open={isTutorialModalOpen}
         onClose={handleTutorialClose}
+      />
+
+      <AboutModal
+        open={isAboutModalOpen}
+        onClose={closeAboutModal}
       />
     </AppContext.Provider>
   );

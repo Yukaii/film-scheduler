@@ -21,7 +21,7 @@ import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Eye, Star, X, ExternalLink } from "lucide-react";
+import { ChevronDown, Eye, Star, X, ExternalLink, Info } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -175,6 +175,7 @@ export function AppSidebar() {
     removeSession,
     revealFilmDetail,
     openShareModal,
+    openAboutModal,
   } = useAppContext();
   const [search, setSearch] = useState("");
   const sortedSeletectSession = selectedSessions.sort(
@@ -357,6 +358,10 @@ export function AppSidebar() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <Button onClick={openAboutModal} variant="outline" size="icon">
+            <Info />
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>

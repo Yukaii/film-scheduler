@@ -27,6 +27,7 @@ export type AppContextType = {
   importModalOpen: boolean;
   closeImportModal: () => void;
   openImportModal: () => void;
+  openAboutModal: () => void;
 };
 
 const noop = () => {};
@@ -57,6 +58,7 @@ export const AppContext = React.createContext<AppContextType>({
   importModalOpen: false,
   closeImportModal: noop,
   openImportModal: noop,
+  openAboutModal: noop,
 });
 
 export const useAppContext = () => React.useContext(AppContext);
