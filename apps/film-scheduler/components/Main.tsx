@@ -12,7 +12,7 @@ import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
-import { cn, scrollSessionIntoView, joinSessions } from "@/lib/utils";
+import { cn, scrollSessionIntoView, joinSessions, highlightSession } from "@/lib/utils";
 import {
   useToggle,
   useLocalStorageState,
@@ -101,7 +101,10 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       setCurrentDate(sessionWeekStart.toDate()); // Set currentDate to the session's week start (Monday)
     }
 
-    window.setTimeout(() => scrollSessionIntoView(session), 50);
+    window.setTimeout(() => {
+      scrollSessionIntoView(session)
+      highlightSession(session)
+    }, 50);
   };
 
   // Star/Unstar functionality

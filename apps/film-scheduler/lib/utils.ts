@@ -156,3 +156,17 @@ export function generateShareableUrlWithSessionIds(
   url.searchParams.set("sessions", serializedSessionIds);
   return url.toString();
 }
+
+export function highlightSession(session: Session) {
+  const sessionId = generateSessionId(session)
+  const sessionElement = document.getElementById(sessionId);
+
+  if (sessionElement) {
+    sessionElement.classList.add("session-highlight-effect");
+
+    // Remove highlight after 1 second
+    setTimeout(() => {
+      sessionElement.classList.remove("session-highlight-effect");
+    }, 1000);
+  }
+}
