@@ -154,6 +154,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       setTutorialModalOpen(true);
     }
   }, [hasViewedOnboarding, setTutorialModalOpen]);
+  const openOnboardingModal = () => setTutorialModalOpen(true)
 
   const handleTutorialClose = () => {
     markOnboardingAsViewed();
@@ -198,6 +199,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         openImportModal,
 
         openAboutModal,
+        openOnboardingModal,
       }}
     >
       <SidebarProvider>

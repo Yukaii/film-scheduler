@@ -21,7 +21,15 @@ import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { ChevronDown, Eye, Star, X, ExternalLink, Info } from "lucide-react";
+import {
+  ChevronDown,
+  Eye,
+  Star,
+  X,
+  ExternalLink,
+  Info,
+  Compass,
+} from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -176,6 +184,7 @@ export function AppSidebar() {
     revealFilmDetail,
     openShareModal,
     openAboutModal,
+    openOnboardingModal,
   } = useAppContext();
   const [search, setSearch] = useState("");
   const sortedSeletectSession = selectedSessions.sort(
@@ -345,6 +354,35 @@ export function AppSidebar() {
       <SidebarFooter>
         <div className="flex gap-2 justify-end">
           <ModeToggle />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={openOnboardingModal}
+                  variant="outline"
+                  size="icon"
+                >
+                  <Compass />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>使用教學</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={openAboutModal} variant="outline" size="icon">
+                  <Info />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>關於</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <TooltipProvider>
             <Tooltip>
@@ -358,10 +396,6 @@ export function AppSidebar() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-          <Button onClick={openAboutModal} variant="outline" size="icon">
-            <Info />
-          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
