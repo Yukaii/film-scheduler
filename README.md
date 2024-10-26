@@ -25,15 +25,14 @@ pnpm install
 - [x] Calendar 細節：today、時間線等等
 - [x] Share/export/import via link
 - [x] Add to google calendar
-- [ ] Search syntax, 類似 GitHub issues 那種
-    - [ ] 點擊日期會自動幫你填入做影片篩選
-- [ ] Printing（OG project moovee 的功能）
 
 ## Roadmap
 
 ### Short Term
 
 - [ ] Better UX for managing film sessions
+- [ ] Search syntax, 類似 GitHub issues 那種
+    - [ ] 點擊日期會自動幫你填入做影片篩選
 
 ### Middle Term
 
@@ -41,6 +40,7 @@ pnpm install
 - [ ] User account
 - [ ] Google Calendar syncing
 - [ ] export to ICS calendar
+- [ ] Printing（OG project moovee 的功能）
 
 ### Long Term
 
