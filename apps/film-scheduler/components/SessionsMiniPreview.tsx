@@ -1,8 +1,15 @@
 import React, { useMemo } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import {
+  TooltipTrigger,
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import { useAppContext } from "@/contexts/AppContext";
 import { generateSessionId } from "@/lib/utils";
-import { Session } from "@/components/types";
+import { Session, Film } from "@/components/types";
 
 interface MonthViewProps {
   sessions: Session[];
@@ -10,7 +17,7 @@ interface MonthViewProps {
   onSelectSession: (sessionId: string) => void;
 }
 
-type SessionWithId = Session & { id: string };
+type SessionWithId = Session & { id: string, film: Film };
 interface WeekWithSessions {
   days: {
     day: dayjs.Dayjs;
@@ -20,6 +27,10 @@ interface WeekWithSessions {
 }
 
 export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, selectedSessionIds, onSelectSession }) => {
+  const {
+    filmsMap,
+  } = useAppContext();
+
   const weeksWithSessions = useMemo(() => {
     const sortedSession = sessions.sort((a, b) => a.time - b.time);
     const firstSession = sortedSession.at(0);
@@ -32,7 +43,11 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
       if (!acc[dateKey]) {
         acc[dateKey] = [];
       }
-      acc[dateKey].push({ ...session, id: generateSessionId(session) });
+      acc[dateKey].push({
+        ...session,
+        film: filmsMap.get(session.filmId)!,
+        id: generateSessionId(session),
+       });
       return acc;
     }, {});
 
@@ -66,14 +81,24 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
             <div key={day.format('YYYY-MM-DD')} className="border border-gray-200 p-1">
               <div className="font-bold text-sm mb-1">{display}</div>
               {sessions.map((session) => (
-                <div
-                  key={session.id}
-                  onClick={() => onSelectSession(session.id)}
-                  className={clsx(
-                    "h-4 rounded mb-1 cursor-pointer",
-                    selectedSessionIds.has(session.id) ? 'bg-violet-900' : 'bg-slate-800'
-                  )}
-                />
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        key={session.id}
+                        onClick={() => onSelectSession(session.id)}
+                        className={clsx(
+                          "h-4 rounded mb-1 cursor-pointer",
+                          selectedSessionIds.has(session.id) ? 'bg-violet-900' : 'bg-slate-800'
+                        )}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side='bottom'>
+                      {session.film.filmTitle} {session.location} -{" "}
+                      {new Date(session.time).toLocaleString()}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ))}
             </div>
           ))}

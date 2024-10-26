@@ -86,8 +86,7 @@ export function ImportModal({
             </label>
           </div>
 
-          <div className="max-h-[320px] overflow-auto">
-            {/* Pass toggleSessionSelection to SessionsMiniPreview */}
+          <div className="max-h-[65vh] overflow-auto">
             <SessionsMiniPreview
               sessions={sessions}
               selectedSessionIds={selectedSessionIds}
