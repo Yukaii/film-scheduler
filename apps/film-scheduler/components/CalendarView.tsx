@@ -86,7 +86,7 @@ function WeekView({
     <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative">
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
-        <div className="relative h-[840px]">
+        <div className="relative h-[840px] select-none">
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
               key={hour}
@@ -125,7 +125,7 @@ function WeekView({
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative"
           >
-            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap">
+            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
               <span
                 className={cn({
                   "font-semibold": isSameDay,
@@ -259,6 +259,7 @@ function SessionBlock({
       className={cn(
         "absolute max-w-[calc(100%-10px)] text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
         "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
+        "select-none",
         {
           "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
             !isSelectedSession,
