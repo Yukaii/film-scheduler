@@ -73,10 +73,13 @@ export function ImportModal({
         <div className="space-y-4">
           <div className="flex items-center sticky top-0">
             <Checkbox
+              id="select-all"
               onCheckedChange={(checked) => selectAllSessions(Boolean(checked))}
               checked={selectedSessions.size === sessions.length}
             />
-            <label className="ml-2">全選</label>
+            <label htmlFor="select-all" className="ml-2">
+              全選
+            </label>
           </div>
 
           <div className="max-h-[320px] overflow-auto">
@@ -88,10 +91,11 @@ export function ImportModal({
               return (
                 <div key={sessionId} className="flex items-center space-x-2">
                   <Checkbox
+                    id={`checkbox-${sessionId}`}
                     onCheckedChange={() => toggleSessionSelection(sessionId)}
                     checked={selectedSessions.has(sessionId)}
                   />
-                  <label>
+                  <label htmlFor={`checkbox-${sessionId}`}>
                     {film.filmTitle} {session.location} -{" "}
                     {new Date(session.time).toLocaleString()}
                   </label>
