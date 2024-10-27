@@ -19,7 +19,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
 import { Film, Session } from "./types";
-import { cn, generateGoogleCalendarUrl } from "@/lib/utils";
+import {
+  cn,
+  generateGoogleCalendarUrl,
+  generateCalendarICS,
+} from "@/lib/utils";
 import dayjs from "dayjs";
 import {
   ChevronDown,
@@ -30,6 +34,7 @@ import {
   Info,
   Compass,
   CalendarIcon,
+  DownloadIcon,
 } from "lucide-react";
 import {
   Collapsible,
@@ -37,6 +42,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "./ui/button";
+import { saveAs } from "file-saver";
 
 // FilmListItem component kept in the same file
 function FilmListItem({
@@ -203,6 +209,7 @@ export function AppSidebar() {
     starredFilmIds,
     starFilm,
     unstarFilm,
+    filmsMap,
     selectedSessions,
     removeSession,
     revealFilmDetail,
@@ -250,6 +257,17 @@ export function AppSidebar() {
   const starredFilms = useMemo(() => {
     return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
+
+  const downloadIcsCalendar = () => {
+    generateCalendarICS(selectedSessions, filmsMap)
+      .then((icsContent) => {
+        if (icsContent) {
+          const blob = new Blob([icsContent], { type: "text/calendar" });
+          saveAs(blob, "Golden_Horse_Film_Schedule.ics");
+        }
+      })
+      .catch((error) => console.error("Error creating calendar:", error));
+  };
 
   return (
     <Sidebar>
@@ -417,6 +435,23 @@ export function AppSidebar() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>分享片單</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={downloadIcsCalendar}
+                  variant="outline"
+                  size="icon"
+                >
+                  <DownloadIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>下載 .ics 日曆</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
