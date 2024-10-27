@@ -22,9 +22,11 @@ import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import {
   generateShareableUrlWithSessionIds,
   generateSessionId,
+  generateCalendarICS,
 } from "@/lib/utils";
 import { Session, FilmsMap } from "@/components/types";
 import { ChevronDown } from "lucide-react";
+import { saveAs } from "file-saver";
 
 interface ShareModalProps {
   sessions: Session[];
@@ -48,7 +50,6 @@ export function ShareModal({
   const onClose = () => setOpen(false);
 
   useEffect(() => {
-    // Select all sessions by default when modal opens
     if (open) {
       setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
     }
@@ -87,13 +88,25 @@ export function ShareModal({
     return "";
   }, [selectedSessions]);
 
+  // Function to generate ICS file
+  const handleDownloadICS = async () => {
+    generateCalendarICS(selectedSessions, filmsMap)
+      .then((icsContent) => {
+        if (icsContent) {
+          const blob = new Blob([icsContent], { type: "text/calendar" });
+          saveAs(blob, "Golden_Horse_Film_Schedule.ics");
+        }
+      })
+      .catch((error) => console.error("Error creating calendar:", error));
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[85%] grid-rows-[auto_1fr_auto]">
         <DialogHeader className="sticky top-0 bg-background">
           <DialogTitle>分享你的場次</DialogTitle>
           <DialogDescription>
-            請選擇您想分享的場次並複製生成的連結。
+            請選擇您想分享的場次並複製生成的連結或下載 ICS 檔案。
           </DialogDescription>
         </DialogHeader>
 
@@ -169,6 +182,9 @@ export function ShareModal({
           <Input value={shareUrl} readOnly className="w-full" />
           <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
             複製到剪貼簿
+          </Button>
+          <Button variant="default" onClick={handleDownloadICS}>
+            下載 ICS
           </Button>
           <Button variant="secondary" onClick={onClose}>
             關閉
