@@ -3,8 +3,9 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { createEvents, EventAttributes } from "ics";
 
-dayjs.extend(utc)
+dayjs.extend(utc);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -162,7 +163,7 @@ export function generateShareableUrlWithSessionIds(
 }
 
 export function highlightSession(session: Session) {
-  const sessionId = generateSessionId(session)
+  const sessionId = generateSessionId(session);
   const sessionElement = document.getElementById(sessionId);
 
   if (sessionElement) {
@@ -175,7 +176,10 @@ export function highlightSession(session: Session) {
   }
 }
 
-export function generateGoogleCalendarUrl(film: Film, session: Session): string {
+export function generateGoogleCalendarUrl(
+  film: Film,
+  session: Session,
+): string {
   const title = encodeURIComponent(film.filmTitle);
   const location = encodeURIComponent(session.location);
 
@@ -186,9 +190,64 @@ export function generateGoogleCalendarUrl(film: Film, session: Session): string 
     .add(film.duration, "minute")
     .format("YYYYMMDDTHHmmss[Z]");
 
-  const details = encodeURIComponent(`Directed by: ${film.directorName}\n\n${film.synopsis}`);
+  const details = encodeURIComponent(`Directed by: ${film.directorName}
+
+${film.synopsis}`);
 
   const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}`;
 
   return googleCalendarUrl;
+}
+
+/**
+ * Generates an ICS calendar file from a list of sessions.
+ * @param {Session[]} sessions - An array of session objects.
+ * @param {Map<string, Film>} filmsMap - A map of film IDs to Film objects.
+ * @returns {Promise<string>} - A promise that resolves with the ICS file content.
+ */
+export async function generateCalendarICS(
+  sessions: Session[],
+  filmsMap: FilmsMap,
+) {
+  // Map sessions to ics-compatible event objects and filter out any null values
+  const events: EventAttributes[] = sessions
+    .map((session) => {
+      const film = filmsMap.get(session.filmId);
+      if (!film) return null;
+
+      const start = dayjs(session.time);
+      const duration = {
+        hours: Math.floor(film.duration / 60),
+        minutes: film.duration % 60,
+      };
+
+      return {
+        title: film.filmTitle,
+        description: film.synopsis,
+        location: session.location,
+        start: [
+          start.year(),
+          start.month() + 1,
+          start.date(),
+          start.hour(),
+          start.minute(),
+        ],
+        duration,
+        status: "CONFIRMED",
+        organizer: {
+          name: "Golden Horse Film Festival",
+          email: "info@goldenhorse.org.tw",
+        },
+      } as EventAttributes;
+    })
+    .filter((event): event is EventAttributes => event !== null); // Type guard to remove null values
+
+  // Generate the ICS content using createEvents
+  const { error, value } = createEvents(events);
+  if (error) {
+    console.error("Error generating ICS:", error);
+    throw new Error("Failed to generate ICS file");
+  }
+
+  return value; // This is the ICS content as a string
 }
