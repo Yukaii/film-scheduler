@@ -17,34 +17,9 @@ https://github.com/user-attachments/assets/1900be74-d6ad-4fe3-a109-ea61851e3ad4
 pnpm install
 ```
 
-## TODOs
-
-- [x] persistent with local storage
-- [x] 電影資訊 Panel
-- [x] Mobile version，畢竟排完不會用電腦看，如果要放到脆上面炫耀勢必得做，真是愛慕虛榮呢（還在 go）
-- [x] Calendar 細節：today、時間線等等
-- [x] Share/export/import via link
-- [x] Add to google calendar
-
 ## Roadmap
 
-### Short Term
-
-- [ ] Better UX for managing film sessions
-- [ ] Search syntax, 類似 GitHub issues 那種
-    - [ ] 點擊日期會自動幫你填入做影片篩選
-
-### Middle Term
-
-- [ ] Better navigation across different film festival
-- [ ] User account
-- [ ] Google Calendar syncing
-- [ ] export to ICS calendar
-- [ ] Printing（OG project moovee 的功能）
-
-### Long Term
-
-- [ ] IMDB api and local cinima schedule integration
+See [GitHub Project](https://github.com/users/Yukaii/projects/9/views/3)
 
 ## FAQs
 
