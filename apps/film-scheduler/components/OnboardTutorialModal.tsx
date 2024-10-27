@@ -39,6 +39,11 @@ const tutorialSteps: TutorialStep[] = [
     description: "可以在「已選擇場次」管理新增的場次",
     imageSrc: "/images/onboarding-3.png",
   },
+  {
+    title: "分享場次",
+    description: "您可以在分享選單分享連結，或是下載 ics 檔案匯入到行事曆",
+    imageSrc: "/images/onboarding-4.png",
+  }
 ];
 
 interface OnboardTutorialModalProps {
@@ -52,13 +57,13 @@ export function OnboardTutorialModal({
 }: OnboardTutorialModalProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="w-full max-w-sm md:max-w-md">
+      <DialogContent className="max-w-md md:max-w-lg">
         {" "}
         {/* Responsive width */}
         <DialogHeader>
           <DialogTitle>使用教學</DialogTitle>
         </DialogHeader>
-        <Carousel className="w-full max-w-full mx-auto">
+        <Carousel>
           {" "}
           {/* Responsive centering */}
           <CarouselContent>
