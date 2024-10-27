@@ -21,8 +21,8 @@ type SessionWithId = Session & { id: string, film: Film };
 interface WeekWithSessions {
   days: {
     day: dayjs.Dayjs;
-    display: string;
     sessions: SessionWithId[];
+    showMonth: boolean;
   }[];
 }
 
@@ -58,7 +58,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
           const day = firstWeekDay.add(j, 'day');
           return {
             day,
-            display: day.format(day.isSame(day.startOf('month')) ? 'MMM/D' : 'D'),
+            showMonth: (i === 0 && j === 0) || day.isSame(day.startOf('month')),
             sessions: sessionsByDate[day.format('YYYY-MM-DD')] ?? []
           };
         }),
@@ -77,9 +77,12 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({ sessions, select
       </div>
       {weeksWithSessions.map((week, weekIdx) => (
         <div key={`week-${weekIdx}`} className="grid grid-cols-7 gap-4 mb-4">
-          {week.days.map(({ day, display, sessions }) => (
+          {week.days.map(({ day, sessions, showMonth }) => (
             <div key={day.format('YYYY-MM-DD')} className="border border-gray-200 p-1">
-              <div className="font-bold text-sm mb-1">{display}</div>
+              { showMonth && (
+                <div className="text-xs">{day.format('MMM')}</div>
+              ) }
+              <div className="font-bold text-sm mb-1">{day.format('D')}</div>
               {sessions.map((session) => (
                 <TooltipProvider key={session.id} delayDuration={0}>
                   <Tooltip>
