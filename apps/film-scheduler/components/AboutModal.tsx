@@ -76,7 +76,7 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
           <section>
             <h3 className="text-lg font-semibold">授權</h3>
             <p className="text-sm text-muted-foreground">
-              本專案使用 MIT 授權，歡迎自由使用、分享。
+              本專案使用 MIT 授權，歡迎自由使用、分享、改製、貢獻。
             </p>
           </section>
         </div>
