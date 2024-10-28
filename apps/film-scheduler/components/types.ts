@@ -14,6 +14,7 @@ export interface Film {
 export type FilmsMap = Map<string, Film>;
 
 export interface Session {
+  id: string;
   filmId: string;
   time: number;
   location: string;

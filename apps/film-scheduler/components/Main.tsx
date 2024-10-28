@@ -12,7 +12,13 @@ import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
-import { cn, scrollSessionIntoView, joinSessions, highlightSession } from "@/lib/utils";
+import {
+  cn,
+  scrollSessionIntoView,
+  joinSessions,
+  highlightSession,
+  generateSessionId,
+} from "@/lib/utils";
 import {
   useToggle,
   useLocalStorageState,
@@ -38,6 +44,15 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     [],
   );
 
+  // migrate session without id
+  useEffect(() => {
+    if (selectedSessions.some((s) => !s.id)) {
+      setSelectedSessions(
+        selectedSessions.map((s) => ({ ...s, id: generateSessionId(s) })),
+      );
+    }
+  }, [selectedSessions, setSelectedSessions]);
+
   const availableSessions = useMemo(() => {
     return props.films.reduce((prev, film) => {
       return [...prev, ...film.schedule];
@@ -51,11 +66,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     const film = props.filmsMap.get(previewFilmId);
     if (!film) return [];
 
-    return film.schedule.map((schedule) => ({
-      filmId: film.id,
-      time: schedule.time,
-      location: schedule.location,
-    }));
+    return [...film.schedule];
   }, [previewFilmId, props.filmsMap]);
 
   // Add session to selectedSessions
@@ -63,10 +74,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     setSelectedSessions((prev) => {
       // Ensure session doesn't already exist
       const exists = prev.some(
-        (s) =>
-          s.filmId === session.filmId &&
-          s.time === session.time &&
-          s.location === session.location,
+        (s) => s.id === session.id
       );
       if (!exists) {
         return [...prev, session];
@@ -102,8 +110,8 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
     }
 
     window.setTimeout(() => {
-      scrollSessionIntoView(session)
-      highlightSession(session)
+      scrollSessionIntoView(session);
+      highlightSession(session);
     }, 50);
   };
 
@@ -157,16 +165,17 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
       setTutorialModalOpen(true);
     }
   }, [hasViewedOnboarding, setTutorialModalOpen]);
-  const openOnboardingModal = () => setTutorialModalOpen(true)
+  const openOnboardingModal = () => setTutorialModalOpen(true);
 
   const handleTutorialClose = () => {
     markOnboardingAsViewed();
     setTutorialModalOpen(false);
   };
 
-  const { open: isAboutModalOpen, setOpen: setAboutModalOpen } = useToggle(false)
-  const openAboutModal = () => setAboutModalOpen(true)
-  const closeAboutModal = () => setAboutModalOpen(false)
+  const { open: isAboutModalOpen, setOpen: setAboutModalOpen } =
+    useToggle(false);
+  const openAboutModal = () => setAboutModalOpen(true);
+  const closeAboutModal = () => setAboutModalOpen(false);
 
   return (
     <AppContext.Provider
@@ -245,10 +254,7 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
         onClose={handleTutorialClose}
       />
 
-      <AboutModal
-        open={isAboutModalOpen}
-        onClose={closeAboutModal}
-      />
+      <AboutModal open={isAboutModalOpen} onClose={closeAboutModal} />
     </AppContext.Provider>
   );
 }

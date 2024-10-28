@@ -7,7 +7,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { useAppContext } from "@/contexts/AppContext";
-import { generateSessionId, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Session, Film } from "@/components/types";
 
 interface MonthViewProps {
@@ -48,7 +48,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
         acc[dateKey].push({
           ...session,
           film: filmsMap.get(session.filmId)!,
-          id: generateSessionId(session),
+          id: session.id,
         });
         return acc;
       },

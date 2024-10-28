@@ -21,7 +21,6 @@ import {
 import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import {
   generateShareableUrlWithSessionIds,
-  generateSessionId,
   generateCalendarICS,
 } from "@/lib/utils";
 import { Session, FilmsMap } from "@/components/types";
@@ -51,7 +50,7 @@ export function ShareModal({
 
   useEffect(() => {
     if (open) {
-      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
+      setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
     }
   }, [open, sessions]);
 
@@ -69,7 +68,7 @@ export function ShareModal({
 
   const selectAllSessions = (isSelected?: boolean) => {
     if (isSelected) {
-      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
+      setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
     } else {
       setSelectedSessionIds(new Set());
     }
@@ -77,7 +76,7 @@ export function ShareModal({
 
   const selectedSessions = useMemo(() => {
     return sessions.filter((session) =>
-      selectedSessionIds.has(generateSessionId(session)),
+      selectedSessionIds.has(session.id),
     );
   }, [selectedSessionIds, sessions]);
 
@@ -151,7 +150,7 @@ export function ShareModal({
 
                 {sessions.map((session) => {
                   const film = filmsMap.get(session.filmId);
-                  const sessionId = generateSessionId(session);
+                  const sessionId = session.id;
                   if (!film) return null;
 
                   return (

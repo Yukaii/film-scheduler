@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function generateSessionId(session: Session): string {
+export function generateSessionId(session: Omit<Session, "id">): string {
   const { filmId, time, location } = session;
   const sessionString = `${filmId}-${new Date(time).toISOString()}-${location}`;
 
@@ -30,18 +30,14 @@ export function includesSession(
   sessions: Session[],
   session: Session,
 ): boolean {
-  return sessions.some(
-    (s) => generateSessionId(s) === generateSessionId(session),
-  );
+  return sessions.some((s) => s.id === session.id);
 }
 
 export function findSessionIndex(
   sessions: Session[],
   session: Session,
 ): number {
-  return sessions.findIndex(
-    (s) => generateSessionId(s) === generateSessionId(session),
-  );
+  return sessions.findIndex((s) => s.id === session.id);
 }
 
 /**
@@ -53,23 +49,14 @@ export function findSessionIndex(
  * @returns {Session[]} - A new array containing unique sessions from both arrays.
  */
 export function joinSessions(array1: Session[], array2: Session[]): Session[] {
-  const sessionIdSet = new Set<string>();
+  const sessionIdSet = new Set<string>(...array1.map(s => s.id));
 
-  // Add all sessions from the first array
-  const resultArray = array1.filter((session) => {
-    const sessionId = generateSessionId(session);
-    if (!sessionIdSet.has(sessionId)) {
-      sessionIdSet.add(sessionId);
-      return true;
-    }
-    return false;
-  });
+  const resultArray = [...array1]
 
   // Add all sessions from the second array that are not duplicates
   array2.forEach((session) => {
-    const sessionId = generateSessionId(session);
+    const sessionId = session.id;
     if (!sessionIdSet.has(sessionId)) {
-      sessionIdSet.add(sessionId);
       resultArray.push(session);
     }
   });
@@ -78,7 +65,7 @@ export function joinSessions(array1: Session[], array2: Session[]): Session[] {
 }
 
 export function scrollSessionIntoView(session: Session) {
-  const sessionId = generateSessionId(session);
+  const sessionId = session.id;
   const sessionElement = document.getElementById(sessionId);
 
   if (sessionElement) {
@@ -107,7 +94,7 @@ export const getSessionDuration = (s: Session, filmsMap: FilmsMap) =>
  * This will store only the session IDs in the URL.
  */
 export function serializeSessionIds(sessions: Session[]): string {
-  const sessionIds = sessions.map((session) => generateSessionId(session));
+  const sessionIds = sessions.map((session) => session.id);
   return btoa(encodeURIComponent(JSON.stringify(sessionIds)));
 }
 
@@ -126,7 +113,7 @@ export function deserializeSessionIds(
 
     // Filter and return sessions that match the session IDs
     return availableSessions.filter((session) =>
-      sessionIds.includes(generateSessionId(session)),
+      sessionIds.includes(session.id),
     );
   } catch (error) {
     console.error("Failed to deserialize session IDs:", error);
@@ -163,7 +150,7 @@ export function generateShareableUrlWithSessionIds(
 }
 
 export function highlightSession(session: Session) {
-  const sessionId = generateSessionId(session);
+  const sessionId = session.id;
   const sessionElement = document.getElementById(sessionId);
 
   if (sessionElement) {
@@ -199,12 +186,6 @@ ${film.synopsis}`);
   return googleCalendarUrl;
 }
 
-/**
- * Generates an ICS calendar file from a list of sessions.
- * @param {Session[]} sessions - An array of session objects.
- * @param {Map<string, Film>} filmsMap - A map of film IDs to Film objects.
- * @returns {Promise<string>} - A promise that resolves with the ICS file content.
- */
 export async function generateCalendarICS(
   sessions: Session[],
   filmsMap: FilmsMap,
