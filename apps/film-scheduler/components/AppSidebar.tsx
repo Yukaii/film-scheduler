@@ -34,7 +34,6 @@ import {
   Info,
   Compass,
   CalendarIcon,
-  DownloadIcon,
 } from "lucide-react";
 import {
   Collapsible,
