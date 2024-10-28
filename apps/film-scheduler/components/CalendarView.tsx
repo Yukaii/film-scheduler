@@ -125,7 +125,7 @@ function WeekView({
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative"
           >
-            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-16 top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
+            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
               <span
                 className={cn({
                   "font-semibold": isSameDay,
@@ -339,8 +339,8 @@ export default function CalendarView(props: { className?: string }) {
   };
 
   return (
-    <div className={cn("w-full md:px-4", props.className)}>
-      <div className="md:mb-4 py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-10">
+    <div className={cn("w-full", props.className)}>
+      <div className="py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-20 md:px-4">
         <div className="flex items-center">
           <Button variant="ghost" onClick={toggleSidebar}>
             {(isMobile ? openMobile : open) ? (
