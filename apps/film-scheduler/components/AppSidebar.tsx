@@ -438,23 +438,6 @@ export function AppSidebar() {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={downloadIcsCalendar}
-                  variant="outline"
-                  size="icon"
-                >
-                  <DownloadIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>下載 .ics 日曆</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </SidebarFooter>
     </Sidebar>
