@@ -22,7 +22,6 @@ import { Film, Session } from "./types";
 import {
   cn,
   generateGoogleCalendarUrl,
-  generateCalendarICS,
 } from "@/lib/utils";
 import dayjs from "dayjs";
 import {
@@ -256,17 +255,6 @@ export function AppSidebar() {
   const starredFilms = useMemo(() => {
     return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
-
-  const downloadIcsCalendar = () => {
-    generateCalendarICS(selectedSessions, filmsMap)
-      .then((icsContent) => {
-        if (icsContent) {
-          const blob = new Blob([icsContent], { type: "text/calendar" });
-          saveAs(blob, "Golden_Horse_Film_Schedule.ics");
-        }
-      })
-      .catch((error) => console.error("Error creating calendar:", error));
-  };
 
   return (
     <Sidebar>
