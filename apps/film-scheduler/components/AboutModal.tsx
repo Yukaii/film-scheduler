@@ -44,6 +44,23 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
             </a>
           </section>
 
+          {/* Bugs Report Link */}
+          <section>
+            <h3 className="text-lg font-semibold">問題回報</h3>
+            <p className="text-sm text-muted-foreground">
+              如果遇到任何問題，請前往 GitHub 提交 issue：
+            </p>
+            <a
+              href="https://github.com/Yukaii/film-scheduler/issues"
+              rel="noreferrer noopener"
+            >
+              <Button variant="link" className="flex items-center mt-2">
+                <ExternalLink className="mr-2" />
+                回報問題
+              </Button>
+            </a>
+          </section>
+
           {/* Contributors */}
           <section>
             <h3 className="text-lg font-semibold">貢獻者</h3>
