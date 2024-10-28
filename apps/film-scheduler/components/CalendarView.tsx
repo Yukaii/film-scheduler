@@ -308,7 +308,7 @@ function SessionBlock({
   );
 }
 
-export default function CalendarView(props: { className?: string }) {
+export function CalendarView(props: { className?: string }) {
   const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(

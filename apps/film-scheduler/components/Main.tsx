@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import React, { useMemo, useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import CalendarView from "@/components/CalendarView";
+import { CalendarView } from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
 import { AboutModal } from "@/components/AboutModal";
 import { ImportModal } from "@/components/ImportModal";
