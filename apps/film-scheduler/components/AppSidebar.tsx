@@ -40,7 +40,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "./ui/button";
-import { saveAs } from "file-saver";
 
 // FilmListItem component kept in the same file
 function FilmListItem({
@@ -207,7 +206,6 @@ export function AppSidebar() {
     starredFilmIds,
     starFilm,
     unstarFilm,
-    filmsMap,
     selectedSessions,
     removeSession,
     revealFilmDetail,
