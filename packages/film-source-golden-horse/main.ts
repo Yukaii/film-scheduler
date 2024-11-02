@@ -1,7 +1,6 @@
 // Import necessary modules
-import { parse } from "https://deno.land/std@0.117.0/flags/mod.ts";
 import { exists, readJson, writeJson } from "https://deno.land/std@0.66.0/fs/mod.ts";
-import { DOMParser, Element } from "jsr:@b-fuze/deno-dom";
+import { DOMParser } from "jsr:@b-fuze/deno-dom";
 
 // Define API URL and headers
 const url = 'https://www.goldenhorse.org.tw/api/film/search';
@@ -44,7 +43,7 @@ async function stepOneDownloadFilmList(ghffId: string, results: Record<string, {
         const ghffIds = ghffListMatches.map((match: string) => {
           const [, id] = match.match(/<option value="(\d+)">(.*?)<\/option>/) || [];
           return id;
-        }).filter(Boolean).filter(id => id !== '0');
+        }).filter(Boolean).filter((id: string) => id !== '0');
 
         // Iterate through each ghff_id to get the film list
         for (const gid of ghffIds) {
