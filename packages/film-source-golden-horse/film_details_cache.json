@@ -13,7 +13,9 @@
       }
     ],
     "duration": "119 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3853": {
     "filmTitle": "默視錄",
@@ -39,7 +41,10 @@
       }
     ],
     "duration": "126 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "653",
+      "654"
+    ]
   },
   "3854": {
     "filmTitle": "馬丁史柯西斯：英倫電影課",
@@ -65,7 +70,9 @@
       }
     ],
     "duration": "133 分",
-    "section": "傳奇影事"
+    "sectionIds": [
+      "666"
+    ]
   },
   "3855": {
     "filmTitle": "艾諾拉",
@@ -86,7 +93,9 @@
       }
     ],
     "duration": "139 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3856": {
     "filmTitle": "夏日小行星",
@@ -117,7 +126,9 @@
       }
     ],
     "duration": "113 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3857": {
     "filmTitle": "女孩與鳥",
@@ -143,7 +154,9 @@
       }
     ],
     "duration": "119 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3858": {
     "filmTitle": "德州電鋸殺人狂：鋸戲謎疑",
@@ -169,7 +182,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "傳奇影事"
+    "sectionIds": [
+      "666"
+    ]
   },
   "3859": {
     "filmTitle": "我去死一下",
@@ -190,7 +205,9 @@
       }
     ],
     "duration": "185 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3861": {
     "filmTitle": "Pavement：記錄傳奇的四種方法",
@@ -211,7 +228,9 @@
       }
     ],
     "duration": "130 分",
-    "section": "傳奇影事"
+    "sectionIds": [
+      "666"
+    ]
   },
   "3862": {
     "filmTitle": "魔怪：如果繁星有樂聲",
@@ -232,7 +251,9 @@
       }
     ],
     "duration": "92 分",
-    "section": "傳奇影事"
+    "sectionIds": [
+      "666"
+    ]
   },
   "3863": {
     "filmTitle": "艾曼紐 2024",
@@ -253,7 +274,9 @@
       }
     ],
     "duration": "105 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3864": {
     "filmTitle": "終將成為烏鴉的男人：深瀨昌久",
@@ -279,7 +302,9 @@
       }
     ],
     "duration": "117 分",
-    "section": "傳奇影事"
+    "sectionIds": [
+      "666"
+    ]
   },
   "3865": {
     "filmTitle": "馬利的假期",
@@ -300,7 +325,9 @@
       }
     ],
     "duration": "76 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3866": {
     "filmTitle": "少女迷上癮",
@@ -326,7 +353,9 @@
       }
     ],
     "duration": "100 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3867": {
     "filmTitle": "屍控奇幻旅程",
@@ -357,7 +386,9 @@
       }
     ],
     "duration": "97 分",
-    "section": "丹尼爾的多重宇宙"
+    "sectionIds": [
+      "668"
+    ]
   },
   "3868": {
     "filmTitle": "致我親愛的馬切洛",
@@ -383,7 +414,9 @@
       }
     ],
     "duration": "121 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3869": {
     "filmTitle": "壯遊",
@@ -409,7 +442,9 @@
       }
     ],
     "duration": "129 分",
-    "section": "不設防地帶"
+    "sectionIds": [
+      "660"
+    ]
   },
   "3870": {
     "filmTitle": "完美起司配方",
@@ -435,7 +470,9 @@
       }
     ],
     "duration": "90 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3871": {
     "filmTitle": "大醉俠",
@@ -461,7 +498,9 @@
       }
     ],
     "duration": "95 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3872": {
     "filmTitle": "河馬佩佩的魔幻漂流",
@@ -487,7 +526,9 @@
       }
     ],
     "duration": "123 分",
-    "section": "不設防地帶"
+    "sectionIds": [
+      "660"
+    ]
   },
   "3873": {
     "filmTitle": "媽的多重宇宙",
@@ -503,7 +544,9 @@
       }
     ],
     "duration": "140 分",
-    "section": "丹尼爾的多重宇宙"
+    "sectionIds": [
+      "668"
+    ]
   },
   "3874": {
     "filmTitle": "睡覺時眼睛睜開",
@@ -524,7 +567,9 @@
       }
     ],
     "duration": "97 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "3875": {
     "filmTitle": "腥際大帝國",
@@ -550,7 +595,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3876": {
     "filmTitle": "跳痛之旅",
@@ -581,7 +628,9 @@
       }
     ],
     "duration": "90 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3877": {
     "filmTitle": "丹尼爾短片輯",
@@ -612,7 +661,9 @@
       }
     ],
     "duration": "20 分",
-    "section": "丹尼爾的多重宇宙"
+    "sectionIds": [
+      "668"
+    ]
   },
   "3878": {
     "filmTitle": "花都剪影",
@@ -638,7 +689,9 @@
       }
     ],
     "duration": "21 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3879": {
     "filmTitle": "亞馬遜迷走",
@@ -664,7 +717,9 @@
       }
     ],
     "duration": "113 分",
-    "section": "不設防地帶"
+    "sectionIds": [
+      "660"
+    ]
   },
   "3880": {
     "filmTitle": "香江花月夜",
@@ -690,7 +745,9 @@
       }
     ],
     "duration": "124 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3881": {
     "filmTitle": "被告汪星人",
@@ -711,7 +768,9 @@
       }
     ],
     "duration": "81 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3882": {
     "filmTitle": "空房間裡的女人",
@@ -742,7 +801,9 @@
       }
     ],
     "duration": "98 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3883": {
     "filmTitle": "借來的人生故事",
@@ -768,7 +829,9 @@
       }
     ],
     "duration": "92 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3884": {
     "filmTitle": "G7高瘋會：首腦危機",
@@ -794,7 +857,9 @@
       }
     ],
     "duration": "104 分",
-    "section": "不設防地帶"
+    "sectionIds": [
+      "660"
+    ]
   },
   "3885": {
     "filmTitle": "小鎮大烏龍",
@@ -820,7 +885,9 @@
       }
     ],
     "duration": "101 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3886": {
     "filmTitle": "手榴彈．革命．還有愛與詩",
@@ -841,7 +908,9 @@
       }
     ],
     "duration": "133 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3887": {
     "filmTitle": "A面：我的一天",
@@ -872,7 +941,9 @@
       }
     ],
     "duration": "22 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3888": {
     "filmTitle": "失速夜",
@@ -893,7 +964,9 @@
       }
     ],
     "duration": "77 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3889": {
     "filmTitle": "春行",
@@ -919,7 +992,9 @@
       }
     ],
     "duration": "90 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3890": {
     "filmTitle": "沒有煙硝的山村",
@@ -950,7 +1025,9 @@
       }
     ],
     "duration": "118 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3891": {
     "filmTitle": "無憾愛別離",
@@ -981,7 +1058,9 @@
       }
     ],
     "duration": "118 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3892": {
     "filmTitle": "九月的四個星期天",
@@ -1012,7 +1091,9 @@
       }
     ],
     "duration": "15 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3893": {
     "filmTitle": "四月勿語",
@@ -1038,7 +1119,9 @@
       }
     ],
     "duration": "134 分",
-    "section": "不設防地帶"
+    "sectionIds": [
+      "660"
+    ]
   },
   "3894": {
     "filmTitle": "臥虎藏龍",
@@ -1059,7 +1142,9 @@
       }
     ],
     "duration": "120 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3895": {
     "filmTitle": "從今以後",
@@ -1085,7 +1170,9 @@
       }
     ],
     "duration": "93 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3896": {
     "filmTitle": "仲夏分手派對",
@@ -1116,7 +1203,9 @@
       }
     ],
     "duration": "114 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3897": {
     "filmTitle": "雨中的慾情",
@@ -1137,7 +1226,9 @@
       }
     ],
     "duration": "134 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3898": {
     "filmTitle": "金魚缸小姐",
@@ -1168,7 +1259,9 @@
       }
     ],
     "duration": "23 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3899": {
     "filmTitle": "鬼才之道",
@@ -1194,7 +1287,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3900": {
     "filmTitle": "關於愛的練習",
@@ -1215,7 +1310,9 @@
       }
     ],
     "duration": "104 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3901": {
     "filmTitle": "燃夜",
@@ -1246,7 +1343,9 @@
       }
     ],
     "duration": "20 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3902": {
     "filmTitle": "生之敵",
@@ -1272,7 +1371,9 @@
       }
     ],
     "duration": "108 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3903": {
     "filmTitle": "我女若蘭",
@@ -1288,7 +1389,9 @@
       }
     ],
     "duration": "111 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3904": {
     "filmTitle": "囚犬",
@@ -1319,7 +1422,9 @@
       }
     ],
     "duration": "42 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3905": {
     "filmTitle": "本心",
@@ -1345,7 +1450,9 @@
       }
     ],
     "duration": "122 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3906": {
     "filmTitle": "BIG",
@@ -1366,7 +1473,9 @@
       }
     ],
     "duration": "159 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3907": {
     "filmTitle": "死了舅舅以後",
@@ -1392,7 +1501,9 @@
       }
     ],
     "duration": "99 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3908": {
     "filmTitle": "嫌疑者的真相",
@@ -1418,7 +1529,9 @@
       }
     ],
     "duration": "120 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3909": {
     "filmTitle": "野生之路",
@@ -1444,7 +1557,9 @@
       }
     ],
     "duration": "31 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3910": {
     "filmTitle": "八百壯士",
@@ -1460,7 +1575,9 @@
       }
     ],
     "duration": "113 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3911": {
     "filmTitle": "我最喜歡的蛋糕",
@@ -1481,7 +1598,9 @@
       }
     ],
     "duration": "97 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3912": {
     "filmTitle": "青春末世物語",
@@ -1507,7 +1626,9 @@
       }
     ],
     "duration": "113 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3913": {
     "filmTitle": "莎莉",
@@ -1528,7 +1649,9 @@
       }
     ],
     "duration": "105 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3914": {
     "filmTitle": "沉默狂想三部曲",
@@ -1554,7 +1677,9 @@
       }
     ],
     "duration": "58 分",
-    "section": "作者影誌"
+    "sectionIds": [
+      "657"
+    ]
   },
   "3915": {
     "filmTitle": "顏色擷取樣本.mov",
@@ -1580,7 +1705,9 @@
       }
     ],
     "duration": "59 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3916": {
     "filmTitle": "寄生上層",
@@ -1606,7 +1733,9 @@
       }
     ],
     "duration": "89 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3917": {
     "filmTitle": "夜校女生",
@@ -1622,7 +1751,9 @@
       }
     ],
     "duration": "109 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3918": {
     "filmTitle": "獄中信－鄒幸彤",
@@ -1648,7 +1779,9 @@
       }
     ],
     "duration": "23 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3919": {
     "filmTitle": "三個羯子",
@@ -1679,7 +1812,9 @@
       }
     ],
     "duration": "80 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3920": {
     "filmTitle": "目擊風暴",
@@ -1705,7 +1840,9 @@
       }
     ],
     "duration": "100 分",
-    "section": "影迷嘉年華"
+    "sectionIds": [
+      "658"
+    ]
   },
   "3921": {
     "filmTitle": "越與南",
@@ -1731,7 +1868,9 @@
       }
     ],
     "duration": "129 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3922": {
     "filmTitle": "哦瑪",
@@ -1757,7 +1896,9 @@
       }
     ],
     "duration": "30 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3923": {
     "filmTitle": "刺心切骨",
@@ -1773,7 +1914,9 @@
       }
     ],
     "duration": "106 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3924": {
     "filmTitle": "蝴蝶，別哭（原：愛情咒語）",
@@ -1799,7 +1942,9 @@
       }
     ],
     "duration": "97 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3925": {
     "filmTitle": "慧童",
@@ -1825,7 +1970,9 @@
       }
     ],
     "duration": "58 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3926": {
     "filmTitle": "怪奇粉紅物語",
@@ -1856,7 +2003,9 @@
       }
     ],
     "duration": "100 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3927": {
     "filmTitle": "化外之醫：第1-2集",
@@ -1892,7 +2041,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3928": {
     "filmTitle": "黎明時道別傷感",
@@ -1918,7 +2069,9 @@
       }
     ],
     "duration": "116 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3929": {
     "filmTitle": "喵十一",
@@ -1949,7 +2102,9 @@
       }
     ],
     "duration": "12 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3930": {
     "filmTitle": "搖籃凡世",
@@ -1975,7 +2130,9 @@
       }
     ],
     "duration": "117 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3931": {
     "filmTitle": "非常男人",
@@ -2001,7 +2158,9 @@
       }
     ],
     "duration": "112 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3932": {
     "filmTitle": "加減乘",
@@ -2032,7 +2191,9 @@
       }
     ],
     "duration": "4 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3933": {
     "filmTitle": "拒絕沉默的女孩",
@@ -2058,7 +2219,9 @@
       }
     ],
     "duration": "74 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3934": {
     "filmTitle": "虎毒不",
@@ -2084,7 +2247,9 @@
       }
     ],
     "duration": "111 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3935": {
     "filmTitle": "幻之彼岸",
@@ -2110,7 +2275,9 @@
       }
     ],
     "duration": "99 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3936": {
     "filmTitle": "化",
@@ -2141,7 +2308,9 @@
       }
     ],
     "duration": "6 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3937": {
     "filmTitle": "黑箱日記",
@@ -2172,7 +2341,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3938": {
     "filmTitle": "房間裡的你",
@@ -2203,7 +2374,9 @@
       }
     ],
     "duration": "7 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3939": {
     "filmTitle": "你是我眼中的那道光",
@@ -2224,7 +2397,9 @@
       }
     ],
     "duration": "118 分",
-    "section": "亞洲之窗"
+    "sectionIds": [
+      "661"
+    ]
   },
   "3940": {
     "filmTitle": "寄了一整個春天",
@@ -2245,7 +2420,9 @@
       }
     ],
     "duration": "96 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3941": {
     "filmTitle": "死囡仔",
@@ -2276,7 +2453,9 @@
       }
     ],
     "duration": "5 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3942": {
     "filmTitle": "撒旦的探戈（上）",
@@ -2302,7 +2481,9 @@
       }
     ],
     "duration": "137 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3943": {
     "filmTitle": "藍色太陽宮",
@@ -2328,7 +2509,9 @@
       }
     ],
     "duration": "117 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3944": {
     "filmTitle": "餘燼",
@@ -2354,7 +2537,9 @@
       }
     ],
     "duration": "162 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3945": {
     "filmTitle": "難言之隱",
@@ -2385,7 +2570,9 @@
       }
     ],
     "duration": "129 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3946": {
     "filmTitle": "櫻桃號",
@@ -2411,7 +2598,9 @@
       }
     ],
     "duration": "100 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3947": {
     "filmTitle": "莎劇演員",
@@ -2437,7 +2626,9 @@
       }
     ],
     "duration": "122 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "3948": {
     "filmTitle": "小雁與吳愛麗",
@@ -2463,7 +2654,9 @@
       }
     ],
     "duration": "107 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3949": {
     "filmTitle": "撒旦的探戈（中）",
@@ -2489,7 +2682,9 @@
       }
     ],
     "duration": "124 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3950": {
     "filmTitle": "跳進部落的孩子",
@@ -2510,7 +2705,9 @@
       }
     ],
     "duration": "90 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3951": {
     "filmTitle": "人造正義",
@@ -2541,7 +2738,9 @@
       }
     ],
     "duration": "98 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3952": {
     "filmTitle": "撒旦的探戈（下）",
@@ -2567,7 +2766,9 @@
       }
     ],
     "duration": "177 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3954": {
     "filmTitle": "X",
@@ -2593,7 +2794,9 @@
       }
     ],
     "duration": "105 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3955": {
     "filmTitle": "看我今天怎麼說",
@@ -2624,7 +2827,9 @@
       }
     ],
     "duration": "132 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3956": {
     "filmTitle": "日泰小食",
@@ -2645,7 +2850,9 @@
       }
     ],
     "duration": "83 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3957": {
     "filmTitle": "紅菱豔",
@@ -2676,7 +2883,9 @@
       }
     ],
     "duration": "136 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3958": {
     "filmTitle": "那些受傷的臉孔",
@@ -2707,7 +2916,9 @@
       }
     ],
     "duration": "118 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3959": {
     "filmTitle": "星空下的黑潮島嶼：第1-2集",
@@ -2733,7 +2944,9 @@
       }
     ],
     "duration": "114 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3960": {
     "filmTitle": "青春18×2 通往有你的旅程",
@@ -2754,7 +2967,9 @@
       }
     ],
     "duration": "124 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3961": {
     "filmTitle": "血腥瑪辛",
@@ -2780,7 +2995,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3962": {
     "filmTitle": "喝酒吧！笨蛋：第1-2集",
@@ -2806,7 +3023,9 @@
       }
     ],
     "duration": "92 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3963": {
     "filmTitle": "爸媽不是家",
@@ -2837,7 +3056,9 @@
       }
     ],
     "duration": "79 分",
-    "section": "罪與罰"
+    "sectionIds": [
+      "662"
+    ]
   },
   "3964": {
     "filmTitle": "白衣蒼狗",
@@ -2868,7 +3089,9 @@
       }
     ],
     "duration": "130 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3965": {
     "filmTitle": "書店裡的影像詩：第三季",
@@ -2889,7 +3112,9 @@
       }
     ],
     "duration": "91 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3966": {
     "filmTitle": "穿越時空愛死你",
@@ -2915,7 +3140,9 @@
       }
     ],
     "duration": "90 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3967": {
     "filmTitle": "半路出家",
@@ -2936,7 +3163,9 @@
       }
     ],
     "duration": "15 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3968": {
     "filmTitle": "熱與塵",
@@ -2962,7 +3191,9 @@
       }
     ],
     "duration": "130 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "3969": {
     "filmTitle": "陽光普照",
@@ -2993,7 +3224,9 @@
       }
     ],
     "duration": "119 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3970": {
     "filmTitle": "優雅的相遇",
@@ -3019,7 +3252,9 @@
       }
     ],
     "duration": "127 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3971": {
     "filmTitle": "女煞葛洛莉",
@@ -3045,7 +3280,9 @@
       }
     ],
     "duration": "121 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3972": {
     "filmTitle": "在水一方",
@@ -3066,7 +3303,9 @@
       }
     ],
     "duration": "15 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3973": {
     "filmTitle": "孽種",
@@ -3087,7 +3326,9 @@
       }
     ],
     "duration": "21 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3974": {
     "filmTitle": "角頭－大橋頭",
@@ -3108,7 +3349,9 @@
       }
     ],
     "duration": "131 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3975": {
     "filmTitle": "德州電鋸殺人狂",
@@ -3134,7 +3377,9 @@
       }
     ],
     "duration": "83 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3976": {
     "filmTitle": "惡魔的洗禮",
@@ -3160,7 +3405,9 @@
       }
     ],
     "duration": "121 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3977": {
     "filmTitle": "波士頓人",
@@ -3186,7 +3433,9 @@
       }
     ],
     "duration": "122 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "3978": {
     "filmTitle": "車輪與灰塵",
@@ -3207,7 +3456,9 @@
       }
     ],
     "duration": "21 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3979": {
     "filmTitle": "鬼妹",
@@ -3228,7 +3479,9 @@
       }
     ],
     "duration": "28 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3980": {
     "filmTitle": "以妳的語言呼喚我",
@@ -3249,7 +3502,9 @@
       }
     ],
     "duration": "101 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "3981": {
     "filmTitle": "夢幻天堂",
@@ -3275,7 +3530,9 @@
       }
     ],
     "duration": "108 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3982": {
     "filmTitle": "拍三小電影",
@@ -3306,7 +3563,9 @@
       }
     ],
     "duration": "80 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3983": {
     "filmTitle": "沃土",
@@ -3337,7 +3596,9 @@
       }
     ],
     "duration": "123 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3984": {
     "filmTitle": "窗外有藍天",
@@ -3363,7 +3624,9 @@
       }
     ],
     "duration": "117 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "3985": {
     "filmTitle": "遊戲",
@@ -3389,7 +3652,9 @@
       }
     ],
     "duration": "12 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3986": {
     "filmTitle": "藥頭悲歌",
@@ -3415,7 +3680,9 @@
       }
     ],
     "duration": "109 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3987": {
     "filmTitle": "十一人賊軍",
@@ -3436,7 +3703,9 @@
       }
     ],
     "duration": "155 分",
-    "section": "瘋狂特快車"
+    "sectionIds": [
+      "665"
+    ]
   },
   "3988": {
     "filmTitle": "慾望迷蹤",
@@ -3457,7 +3726,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "3989": {
     "filmTitle": "昏飛",
@@ -3483,7 +3754,9 @@
       }
     ],
     "duration": "13 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3990": {
     "filmTitle": "蟲",
@@ -3514,7 +3787,9 @@
       }
     ],
     "duration": "135 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "3991": {
     "filmTitle": "橫山家之味",
@@ -3530,7 +3805,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3992": {
     "filmTitle": "山裡走走",
@@ -3556,7 +3833,9 @@
       }
     ],
     "duration": "20 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3993": {
     "filmTitle": "薄荷涼菸",
@@ -3582,7 +3861,9 @@
       }
     ],
     "duration": "20 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3994": {
     "filmTitle": "春風沉醉的夜晚",
@@ -3608,7 +3889,9 @@
       }
     ],
     "duration": "111 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "3995": {
     "filmTitle": "墨利斯的情人",
@@ -3634,7 +3917,9 @@
       }
     ],
     "duration": "140 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "3996": {
     "filmTitle": "尋找彼端的你",
@@ -3660,7 +3945,9 @@
       }
     ],
     "duration": "106 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "3997": {
     "filmTitle": "原來海上沒有島",
@@ -3686,7 +3973,9 @@
       }
     ],
     "duration": "25 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "3999": {
     "filmTitle": "母親三十歲",
@@ -3707,7 +3996,9 @@
       }
     ],
     "duration": "89 分",
-    "section": "經典重現"
+    "sectionIds": [
+      "667"
+    ]
   },
   "4000": {
     "filmTitle": "洗淨",
@@ -3733,7 +4024,9 @@
       }
     ],
     "duration": "23 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "4001": {
     "filmTitle": "女兒的女兒",
@@ -3759,7 +4052,9 @@
       }
     ],
     "duration": "126 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4002": {
     "filmTitle": "此情可問天",
@@ -3785,7 +4080,9 @@
       }
     ],
     "duration": "142 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "4003": {
     "filmTitle": "氣旋",
@@ -3806,7 +4103,9 @@
       }
     ],
     "duration": "13 分",
-    "section": "華語首映"
+    "sectionIds": [
+      "655"
+    ]
   },
   "4004": {
     "filmTitle": "距離世界盡頭三公里",
@@ -3832,7 +4131,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "4005": {
     "filmTitle": "隔壁的房間",
@@ -3853,7 +4154,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "大師饗宴"
+    "sectionIds": [
+      "656"
+    ]
   },
   "4006": {
     "filmTitle": "長日將盡",
@@ -3879,7 +4182,9 @@
       }
     ],
     "duration": "134 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "4007": {
     "filmTitle": "默詮艾佛利電影情緣",
@@ -3900,7 +4205,9 @@
       }
     ],
     "duration": "112 分",
-    "section": "焦點導演：詹姆斯艾佛利"
+    "sectionIds": [
+      "669"
+    ]
   },
   "4008": {
     "filmTitle": "李歐卡霍：不是我",
@@ -3926,7 +4233,9 @@
       }
     ],
     "duration": "41 分",
-    "section": "大師饗宴"
+    "sectionIds": [
+      "656"
+    ]
   },
   "4009": {
     "filmTitle": "破浪男女",
@@ -3947,7 +4256,9 @@
       }
     ],
     "duration": "106 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4010": {
     "filmTitle": "秋光變奏曲",
@@ -3973,7 +4284,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "大師饗宴"
+    "sectionIds": [
+      "656"
+    ]
   },
   "4011": {
     "filmTitle": "白天的我，夜裡的他",
@@ -3999,7 +4312,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "4012": {
     "filmTitle": "我談的那場戀愛",
@@ -4025,7 +4340,9 @@
       }
     ],
     "duration": "114 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4013": {
     "filmTitle": "武替道",
@@ -4046,7 +4363,9 @@
       }
     ],
     "duration": "114 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4014": {
     "filmTitle": "約見波布",
@@ -4067,7 +4386,9 @@
       }
     ],
     "duration": "112 分",
-    "section": "大師饗宴"
+    "sectionIds": [
+      "656"
+    ]
   },
   "4015": {
     "filmTitle": "憐憫的種類",
@@ -4098,7 +4419,9 @@
       }
     ],
     "duration": "164 分",
-    "section": "大師饗宴"
+    "sectionIds": [
+      "656"
+    ]
   },
   "4016": {
     "filmTitle": "青春（苦）",
@@ -4124,7 +4447,9 @@
       }
     ],
     "duration": "226 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4017": {
     "filmTitle": "由島至島",
@@ -4145,7 +4470,9 @@
       }
     ],
     "duration": "290 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4018": {
     "filmTitle": "漂亮朋友",
@@ -4181,7 +4508,9 @@
       }
     ],
     "duration": "117 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4019": {
     "filmTitle": "一部未完成的電影",
@@ -4207,7 +4536,9 @@
       }
     ],
     "duration": "107 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4020": {
     "filmTitle": "有些夜晚我想散步",
@@ -4233,7 +4564,9 @@
       }
     ],
     "duration": "103 分",
-    "section": "酷兒新世界"
+    "sectionIds": [
+      "663"
+    ]
   },
   "4021": {
     "filmTitle": "種土",
@@ -4254,7 +4587,9 @@
       }
     ],
     "duration": "142 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4022": {
     "filmTitle": "香巴拉",
@@ -4280,7 +4615,9 @@
       }
     ],
     "duration": "150 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4023": {
     "filmTitle": "雪水消融的季節",
@@ -4301,7 +4638,9 @@
       }
     ],
     "duration": "110 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4024": {
     "filmTitle": "列車捎來的幸福",
@@ -4327,7 +4666,9 @@
       }
     ],
     "duration": "80 分",
-    "section": "動畫傳送門"
+    "sectionIds": [
+      "664"
+    ]
   },
   "4025": {
     "filmTitle": "曦曦",
@@ -4348,7 +4689,9 @@
       }
     ],
     "duration": "100 分",
-    "section": "金馬獎入圍影片"
+    "sectionIds": [
+      "654"
+    ]
   },
   "4026": {
     "filmTitle": "超摩登原始人",
@@ -4374,7 +4717,9 @@
       }
     ],
     "duration": "85 分",
-    "section": "動畫傳送門"
+    "sectionIds": [
+      "664"
+    ]
   },
   "4027": {
     "filmTitle": "好野人出沒，注意！",
@@ -4400,7 +4745,9 @@
       }
     ],
     "duration": "86 分",
-    "section": "動畫傳送門"
+    "sectionIds": [
+      "664"
+    ]
   },
   "4028": {
     "filmTitle": "少年西蒙的煩惱",
@@ -4426,7 +4773,9 @@
       }
     ],
     "duration": "98 分",
-    "section": "影壇新勢力"
+    "sectionIds": [
+      "659"
+    ]
   },
   "4029": {
     "filmTitle": "擁抱棉花糖男孩",
@@ -4447,7 +4796,9 @@
       }
     ],
     "duration": "79 分",
-    "section": "動畫傳送門"
+    "sectionIds": [
+      "664"
+    ]
   },
   "4030": {
     "filmTitle": "沙漏下的療養院",
@@ -4473,7 +4824,9 @@
       }
     ],
     "duration": "77 分",
-    "section": "動畫傳送門"
+    "sectionIds": [
+      "664"
+    ]
   },
   "4032": {
     "filmTitle": "粗獷派建築師",
@@ -4494,6 +4847,8 @@
       }
     ],
     "duration": "215 分",
-    "section": "神祕影片"
+    "sectionIds": [
+      "670"
+    ]
   }
 }

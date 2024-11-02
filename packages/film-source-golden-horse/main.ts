@@ -4,8 +4,7 @@ import { DOMParser } from "jsr:@b-fuze/deno-dom";
 interface FilmBasicInfo {
   name: string;
   imageUrl: string;
-  sectionId: string;
-  sectionName: string;
+  sectionIds: string[];
 }
 
 interface FilmSchedule {
@@ -22,7 +21,7 @@ interface FilmDetails {
   synopsis: string;
   schedule: FilmSchedule[];
   duration: string;
-  section: string;
+  sectionIds: string[];
 }
 
 interface Category {
@@ -41,12 +40,17 @@ interface FestivalConfig {
   name: string;
 }
 
+interface FilmSectionsMap {
+  [filmId: string]: string[];
+}
+
 class Config {
   static readonly API_URL = 'https://www.goldenhorse.org.tw/api/film/search';
   static readonly FILM_DETAILS_BASE_URL = 'https://www.goldenhorse.org.tw/film/programme/films/detail';
   static readonly CACHE_FILE_PATH = './film_list_cache.json';
   static readonly DETAILS_CACHE_FILE_PATH = './film_details_cache.json';
   static readonly SECTIONS_CACHE_FILE_PATH = './sections_cache.json';
+  static readonly SECTIONS_MAP_CACHE_FILE_PATH = './film_sections_map.json';
   static readonly HEADERS = new Headers({
     'Accept': 'application/json',
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -159,8 +163,8 @@ class FilmApiService {
 }
 
 class ParserService {
-  static parseFilmListAndImages(filmList: string, imageList: string): Record<string, Omit<FilmBasicInfo, 'sectionId' | 'sectionName'>> {
-    const results: Record<string, Omit<FilmBasicInfo, 'sectionId' | 'sectionName'>> = {};
+  static parseFilmListAndImages(filmList: string, imageList: string): Record<string, Omit<FilmBasicInfo, 'sectionIds'>> {
+    const results: Record<string, Omit<FilmBasicInfo, 'sectionIds'>> = {};
     const filmListMatches = filmList.match(/<option value="(\d+)">(.*?)<\/option>/g) || [];
     const imageListMatches = imageList.match(/<span id="movie_alt_(\d+)"[\s\S]*?<img class="col-12" src="(https:[^\s]+\.jpeg)"/g) || [];
 
@@ -175,7 +179,7 @@ class ParserService {
     return results;
   }
 
-  static parseFilmDetailsFromHtml(document: Document): Omit<FilmDetails, 'section'> {
+  static parseFilmDetailsFromHtml(document: Document): Omit<FilmDetails, 'sectionIds'> {
     const titleElement = document.querySelector("div.h1.first");
     const directorElement = document.querySelector("div.h4");
     const synopsisElements = document.querySelectorAll("div.margin-top.zero p");
@@ -224,7 +228,7 @@ class ParserService {
 }
 
 class FilmService {
-  static async downloadFilmList(ghffId: string, results: Record<string, FilmBasicInfo> = {}): Promise<Record<string, FilmBasicInfo>> {
+  static async downloadFilmList(ghffId: string, results: Record<string, FilmBasicInfo> = {}, sectionMap: FilmSectionsMap = {}): Promise<[Record<string, FilmBasicInfo>, FilmSectionsMap]> {
     const payload = new URLSearchParams({
       'action': 'get_class_list',
       'search_year': Config.DEFAULT_YEAR,
@@ -245,19 +249,26 @@ class FilmService {
         const sections = SectionManager.getSections();
         for (const section of sections) {
           if (section.id !== '0') {
-            await this.downloadFilmList(section.id, results);
+            await this.downloadFilmList(section.id, results, sectionMap);
           }
         }
       } else {
-        const currentSection = SectionManager.getSection(ghffId);
         const sectionFilms = ParserService.parseFilmListAndImages(data.film_list, data.image_list);
 
         Object.entries(sectionFilms).forEach(([filmId, filmInfo]) => {
-          results[filmId] = {
-            ...filmInfo,
-            sectionId: ghffId,
-            sectionName: currentSection?.name || 'Unknown Section'
-          };
+          if (!results[filmId]) {
+            results[filmId] = {
+              ...filmInfo,
+              sectionIds: []
+            };
+          }
+
+          if (!sectionMap[filmId]) {
+            sectionMap[filmId] = [];
+          }
+          if (!sectionMap[filmId].includes(ghffId)) {
+            sectionMap[filmId].push(ghffId);
+          }
         });
       }
 
@@ -265,10 +276,15 @@ class FilmService {
       console.error(`Error fetching data for ghff_id: ${ghffId}:`, error);
     }
 
-    return results;
+    return [results, sectionMap];
   }
 
-  static async getFilmDetails(filmId: string, detailsCache: Record<string, FilmDetails>, films: Record<string, FilmBasicInfo>): Promise<void> {
+  static async getFilmDetails(
+    filmId: string,
+    detailsCache: Record<string, FilmDetails>,
+    films: Record<string, FilmBasicInfo>,
+    sectionMap: FilmSectionsMap
+  ): Promise<void> {
     if (detailsCache[filmId]) {
       console.log(`Loaded film details for filmId: ${filmId} from cache.`);
       console.log(detailsCache[filmId]);
@@ -283,10 +299,9 @@ class FilmService {
       const document = new DOMParser().parseFromString(html, "text/html");
       if (!document) throw new Error(`Failed to parse HTML for filmId: ${filmId}`);
 
-      const filmInfo = films[filmId];
       const filmDetails = {
         ...ParserService.parseFilmDetailsFromHtml(document),
-        section: filmInfo.sectionName
+        sectionIds: sectionMap[filmId] || []
       };
 
       detailsCache[filmId] = filmDetails;
@@ -305,19 +320,23 @@ async function main() {
 
   let results = await CacheManager.loadCache<Record<string, FilmBasicInfo>>(Config.CACHE_FILE_PATH) || {};
   let detailsCache = await CacheManager.loadCache<Record<string, FilmDetails>>(Config.DETAILS_CACHE_FILE_PATH) || {};
+  let sectionMap = await CacheManager.loadCache<FilmSectionsMap>(Config.SECTIONS_MAP_CACHE_FILE_PATH) || {};
 
   if (Object.keys(results).length === 0) {
-    results = await FilmService.downloadFilmList('0');
+    [results, sectionMap] = await FilmService.downloadFilmList('0');
     await CacheManager.saveCache(Config.CACHE_FILE_PATH, results);
-    console.log("Saved film list to cache.");
+    await CacheManager.saveCache(Config.SECTIONS_MAP_CACHE_FILE_PATH, sectionMap);
+    console.log("Saved film list and section map to cache.");
   }
 
   console.log("\nFinal Film List:\n");
   console.log(JSON.stringify(results, null, 2));
+  console.log("\nSection Mapping:\n");
+  console.log(JSON.stringify(sectionMap, null, 2));
 
   const filmIds = Object.keys(results).filter(filmId => filmId !== '0');
   for (const filmId of filmIds) {
-    await FilmService.getFilmDetails(filmId, detailsCache, results);
+    await FilmService.getFilmDetails(filmId, detailsCache, results, sectionMap);
     await new Promise(resolve => setTimeout(resolve, 700));
   }
 }
