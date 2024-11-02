@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import * as React from "react";
+import Image, { type StaticImageData } from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -17,33 +18,38 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+import onboarding1Src from "@/public/images/onboarding-1.jpg";
+import onboarding2Src from "@/public/images/onboarding-2.gif";
+import onboarding3Src from "@/public/images/onboarding-3.png";
+import onboarding4Src from "@/public/images/onboarding-4.png";
+
 interface TutorialStep {
   title: string;
   description: string;
-  imageSrc: string;
+  imageSrc: StaticImageData;
 }
 
 const tutorialSteps: TutorialStep[] = [
   {
     title: "Step 1: 在影片列表搜尋影片",
     description: "在影片列表選擇您想觀賞的影片",
-    imageSrc: "/images/onboarding-1.jpg",
+    imageSrc: onboarding1Src,
   },
   {
     title: "Step 2: 加到場次列表中",
     description: "點一下月曆上的灰色場次，新增到列表",
-    imageSrc: "/images/onboarding-2.gif",
+    imageSrc: onboarding2Src,
   },
   {
     title: "Step 3: 管理場次",
     description: "可以在「已選擇場次」管理新增的場次",
-    imageSrc: "/images/onboarding-3.png",
+    imageSrc: onboarding3Src,
   },
   {
     title: "分享場次",
     description: "您可以在分享選單分享連結，或是下載 ics 檔案匯入到行事曆",
-    imageSrc: "/images/onboarding-4.png",
-  }
+    imageSrc: onboarding4Src,
+  },
 ];
 
 interface OnboardTutorialModalProps {
@@ -72,7 +78,8 @@ export function OnboardTutorialModal({
                 <div className="px-2 py-4 w-full">
                   <Card className="w-full">
                     <CardContent className="flex flex-col items-center space-y-3 p-4 md:p-6">
-                      <img
+                      <Image
+                        priority
                         src={step.imageSrc}
                         alt={step.title}
                         className="aspect-video max-h-40 md:max-h-48 w-full object-contain"
