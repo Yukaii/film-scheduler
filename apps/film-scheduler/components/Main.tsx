@@ -46,10 +46,14 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
 
   // migrate session without id
   useEffect(() => {
-    if (selectedSessions.some((s) => !s.id)) {
-      setSelectedSessions(
-        selectedSessions.map((s) => ({ ...s, id: generateSessionId(s) })),
+    const sessionsWithoutIds = selectedSessions.some((s) => !s.id);
+
+    if (sessionsWithoutIds) {
+      const updatedSessions = selectedSessions.map((s) =>
+        s.id ? s : { ...s, id: generateSessionId(s) }
       );
+
+      setSelectedSessions(updatedSessions);
     }
   }, [selectedSessions, setSelectedSessions]);
 
