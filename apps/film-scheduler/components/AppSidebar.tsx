@@ -26,7 +26,6 @@ import {
 import dayjs from "dayjs";
 import {
   ChevronDown,
-  Eye,
   Star,
   X,
   ExternalLink,
@@ -49,7 +48,6 @@ function FilmListItem({
   onClickSession,
   isStarred,
   onStarToggle,
-  onClickViewDetail,
 }: {
   film: Film;
   isPreviewing: boolean;
@@ -85,16 +83,6 @@ function FilmListItem({
           <span className="text-xs whitespace-nowrap">
             [{film.duration} 分鐘]
           </span>
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClickViewDetail(film);
-          }}
-          className="ml-2 p-2"
-        >
-          <Eye size={16} />
         </button>
 
         <button
