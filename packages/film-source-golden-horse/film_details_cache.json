@@ -12,7 +12,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "119 分"
+    "duration": "119 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3853": {
     "filmTitle": "默視錄",
@@ -37,7 +40,11 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "126 分"
+    "duration": "126 分",
+    "sectionIds": [
+      "653",
+      "654"
+    ]
   },
   "3854": {
     "filmTitle": "馬丁史柯西斯：英倫電影課",
@@ -62,7 +69,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "133 分"
+    "duration": "133 分",
+    "sectionIds": [
+      "666"
+    ]
   },
   "3855": {
     "filmTitle": "艾諾拉",
@@ -82,7 +92,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "139 分"
+    "duration": "139 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3856": {
     "filmTitle": "夏日小行星",
@@ -105,9 +118,17 @@
         "date": "11.23",
         "time": "10:10",
         "location": "信義威秀 13廳"
+      },
+      {
+        "date": "11.24",
+        "time": "15:50",
+        "location": "信義威秀 13廳 ( 加演場 )"
       }
     ],
-    "duration": "113 分"
+    "duration": "113 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3857": {
     "filmTitle": "女孩與鳥",
@@ -132,7 +153,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "119 分"
+    "duration": "119 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3858": {
     "filmTitle": "德州電鋸殺人狂：鋸戲謎疑",
@@ -157,7 +181,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "666"
+    ]
   },
   "3859": {
     "filmTitle": "我去死一下",
@@ -177,7 +204,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "185 分"
+    "duration": "185 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3861": {
     "filmTitle": "Pavement：記錄傳奇的四種方法",
@@ -189,15 +219,18 @@
       {
         "date": "11.15",
         "time": "15:50",
-        "location": "信義威秀 11廳"
+        "location": "信義威秀 11廳　 ★"
       },
       {
         "date": "11.17",
         "time": "21:00",
-        "location": "信義威秀 10廳"
+        "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "130 分"
+    "duration": "130 分",
+    "sectionIds": [
+      "666"
+    ]
   },
   "3862": {
     "filmTitle": "魔怪：如果繁星有樂聲",
@@ -217,7 +250,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "92 分"
+    "duration": "92 分",
+    "sectionIds": [
+      "666"
+    ]
   },
   "3863": {
     "filmTitle": "艾曼紐 2024",
@@ -237,7 +273,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "105 分"
+    "duration": "105 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3864": {
     "filmTitle": "終將成為烏鴉的男人：深瀨昌久",
@@ -262,7 +301,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "117 分"
+    "duration": "117 分",
+    "sectionIds": [
+      "666"
+    ]
   },
   "3865": {
     "filmTitle": "馬利的假期",
@@ -282,7 +324,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "76 分"
+    "duration": "76 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3866": {
     "filmTitle": "少女迷上癮",
@@ -307,7 +352,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "100 分"
+    "duration": "100 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3867": {
     "filmTitle": "屍控奇幻旅程",
@@ -330,9 +378,17 @@
         "date": "11.21",
         "time": "18:30",
         "location": "信義威秀 10廳　 ★"
+      },
+      {
+        "date": "11.23",
+        "time": "11:00",
+        "location": "信義威秀 10廳"
       }
     ],
-    "duration": "97 分"
+    "duration": "97 分",
+    "sectionIds": [
+      "668"
+    ]
   },
   "3868": {
     "filmTitle": "致我親愛的馬切洛",
@@ -357,7 +413,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "121 分"
+    "duration": "121 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3869": {
     "filmTitle": "壯遊",
@@ -382,7 +441,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "129 分"
+    "duration": "129 分",
+    "sectionIds": [
+      "660"
+    ]
   },
   "3870": {
     "filmTitle": "完美起司配方",
@@ -407,7 +469,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "90 分"
+    "duration": "90 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3871": {
     "filmTitle": "大醉俠",
@@ -425,9 +490,17 @@
         "date": "11.11",
         "time": "13:00",
         "location": "信義威秀 13廳　 ▲"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 13廳 ( 加演場 )　 ▲"
       }
     ],
-    "duration": "95 分"
+    "duration": "95 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3872": {
     "filmTitle": "河馬佩佩的魔幻漂流",
@@ -452,7 +525,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "123 分"
+    "duration": "123 分",
+    "sectionIds": [
+      "660"
+    ]
   },
   "3873": {
     "filmTitle": "媽的多重宇宙",
@@ -467,7 +543,10 @@
         "location": "MUVIE TITAN　 ★"
       }
     ],
-    "duration": "140 分"
+    "duration": "140 分",
+    "sectionIds": [
+      "668"
+    ]
   },
   "3874": {
     "filmTitle": "睡覺時眼睛睜開",
@@ -487,7 +566,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "97 分"
+    "duration": "97 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "3875": {
     "filmTitle": "腥際大帝國",
@@ -512,7 +594,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3876": {
     "filmTitle": "跳痛之旅",
@@ -528,7 +613,7 @@
       },
       {
         "date": "11.13",
-        "time": "22:10",
+        "time": "18:20",
         "location": "MUVIE TITAN"
       },
       {
@@ -542,7 +627,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "90 分"
+    "duration": "90 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3877": {
     "filmTitle": "丹尼爾短片輯",
@@ -565,9 +653,17 @@
         "date": "11.21",
         "time": "18:30",
         "location": "信義威秀 10廳　 ★"
+      },
+      {
+        "date": "11.23",
+        "time": "11:00",
+        "location": "信義威秀 10廳"
       }
     ],
-    "duration": "20 分"
+    "duration": "20 分",
+    "sectionIds": [
+      "668"
+    ]
   },
   "3878": {
     "filmTitle": "花都剪影",
@@ -592,7 +688,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "21 分"
+    "duration": "21 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3879": {
     "filmTitle": "亞馬遜迷走",
@@ -617,7 +716,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "113 分"
+    "duration": "113 分",
+    "sectionIds": [
+      "660"
+    ]
   },
   "3880": {
     "filmTitle": "香江花月夜",
@@ -635,9 +737,17 @@
         "date": "11.16",
         "time": "16:30",
         "location": "信義威秀 13廳　 ▲"
+      },
+      {
+        "date": "11.24",
+        "time": "11:00",
+        "location": "信義威秀 13廳 ( 加演場 )　 ▲"
       }
     ],
-    "duration": "124 分"
+    "duration": "124 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3881": {
     "filmTitle": "被告汪星人",
@@ -657,7 +767,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "81 分"
+    "duration": "81 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3882": {
     "filmTitle": "空房間裡的女人",
@@ -687,7 +800,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "98 分"
+    "duration": "98 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3883": {
     "filmTitle": "借來的人生故事",
@@ -712,7 +828,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "92 分"
+    "duration": "92 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3884": {
     "filmTitle": "G7高瘋會：首腦危機",
@@ -737,7 +856,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "104 分"
+    "duration": "104 分",
+    "sectionIds": [
+      "660"
+    ]
   },
   "3885": {
     "filmTitle": "小鎮大烏龍",
@@ -762,7 +884,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "101 分"
+    "duration": "101 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3886": {
     "filmTitle": "手榴彈．革命．還有愛與詩",
@@ -782,7 +907,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "133 分"
+    "duration": "133 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3887": {
     "filmTitle": "A面：我的一天",
@@ -802,12 +930,20 @@
         "location": "信義威秀 12廳"
       },
       {
+        "date": "11.17",
+        "time": "10:50",
+        "location": "信義威秀 13廳"
+      },
+      {
         "date": "11.22",
         "time": "18:40",
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "22 分"
+    "duration": "22 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3888": {
     "filmTitle": "失速夜",
@@ -827,7 +963,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "77 分"
+    "duration": "77 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3889": {
     "filmTitle": "春行",
@@ -852,7 +991,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "90 分"
+    "duration": "90 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3890": {
     "filmTitle": "沒有煙硝的山村",
@@ -872,12 +1014,20 @@
         "location": "信義威秀 10廳"
       },
       {
+        "date": "11.19",
+        "time": "21:20",
+        "location": "信義威秀 10廳 ( 加演場 )"
+      },
+      {
         "date": "11.23",
         "time": "16:20",
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "118 分"
+    "duration": "118 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3891": {
     "filmTitle": "無憾愛別離",
@@ -900,9 +1050,17 @@
         "date": "11.21",
         "time": "21:30",
         "location": "信義威秀 13廳"
+      },
+      {
+        "date": "11.24",
+        "time": "18:20",
+        "location": "信義威秀 13廳 ( 加演場 )"
       }
     ],
-    "duration": "118 分"
+    "duration": "118 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3892": {
     "filmTitle": "九月的四個星期天",
@@ -922,12 +1080,20 @@
         "location": "信義威秀 12廳"
       },
       {
+        "date": "11.17",
+        "time": "10:50",
+        "location": "信義威秀 13廳"
+      },
+      {
         "date": "11.22",
         "time": "18:40",
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "15 分"
+    "duration": "15 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3893": {
     "filmTitle": "四月勿語",
@@ -952,7 +1118,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "134 分"
+    "duration": "134 分",
+    "sectionIds": [
+      "660"
+    ]
   },
   "3894": {
     "filmTitle": "臥虎藏龍",
@@ -972,7 +1141,10 @@
         "location": "MUVIE TITAN　 ▲"
       }
     ],
-    "duration": "120 分"
+    "duration": "120 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3895": {
     "filmTitle": "從今以後",
@@ -997,7 +1169,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "93 分"
+    "duration": "93 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3896": {
     "filmTitle": "仲夏分手派對",
@@ -1020,9 +1195,17 @@
         "date": "11.23",
         "time": "21:40",
         "location": "信義威秀 13廳"
+      },
+      {
+        "date": "11.24",
+        "time": "10:20",
+        "location": "信義威秀 10廳 ( 加演場 )"
       }
     ],
-    "duration": "114 分"
+    "duration": "114 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3897": {
     "filmTitle": "雨中的慾情",
@@ -1042,7 +1225,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "134 分"
+    "duration": "134 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3898": {
     "filmTitle": "金魚缸小姐",
@@ -1062,12 +1248,20 @@
         "location": "信義威秀 12廳"
       },
       {
+        "date": "11.17",
+        "time": "10:50",
+        "location": "信義威秀 13廳"
+      },
+      {
         "date": "11.22",
         "time": "18:40",
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "23 分"
+    "duration": "23 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3899": {
     "filmTitle": "鬼才之道",
@@ -1092,7 +1286,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3900": {
     "filmTitle": "關於愛的練習",
@@ -1107,17 +1304,15 @@
         "location": "信義威秀 11廳"
       },
       {
-        "date": "11.21",
-        "time": "16:10",
-        "location": "信義威秀 10廳"
-      },
-      {
         "date": "11.23",
         "time": "17:20",
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "104 分"
+    "duration": "104 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3901": {
     "filmTitle": "燃夜",
@@ -1137,12 +1332,20 @@
         "location": "信義威秀 12廳"
       },
       {
+        "date": "11.17",
+        "time": "10:50",
+        "location": "信義威秀 13廳"
+      },
+      {
         "date": "11.22",
         "time": "18:40",
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "20 分"
+    "duration": "20 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3902": {
     "filmTitle": "生之敵",
@@ -1167,7 +1370,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "108 分"
+    "duration": "108 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3903": {
     "filmTitle": "我女若蘭",
@@ -1182,7 +1388,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "111 分"
+    "duration": "111 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3904": {
     "filmTitle": "囚犬",
@@ -1191,6 +1400,11 @@
     "directorOriginalName": "YEN Hao-hsuan",
     "synopsis": "資源班龍蛇雜處，頭腦不靈光的阿河，即使被愚弄仍成日與壞同學混在一起；用功讀書的班長小潔，將升學視為脫離眼下環境的唯一出路。一念之善，小潔自願擔任阿河的小老師，兩人受命共同看顧一隻籠中野狗，更多了一份連結。然而，現實的去與留，讓人沒有機會做出溫柔的選擇⋯⋯。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -1207,7 +1421,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "42 分"
+    "duration": "42 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3905": {
     "filmTitle": "本心",
@@ -1232,7 +1449,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "122 分"
+    "duration": "122 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3906": {
     "filmTitle": "BIG",
@@ -1252,7 +1472,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "159 分"
+    "duration": "159 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3907": {
     "filmTitle": "死了舅舅以後",
@@ -1277,7 +1500,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "99 分"
+    "duration": "99 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3908": {
     "filmTitle": "嫌疑者的真相",
@@ -1302,7 +1528,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "120 分"
+    "duration": "120 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3909": {
     "filmTitle": "野生之路",
@@ -1327,7 +1556,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "31 分"
+    "duration": "31 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3910": {
     "filmTitle": "八百壯士",
@@ -1342,7 +1574,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "113 分"
+    "duration": "113 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3911": {
     "filmTitle": "我最喜歡的蛋糕",
@@ -1362,7 +1597,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "97 分"
+    "duration": "97 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3912": {
     "filmTitle": "青春末世物語",
@@ -1387,7 +1625,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "113 分"
+    "duration": "113 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3913": {
     "filmTitle": "莎莉",
@@ -1407,7 +1648,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "105 分"
+    "duration": "105 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3914": {
     "filmTitle": "沉默狂想三部曲",
@@ -1432,7 +1676,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "58 分"
+    "duration": "58 分",
+    "sectionIds": [
+      "657"
+    ]
   },
   "3915": {
     "filmTitle": "顏色擷取樣本.mov",
@@ -1457,7 +1704,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "59 分"
+    "duration": "59 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3916": {
     "filmTitle": "寄生上層",
@@ -1482,7 +1732,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "89 分"
+    "duration": "89 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3917": {
     "filmTitle": "夜校女生",
@@ -1497,7 +1750,10 @@
         "location": "MUVIE TITAN　 ★"
       }
     ],
-    "duration": "109 分"
+    "duration": "109 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3918": {
     "filmTitle": "獄中信－鄒幸彤",
@@ -1522,7 +1778,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "23 分"
+    "duration": "23 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3919": {
     "filmTitle": "三個羯子",
@@ -1544,15 +1803,18 @@
       {
         "date": "11.18",
         "time": "18:40",
-        "location": "信義威秀 11廳　 ★"
+        "location": "信義威秀 11廳"
       },
       {
         "date": "11.19",
         "time": "11:20",
-        "location": "信義威秀 11廳　 ★"
+        "location": "信義威秀 11廳"
       }
     ],
-    "duration": "80 分"
+    "duration": "80 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3920": {
     "filmTitle": "目擊風暴",
@@ -1577,7 +1839,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "100 分"
+    "duration": "100 分",
+    "sectionIds": [
+      "658"
+    ]
   },
   "3921": {
     "filmTitle": "越與南",
@@ -1602,7 +1867,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "129 分"
+    "duration": "129 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3922": {
     "filmTitle": "哦瑪",
@@ -1627,7 +1895,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "30 分"
+    "duration": "30 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3923": {
     "filmTitle": "刺心切骨",
@@ -1642,7 +1913,10 @@
         "location": "MUVIE TITAN　 ★"
       }
     ],
-    "duration": "106 分"
+    "duration": "106 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3924": {
     "filmTitle": "蝴蝶，別哭（原：愛情咒語）",
@@ -1667,7 +1941,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "97 分"
+    "duration": "97 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3925": {
     "filmTitle": "慧童",
@@ -1692,7 +1969,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "58 分"
+    "duration": "58 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3926": {
     "filmTitle": "怪奇粉紅物語",
@@ -1722,7 +2002,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "100 分"
+    "duration": "100 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3927": {
     "filmTitle": "化外之醫：第1-2集",
@@ -1757,7 +2040,10 @@
         "location": "高雄內惟藝術中心 1廳 ( 司法講堂 )"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3928": {
     "filmTitle": "黎明時道別傷感",
@@ -1782,7 +2068,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "116 分"
+    "duration": "116 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3929": {
     "filmTitle": "喵十一",
@@ -1791,6 +2080,11 @@
     "directorOriginalName": "ZHANG Bo",
     "synopsis": "白虎大俠十一勇闖法場救弟兄，一番鏖戰不敵魔頭絕情刀，淪為檯上囚刀下肉。刀劍如電亦如夢，十一霎時驚覺絕情刀似為舊識。江湖路冷孽緣難了，這一刀揮下，是恩還是怨？絕命怎能不絕情？腦洞大開、喵不可言的奇作！華麗打鬥，叫人血脈賁張，驚人轉折，更是拍案叫絕。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -1807,7 +2101,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "12 分"
+    "duration": "12 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3930": {
     "filmTitle": "搖籃凡世",
@@ -1832,7 +2129,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "117 分"
+    "duration": "117 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3931": {
     "filmTitle": "非常男人",
@@ -1857,7 +2157,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "112 分"
+    "duration": "112 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3932": {
     "filmTitle": "加減乘",
@@ -1866,6 +2169,11 @@
     "directorOriginalName": "LEE Chu-chieh",
     "synopsis": "有沒有哪一處能完美容下我，讓我不再哭泣？女子穿梭於充滿容器的未知世界，尋覓安身之處，也摸索自己內心空缺的形狀。她四下張望，嚮往叢生，然而他人的目光，能否帶來心底的安詳？以容器隱喻安全場所，運用2D動畫與陶藝、黏土等媒材，反映出自我認同的不同追尋狀態。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -1882,7 +2190,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "4 分"
+    "duration": "4 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3933": {
     "filmTitle": "拒絕沉默的女孩",
@@ -1907,7 +2218,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "74 分"
+    "duration": "74 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3934": {
     "filmTitle": "虎毒不",
@@ -1932,7 +2246,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "111 分"
+    "duration": "111 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3935": {
     "filmTitle": "幻之彼岸",
@@ -1957,7 +2274,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "99 分"
+    "duration": "99 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3936": {
     "filmTitle": "化",
@@ -1966,6 +2286,11 @@
     "directorOriginalName": "HUNG Wan-yu",
     "synopsis": "風起葉揚，露水、草葉、樹枝、天地靈氣聚合為一獸。草化羽，葉化身，獸低頭照水鏡，映見自我之時，森林相應而生。風再起，獸舞林中旋，林亦舞翩翩，萬物化於同一節奏，消解彼此邊界。化靜為動的停格動畫，將簡約自然元素、傳統樂音，凝為哲思墜心池，泛成漣漪陣陣。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -1982,7 +2307,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "6 分"
+    "duration": "6 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3937": {
     "filmTitle": "黑箱日記",
@@ -2012,7 +2340,10 @@
         "location": "高雄內惟藝術中心 1廳 ( 司法講堂 )"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3938": {
     "filmTitle": "房間裡的你",
@@ -2021,6 +2352,11 @@
     "directorOriginalName": "SHEK Ka-chun",
     "synopsis": "遙遠房間裡的你，記憶隧道中的我，手上魔術方塊一轉，門一道道推開，我穿越房間賣力追逐彼方的你，為何你與我之間，總是走不近、觸不到、抱不著、看不清？把人子面對獄中父親長年缺席的疏離，具象化為令人心碎的空間變化。炭筆手繪的粗礪質地、抖動線條，更添抑鬱情調。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -2037,7 +2373,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "7 分"
+    "duration": "7 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3939": {
     "filmTitle": "你是我眼中的那道光",
@@ -2057,7 +2396,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "118 分"
+    "duration": "118 分",
+    "sectionIds": [
+      "661"
+    ]
   },
   "3940": {
     "filmTitle": "寄了一整個春天",
@@ -2077,7 +2419,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "96 分"
+    "duration": "96 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3941": {
     "filmTitle": "死囡仔",
@@ -2086,6 +2431,11 @@
     "directorOriginalName": "CHUANG Yu-jin",
     "synopsis": "鄉道猴子沒有重機，只能玩玩夾娃娃機，敲敲交通導標解氣。紅蟲聚集，犬吠不息，引擎轉急，危險訊號來襲，幻音迷色飆起，這群死囡仔的天真嬉戲，會不會一甩釀成無法挽回的嘆息？取材自導演的中小學任教經歷，以石膏與粉彩刮繪，將熟悉的在地鄉間元素，濃縮為絢爛極短篇。",
     "schedule": [
+      {
+        "date": "11.10",
+        "time": "21:50",
+        "location": "信義威秀 13廳"
+      },
       {
         "date": "11.17",
         "time": "10:10",
@@ -2102,7 +2452,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "5 分"
+    "duration": "5 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3942": {
     "filmTitle": "撒旦的探戈（上）",
@@ -2127,7 +2480,10 @@
         "location": "信義威秀 11廳 ( 中場休息20分鐘 )"
       }
     ],
-    "duration": "137 分"
+    "duration": "137 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3943": {
     "filmTitle": "藍色太陽宮",
@@ -2152,7 +2508,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "117 分"
+    "duration": "117 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3944": {
     "filmTitle": "餘燼",
@@ -2163,7 +2522,7 @@
     "schedule": [
       {
         "date": "11.13",
-        "time": "18:20",
+        "time": "20:30",
         "location": "MUVIE TITAN　 ★"
       },
       {
@@ -2177,7 +2536,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "162 分"
+    "duration": "162 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3945": {
     "filmTitle": "難言之隱",
@@ -2207,7 +2569,10 @@
         "location": "台中大魯閣威秀 3廳"
       }
     ],
-    "duration": "129 分"
+    "duration": "129 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3946": {
     "filmTitle": "櫻桃號",
@@ -2232,7 +2597,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "100 分"
+    "duration": "100 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3947": {
     "filmTitle": "莎劇演員",
@@ -2257,7 +2625,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "122 分"
+    "duration": "122 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "3948": {
     "filmTitle": "小雁與吳愛麗",
@@ -2282,7 +2653,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "107 分"
+    "duration": "107 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3949": {
     "filmTitle": "撒旦的探戈（中）",
@@ -2307,7 +2681,10 @@
         "location": "信義威秀 11廳 ( 中場休息20分鐘 )"
       }
     ],
-    "duration": "124 分"
+    "duration": "124 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3950": {
     "filmTitle": "跳進部落的孩子",
@@ -2327,7 +2704,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "90 分"
+    "duration": "90 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3951": {
     "filmTitle": "人造正義",
@@ -2357,7 +2737,10 @@
         "location": "高雄內惟藝術中心 1廳"
       }
     ],
-    "duration": "98 分"
+    "duration": "98 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3952": {
     "filmTitle": "撒旦的探戈（下）",
@@ -2382,7 +2765,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "177 分"
+    "duration": "177 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3954": {
     "filmTitle": "X",
@@ -2407,7 +2793,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "105 分"
+    "duration": "105 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3955": {
     "filmTitle": "看我今天怎麼說",
@@ -2437,7 +2826,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "132 分"
+    "duration": "132 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3956": {
     "filmTitle": "日泰小食",
@@ -2457,7 +2849,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "83 分"
+    "duration": "83 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3957": {
     "filmTitle": "紅菱豔",
@@ -2480,9 +2875,17 @@
         "date": "11.18",
         "time": "15:40",
         "location": "信義威秀 10廳"
+      },
+      {
+        "date": "11.23",
+        "time": "18:50",
+        "location": "信義威秀 10廳 ( 加演場 )"
       }
     ],
-    "duration": "136 分"
+    "duration": "136 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3958": {
     "filmTitle": "那些受傷的臉孔",
@@ -2512,7 +2915,10 @@
         "location": "台中大魯閣威秀 3廳"
       }
     ],
-    "duration": "118 分"
+    "duration": "118 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3959": {
     "filmTitle": "星空下的黑潮島嶼：第1-2集",
@@ -2534,10 +2940,13 @@
       {
         "date": "11.15",
         "time": "16:20",
-        "location": "信義威秀 12廳"
+        "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "114 分"
+    "duration": "114 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3960": {
     "filmTitle": "青春18×2 通往有你的旅程",
@@ -2557,7 +2966,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "124 分"
+    "duration": "124 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3961": {
     "filmTitle": "血腥瑪辛",
@@ -2582,7 +2994,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3962": {
     "filmTitle": "喝酒吧！笨蛋：第1-2集",
@@ -2604,10 +3019,13 @@
       {
         "date": "11.18",
         "time": "16:10",
-        "location": "信義威秀 11廳"
+        "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "92 分"
+    "duration": "92 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3963": {
     "filmTitle": "爸媽不是家",
@@ -2637,7 +3055,10 @@
         "location": "高雄內惟藝術中心 1廳"
       }
     ],
-    "duration": "79 分"
+    "duration": "79 分",
+    "sectionIds": [
+      "662"
+    ]
   },
   "3964": {
     "filmTitle": "白衣蒼狗",
@@ -2667,7 +3088,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "130 分"
+    "duration": "130 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3965": {
     "filmTitle": "書店裡的影像詩：第三季",
@@ -2687,7 +3111,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "91 分"
+    "duration": "91 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3966": {
     "filmTitle": "穿越時空愛死你",
@@ -2712,7 +3139,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "90 分"
+    "duration": "90 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3967": {
     "filmTitle": "半路出家",
@@ -2732,7 +3162,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "15 分"
+    "duration": "15 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3968": {
     "filmTitle": "熱與塵",
@@ -2757,7 +3190,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "130 分"
+    "duration": "130 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "3969": {
     "filmTitle": "陽光普照",
@@ -2780,9 +3216,17 @@
         "date": "11.21",
         "time": "11:10",
         "location": "信義威秀 12廳"
+      },
+      {
+        "date": "11.23",
+        "time": "21:00",
+        "location": "信義威秀 12廳 ( 加演場 )"
       }
     ],
-    "duration": "119 分"
+    "duration": "119 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3970": {
     "filmTitle": "優雅的相遇",
@@ -2807,7 +3251,10 @@
         "location": "信義威秀 15廳 ( 業界限定場 )"
       }
     ],
-    "duration": "127 分"
+    "duration": "127 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3971": {
     "filmTitle": "女煞葛洛莉",
@@ -2832,7 +3279,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "121 分"
+    "duration": "121 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3972": {
     "filmTitle": "在水一方",
@@ -2852,7 +3302,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "15 分"
+    "duration": "15 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3973": {
     "filmTitle": "孽種",
@@ -2872,7 +3325,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "21 分"
+    "duration": "21 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3974": {
     "filmTitle": "角頭－大橋頭",
@@ -2892,7 +3348,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "131 分"
+    "duration": "131 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3975": {
     "filmTitle": "德州電鋸殺人狂",
@@ -2917,7 +3376,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "83 分"
+    "duration": "83 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3976": {
     "filmTitle": "惡魔的洗禮",
@@ -2942,7 +3404,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "121 分"
+    "duration": "121 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3977": {
     "filmTitle": "波士頓人",
@@ -2967,7 +3432,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "122 分"
+    "duration": "122 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "3978": {
     "filmTitle": "車輪與灰塵",
@@ -2987,7 +3455,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "21 分"
+    "duration": "21 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3979": {
     "filmTitle": "鬼妹",
@@ -3007,7 +3478,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "28 分"
+    "duration": "28 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3980": {
     "filmTitle": "以妳的語言呼喚我",
@@ -3027,7 +3501,10 @@
         "location": "信義威秀 12廳　 ▲ ★"
       }
     ],
-    "duration": "101 分"
+    "duration": "101 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "3981": {
     "filmTitle": "夢幻天堂",
@@ -3052,7 +3529,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "108 分"
+    "duration": "108 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3982": {
     "filmTitle": "拍三小電影",
@@ -3072,12 +3552,20 @@
         "location": "MUVIE TITAN"
       },
       {
+        "date": "11.23",
+        "time": "21:40",
+        "location": "信義威秀 10廳 ( 加演場 )"
+      },
+      {
         "date": "11.24",
         "time": "12:50",
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "80 分"
+    "duration": "80 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3983": {
     "filmTitle": "沃土",
@@ -3107,7 +3595,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "123 分"
+    "duration": "123 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3984": {
     "filmTitle": "窗外有藍天",
@@ -3132,7 +3623,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "117 分"
+    "duration": "117 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "3985": {
     "filmTitle": "遊戲",
@@ -3150,9 +3644,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "12 分"
+    "duration": "12 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3986": {
     "filmTitle": "藥頭悲歌",
@@ -3177,7 +3679,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "109 分"
+    "duration": "109 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3987": {
     "filmTitle": "十一人賊軍",
@@ -3197,7 +3702,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "155 分"
+    "duration": "155 分",
+    "sectionIds": [
+      "665"
+    ]
   },
   "3988": {
     "filmTitle": "慾望迷蹤",
@@ -3217,14 +3725,17 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "3989": {
     "filmTitle": "昏飛",
     "filmOriginalTitle": "Nuptial Flight",
     "directorName": "陳俊先",
     "directorOriginalName": "CHAN Chon-sin",
-    "synopsis": "跳舞的男人眼中出現不規則光影，隨著舞動的身軀盤踞在視線之中。他遵循醫囑啃食鳳梨，視野裡的不速之客仍難以驅散。澳門導演將鳳梨吃出新風貌，黑白彩色實驗拼貼，影像無聲喧嘩。",
+    "synopsis": "跳舞的男人眼中出現不規則光影，隨著舞動的身軀盤踞在視線之中。他遵循醫囑啃食鳳梨，視野裡的不速之客仍難以驅散，飛蚊如影隨形。澳門導演將黑白彩色實驗拼貼，影像無聲喧嘩。",
     "schedule": [
       {
         "date": "11.17",
@@ -3235,9 +3746,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "13 分"
+    "duration": "13 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3990": {
     "filmTitle": "蟲",
@@ -3267,7 +3786,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "135 分"
+    "duration": "135 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "3991": {
     "filmTitle": "橫山家之味",
@@ -3282,7 +3804,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3992": {
     "filmTitle": "山裡走走",
@@ -3300,9 +3825,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "20 分"
+    "duration": "20 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3993": {
     "filmTitle": "薄荷涼菸",
@@ -3320,9 +3853,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "20 分"
+    "duration": "20 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3994": {
     "filmTitle": "春風沉醉的夜晚",
@@ -3337,12 +3878,20 @@
         "location": "信義威秀 11廳　 ▲"
       },
       {
+        "date": "11.15",
+        "time": "21:40",
+        "location": "信義威秀 11廳 ( 加演場 )　 ▲"
+      },
+      {
         "date": "11.16",
         "time": "10:40",
         "location": "信義威秀 11廳　 ▲"
       }
     ],
-    "duration": "111 分"
+    "duration": "111 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "3995": {
     "filmTitle": "墨利斯的情人",
@@ -3367,7 +3916,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "140 分"
+    "duration": "140 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "3996": {
     "filmTitle": "尋找彼端的你",
@@ -3392,7 +3944,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "106 分"
+    "duration": "106 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "3997": {
     "filmTitle": "原來海上沒有島",
@@ -3410,9 +3965,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "25 分"
+    "duration": "25 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "3999": {
     "filmTitle": "母親三十歲",
@@ -3432,7 +3995,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "89 分"
+    "duration": "89 分",
+    "sectionIds": [
+      "667"
+    ]
   },
   "4000": {
     "filmTitle": "洗淨",
@@ -3450,9 +4016,17 @@
         "date": "11.21",
         "time": "16:00",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.22",
+        "time": "21:30",
+        "location": "信義威秀 12廳"
       }
     ],
-    "duration": "23 分"
+    "duration": "23 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "4001": {
     "filmTitle": "女兒的女兒",
@@ -3477,7 +4051,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "126 分"
+    "duration": "126 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4002": {
     "filmTitle": "此情可問天",
@@ -3502,7 +4079,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "142 分"
+    "duration": "142 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "4003": {
     "filmTitle": "氣旋",
@@ -3522,7 +4102,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "13 分"
+    "duration": "13 分",
+    "sectionIds": [
+      "655"
+    ]
   },
   "4004": {
     "filmTitle": "距離世界盡頭三公里",
@@ -3547,7 +4130,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "4005": {
     "filmTitle": "隔壁的房間",
@@ -3567,7 +4153,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "656"
+    ]
   },
   "4006": {
     "filmTitle": "長日將盡",
@@ -3592,7 +4181,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "134 分"
+    "duration": "134 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "4007": {
     "filmTitle": "默詮艾佛利電影情緣",
@@ -3612,7 +4204,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "112 分"
+    "duration": "112 分",
+    "sectionIds": [
+      "669"
+    ]
   },
   "4008": {
     "filmTitle": "李歐卡霍：不是我",
@@ -3637,7 +4232,10 @@
         "location": "信義威秀 10廳"
       }
     ],
-    "duration": "41 分"
+    "duration": "41 分",
+    "sectionIds": [
+      "656"
+    ]
   },
   "4009": {
     "filmTitle": "破浪男女",
@@ -3657,7 +4255,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "106 分"
+    "duration": "106 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4010": {
     "filmTitle": "秋光變奏曲",
@@ -3682,7 +4283,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "656"
+    ]
   },
   "4011": {
     "filmTitle": "白天的我，夜裡的他",
@@ -3707,7 +4311,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "4012": {
     "filmTitle": "我談的那場戀愛",
@@ -3729,10 +4336,13 @@
       {
         "date": "11.21",
         "time": "21:20",
-        "location": "信義威秀 11廳"
+        "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "114 分"
+    "duration": "114 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4013": {
     "filmTitle": "武替道",
@@ -3752,7 +4362,10 @@
         "location": "信義威秀 13廳　 ★"
       }
     ],
-    "duration": "114 分"
+    "duration": "114 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4014": {
     "filmTitle": "約見波布",
@@ -3772,7 +4385,10 @@
         "location": "信義威秀 11廳"
       }
     ],
-    "duration": "112 分"
+    "duration": "112 分",
+    "sectionIds": [
+      "656"
+    ]
   },
   "4015": {
     "filmTitle": "憐憫的種類",
@@ -3802,7 +4418,10 @@
         "location": "MUVIE TITAN"
       }
     ],
-    "duration": "164 分"
+    "duration": "164 分",
+    "sectionIds": [
+      "656"
+    ]
   },
   "4016": {
     "filmTitle": "青春（苦）",
@@ -3827,7 +4446,10 @@
         "location": "信義威秀 11廳　 ★"
       }
     ],
-    "duration": "226 分"
+    "duration": "226 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4017": {
     "filmTitle": "由島至島",
@@ -3847,7 +4469,10 @@
         "location": "信義威秀 12廳 ( 中場休息10分鐘 )"
       }
     ],
-    "duration": "290 分"
+    "duration": "290 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4018": {
     "filmTitle": "漂亮朋友",
@@ -3875,16 +4500,24 @@
         "date": "11.22",
         "time": "10:30",
         "location": "MUVIE TITAN"
+      },
+      {
+        "date": "11.23",
+        "time": "10:30",
+        "location": "信義威秀 11廳 ( 加演場 )"
       }
     ],
-    "duration": "117 分"
+    "duration": "117 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4019": {
     "filmTitle": "一部未完成的電影",
     "filmOriginalTitle": "An Unfinished Film",
     "directorName": "婁燁",
     "directorOriginalName": "LOU Ye",
-    "synopsis": "2020年初，一個電影攝製組在武漢附近重聚，準備繼續拍攝一部十年前未完成的影片，但是隨著各地進入封城狀態，全攝製組不得不共同面對意想不到的挑戰。導演曉睿必須要決定是不是再次中斷拍攝。有一些工作人員和演員幸運地在酒店被封鎖之前離開了，而被滯留在酒店裡的每個人都被困在了自己的房間裡。所有與外界的溝通都只能通過手機進行，而身處隔離之中的主要演員江誠和被封在北京的妻子和一個月大的寶寶通過網路互相陪伴，共同渡過最艱難的那段日子。",
+    "synopsis": "2020年初，一個電影攝製組在武漢附近重聚，準備繼續拍攝一部十年前未完成的影片，但是隨著各地進入封城狀態，全攝製組不得不共同面對意想不到的挑戰。導演曉睿必須要決定是不是再次中斷拍攝。有一些工作人員和演員幸運地在酒店被封鎖之前離開了，而被滯留在酒店裡的每個人都被困在了自己的房間裡。所有與外界的溝通都只能通過手機進行，而身處隔離之中的主要演員江誠和被封在北京的妻子和一個月大的寶寶通過網路互相陪伴，共同度過最艱難的那段日子。",
     "schedule": [
       {
         "date": "11.17",
@@ -3902,7 +4535,10 @@
         "location": "MUVIE TITAN　 ★"
       }
     ],
-    "duration": "107 分"
+    "duration": "107 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4020": {
     "filmTitle": "有些夜晚我想散步",
@@ -3920,9 +4556,17 @@
         "date": "11.18",
         "time": "15:50",
         "location": "信義威秀 13廳　 ★"
+      },
+      {
+        "date": "11.24",
+        "time": "20:50",
+        "location": "信義威秀 13廳 ( 加演場 )"
       }
     ],
-    "duration": "103 分"
+    "duration": "103 分",
+    "sectionIds": [
+      "663"
+    ]
   },
   "4021": {
     "filmTitle": "種土",
@@ -3942,7 +4586,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "142 分"
+    "duration": "142 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4022": {
     "filmTitle": "香巴拉",
@@ -3967,7 +4614,10 @@
         "location": "信義威秀 10廳　 ★"
       }
     ],
-    "duration": "150 分"
+    "duration": "150 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4023": {
     "filmTitle": "雪水消融的季節",
@@ -3987,7 +4637,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "110 分"
+    "duration": "110 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4024": {
     "filmTitle": "列車捎來的幸福",
@@ -4012,7 +4665,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "80 分"
+    "duration": "80 分",
+    "sectionIds": [
+      "664"
+    ]
   },
   "4025": {
     "filmTitle": "曦曦",
@@ -4032,7 +4688,10 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "100 分"
+    "duration": "100 分",
+    "sectionIds": [
+      "654"
+    ]
   },
   "4026": {
     "filmTitle": "超摩登原始人",
@@ -4050,9 +4709,17 @@
         "date": "11.09",
         "time": "17:20",
         "location": "信義威秀 12廳　 ★"
+      },
+      {
+        "date": "11.24",
+        "time": "10:50",
+        "location": "信義威秀 11廳 ( 加演場 )"
       }
     ],
-    "duration": "85 分"
+    "duration": "85 分",
+    "sectionIds": [
+      "664"
+    ]
   },
   "4027": {
     "filmTitle": "好野人出沒，注意！",
@@ -4077,7 +4744,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "86 分"
+    "duration": "86 分",
+    "sectionIds": [
+      "664"
+    ]
   },
   "4028": {
     "filmTitle": "少年西蒙的煩惱",
@@ -4102,7 +4772,10 @@
         "location": "信義威秀 12廳"
       }
     ],
-    "duration": "98 分"
+    "duration": "98 分",
+    "sectionIds": [
+      "659"
+    ]
   },
   "4029": {
     "filmTitle": "擁抱棉花糖男孩",
@@ -4122,7 +4795,10 @@
         "location": "信義威秀 12廳　 ★"
       }
     ],
-    "duration": "79 分"
+    "duration": "79 分",
+    "sectionIds": [
+      "664"
+    ]
   },
   "4030": {
     "filmTitle": "沙漏下的療養院",
@@ -4147,6 +4823,32 @@
         "location": "信義威秀 13廳"
       }
     ],
-    "duration": "77 分"
+    "duration": "77 分",
+    "sectionIds": [
+      "664"
+    ]
+  },
+  "4032": {
+    "filmTitle": "粗獷派建築師",
+    "filmOriginalTitle": "The Brutalist",
+    "directorName": "布萊迪寇貝特",
+    "directorOriginalName": "Brady CORBET",
+    "synopsis": "二戰結束，匈牙利猶太裔建築師逃過死劫，遠渡重洋來到美國。他一方面等待被困在歐洲的妻子與姪女前來會合，另方面在賓州定居，受當地富豪賞識才氣，準備在陌生土地上重新展開事業。然而，在歐洲身為成功建築師的地位與聲勢，卻難以在此地的上流社會中延續。隨著建案推進、權力增長，付出的代價亦愈見高昂，心中期待的「美國夢」，反而變得虛幻難觸⋯⋯。\n\n時隔多年，《邪惡的養成》導演布萊迪寇貝特推出新作，不僅再度和莫娜費斯沃德共同編劇，更找來《戰地琴人》奧斯卡影帝安卓亞布洛迪、實力派演員費莉絲蒂瓊斯與蓋皮爾斯共演。善用演員幽暗神祕的氣質，在精準場面調度與配樂中堆疊心理層次，並將建築風格與戰後身心狀態相比喻，深度詮釋移民者經驗的無法類同，以及藝術創作的漫長艱難，為影片創造宏大而史詩的氣勢，一舉拿下威尼斯影展最佳導演獎。",
+    "schedule": [
+      {
+        "date": "11.20",
+        "time": "19:50",
+        "location": "MUVIE TITAN ( 中場休息15分鐘 )"
+      },
+      {
+        "date": "11.23",
+        "time": "19:30",
+        "location": "信義威秀 11廳 ( 中場休息15分鐘 )"
+      }
+    ],
+    "duration": "215 分",
+    "sectionIds": [
+      "670"
+    ]
   }
 }
