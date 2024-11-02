@@ -10,10 +10,10 @@ import { useAppContext } from "@/contexts/AppContext";
 import {
   cn,
   findSessionIndex,
-  generateSessionId,
   getSessionDuration,
   includesSession,
   scrollNowIndicatorIntoView,
+  joinSessions,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
 import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -55,14 +55,7 @@ function WeekView({
   const startHour = 10;
   const hoursInDay = 14;
 
-  const sessions = Array.from(
-    new Map(
-      [...selectedSessions, ...previewSessions].map((session) => [
-        session.filmId + session.time + session.location,
-        session,
-      ]),
-    ).values(),
-  );
+  const sessions = joinSessions(selectedSessions, previewSessions)
 
   // Current time state to track "now"
   const [now, setNow] = useState(dayjs());
@@ -155,7 +148,7 @@ function WeekView({
                 .filter((session) => dayjs(session.time).isSame(day, "day"))
                 .map((session) => (
                   <SessionBlock
-                    key={generateSessionId(session)}
+                    key={session.id}
                     session={session}
                     filmsMap={filmsMap}
                     selectedSessions={selectedSessions}
@@ -204,7 +197,7 @@ function SessionBlock({
   const film = filmsMap.get(session.filmId);
   if (!film) return null;
 
-  const sessionId = generateSessionId(session);
+  const sessionId = session.id;
 
   const startTime = dayjs(session.time);
   const endTime = startTime.add(film.duration, "minute");
@@ -315,7 +308,7 @@ function SessionBlock({
   );
 }
 
-export default function CalendarView(props: { className?: string }) {
+export function CalendarView(props: { className?: string }) {
   const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(

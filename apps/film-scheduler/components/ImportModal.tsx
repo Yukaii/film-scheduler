@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import { Session, FilmsMap } from "@/components/types";
-import { generateSessionId } from "@/lib/utils";
 
 interface ImportModalProps {
   sessions: Session[];
@@ -48,7 +47,7 @@ export function ImportModal({
 
   const selectAllSessions = (isSelected?: boolean) => {
     if (isSelected) {
-      setSelectedSessionIds(new Set(sessions.map((s) => generateSessionId(s))));
+      setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
     } else {
       setSelectedSessionIds(new Set());
     }
@@ -56,7 +55,7 @@ export function ImportModal({
 
   const selectedSessions = useMemo(() => {
     return sessions.filter((session) =>
-      selectedSessionIds.has(generateSessionId(session)),
+      selectedSessionIds.has(session.id),
     );
   }, [selectedSessionIds, sessions]);
 
@@ -96,7 +95,7 @@ export function ImportModal({
 
           {sessions.map((session) => {
             const film = filmsMap.get(session.filmId);
-            const sessionId = generateSessionId(session);
+            const sessionId = session.id;
             if (!film) return null;
 
             return (
