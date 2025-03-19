@@ -9,10 +9,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "allowJs": true,
     "declaration": true,
     "lib": ["ES2022", "DOM"],
     "typeRoots": ["./node_modules/@types", "./src/@types"]
   },
-  "include": ["src/**/*.ts", "src/@types/**/*.d.ts"],
+  "include": ["src/**/*.ts", "src/@types/**/*.d.ts", "*.json"],
   "exclude": ["node_modules"]
 }
