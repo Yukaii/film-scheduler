@@ -1,5 +1,7 @@
-import { exists, readJson, writeJson } from "https://deno.land/std@0.66.0/fs/mod.ts";
-import { DOMParser } from "jsr:@b-fuze/deno-dom";
+import fs from 'fs/promises';
+import path from 'path';
+import fetch from 'node-fetch';
+import { JSDOM } from 'jsdom';
 
 interface FilmBasicInfo {
   name: string;
@@ -51,10 +53,10 @@ class Config {
   static readonly DETAILS_CACHE_FILE_PATH = './film_details_cache.json';
   static readonly SECTIONS_CACHE_FILE_PATH = './sections_cache.json';
   static readonly SECTIONS_MAP_CACHE_FILE_PATH = './film_sections_map.json';
-  static readonly HEADERS = new Headers({
+  static readonly HEADERS = {
     'Accept': 'application/json',
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-  });
+  };
 
   static readonly CATEGORIES: Category[] = [
     { value: 'FFF', label: '金馬奇幻影展' },
@@ -82,14 +84,24 @@ class Config {
 
 class CacheManager {
   static async loadCache<T>(filePath: string): Promise<T | null> {
-    if (await exists(filePath)) {
-      return await readJson(filePath) as T;
+    try {
+      if (await fs.stat(filePath).catch(() => null)) {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as T;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error loading cache from ${filePath}:`, error);
+      return null;
     }
-    return null;
   }
 
   static async saveCache(filePath: string, data: unknown): Promise<void> {
-    await writeJson(filePath, data, { spaces: 2 });
+    try {
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (error) {
+      console.error(`Error saving cache to ${filePath}:`, error);
+    }
   }
 }
 
@@ -153,7 +165,7 @@ class FilmApiService {
     return await fetch(Config.API_URL, {
       method: 'POST',
       headers: Config.HEADERS,
-      body: payload
+      body: payload.toString()
     });
   }
 
@@ -296,7 +308,8 @@ class FilmService {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const html = await response.text();
-      const document = new DOMParser().parseFromString(html, "text/html");
+      const dom = new JSDOM(html);
+      const document = dom.window.document;
       if (!document) throw new Error(`Failed to parse HTML for filmId: ${filmId}`);
 
       const filmDetails = {
@@ -341,4 +354,4 @@ async function main() {
   }
 }
 
-main();
+main().catch(console.error);

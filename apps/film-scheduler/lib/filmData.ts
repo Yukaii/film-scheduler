@@ -1,5 +1,5 @@
 import { Film, RawFilm } from "@/components/types";
-import filmsData from "../data/filmsData.json";
+import { filmDetailsCache } from "@film-scheduler/film-source-golden-horse/data";
 import { generateSessionId } from "@/lib/utils";
 
 function transformFilm([id, rawFilm]: [string, RawFilm]): Film {
@@ -26,7 +26,7 @@ function transformFilm([id, rawFilm]: [string, RawFilm]): Film {
 }
 
 export const films = (
-  Object.entries(filmsData) as unknown as [string, RawFilm][]
+  Object.entries(filmDetailsCache) as unknown as [string, RawFilm][]
 ).map(transformFilm);
 export const filmsMap = films.reduce((acc, film) => {
   acc.set(film.id, film);
