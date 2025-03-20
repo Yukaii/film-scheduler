@@ -8,48 +8,15 @@ import inquirer from 'inquirer';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-interface FilmBasicInfo {
-  name: string;
-  imageUrl: string;
-  sectionIds: string[];
-}
-
-interface FilmSchedule {
-  date: string;
-  time: string;
-  location: string;
-}
-
-interface FilmDetails {
-  filmTitle: string;
-  filmOriginalTitle: string;
-  directorName: string;
-  directorOriginalName: string;
-  synopsis: string;
-  schedule: FilmSchedule[];
-  duration: string;
-  sectionIds: string[];
-}
-
-interface Category {
-  value: string;
-  label: string;
-}
-
-interface Section {
-  id: string;
-  name: string;
-}
-
-interface FestivalConfig {
-  year: string;
-  parentId: string;
-  category: string;
-}
-
-interface FilmSectionsMap {
-  [filmId: string]: string[];
-}
+import {
+  FilmBasicInfo,
+  FilmSchedule,
+  FilmDetails,
+  Category,
+  Section,
+  FestivalConfig,
+  FilmSectionsMap
+} from './types';
 
 class Config {
   static readonly API_URL = 'https://www.goldenhorse.org.tw/api/film/search';
