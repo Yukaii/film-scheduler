@@ -39,7 +39,7 @@ interface Section {
 interface FestivalConfig {
   year: string;
   parentId: string;
-  name: string;
+  category: string;
 }
 
 interface FilmSectionsMap {
@@ -65,8 +65,9 @@ class Config {
   ];
 
   static readonly FESTIVALS: FestivalConfig[] = [
-    { year: '2024', parentId: '638', name: '第61屆金馬影展' },
-    { year: '2023', parentId: '637', name: '第60屆金馬影展' },
+    { year: '2025', parentId: '674', category: 'FFF' },
+    { year: '2024', parentId: '638', category: 'FF' },
+    { year: '2023', parentId: '637', category: 'FF' },
   ];
 
   static readonly ACTIVE_FESTIVAL = Config.FESTIVALS[0];
@@ -78,8 +79,6 @@ class Config {
   static get DEFAULT_PARENT_ID(): string {
     return this.ACTIVE_FESTIVAL.parentId;
   }
-
-  static readonly DEFAULT_CATEGORY = 'FF';
 }
 
 class CacheManager {
@@ -122,7 +121,7 @@ class SectionManager {
     const payload = new URLSearchParams({
       'action': 'get_class_list',
       'search_year': Config.DEFAULT_YEAR,
-      'search_category': Config.DEFAULT_CATEGORY,
+      'search_category': Config.ACTIVE_FESTIVAL.category,
       'parent_id': Config.DEFAULT_PARENT_ID,
       'ghff_id': '0'
     });
@@ -244,7 +243,7 @@ class FilmService {
     const payload = new URLSearchParams({
       'action': 'get_class_list',
       'search_year': Config.DEFAULT_YEAR,
-      'search_category': Config.DEFAULT_CATEGORY,
+      'search_category': Config.ACTIVE_FESTIVAL.category,
       'parent_id': Config.DEFAULT_PARENT_ID,
       'ghff_id': ghffId
     });
