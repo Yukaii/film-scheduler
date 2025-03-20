@@ -1,4 +1,6 @@
 {
   "buildCommand": "pnpm build",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "outputDirectory": "apps/film-scheduler/.next"
 }
