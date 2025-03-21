@@ -102,6 +102,11 @@ function WeekView({
     // Only handle left mouse button
     if (e.button !== 0) return;
     
+    // Don't start drag if clicked on a session block
+    if ((e.target as HTMLElement).closest('.session-block')) {
+      return;
+    }
+    
     // Find the position relative to the day column
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const posY = e.clientY - rect.top;
@@ -144,6 +149,12 @@ function WeekView({
     setDragStartPos(null);
     setDragEndDay(null);
     setDragEndPos(null);
+    
+    // Prevent any click events for the next few milliseconds to avoid triggering session clicks
+    weekViewRef.current?.setAttribute('data-prevent-clicks', 'true');
+    setTimeout(() => {
+      weekViewRef.current?.removeAttribute('data-prevent-clicks');
+    }, 300);
   };
 
   // Handle mouse leave during selection to cancel it
@@ -196,12 +207,13 @@ function WeekView({
     return () => {
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos]);
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, handleMouseUp]);
 
   return (
     <div 
       className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative"
       ref={weekViewRef}
+      data-is-dragging={isDragging}
     >
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
@@ -391,7 +403,7 @@ function SessionBlock({
       className={cn(
         "absolute max-w-[calc(100%-10px)] text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
         "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
-        "select-none",
+        "select-none session-block",
         {
           "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
             !isSelectedSession,
@@ -401,11 +413,10 @@ function SessionBlock({
           "p-1": !isTinyCard,
         },
       )}
-      onClick={() => {
+      onClick={(e) => {        
         if (isPreviewSession) {
           addSession(session);
         }
-
         if (isSelectedSession) {
           revealFilmDetail(film);
         }
