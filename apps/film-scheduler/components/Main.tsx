@@ -9,6 +9,7 @@ import { FilmSidebar } from "@/components/FilmSidebar";
 import { AboutModal } from "@/components/AboutModal";
 import { ImportModal } from "@/components/ImportModal";
 import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
+import { FillBlankModal } from "@/components/FillBlankModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
@@ -25,7 +26,8 @@ import {
   useSessionImport,
   useOnboardingStatus,
 } from "@/lib/hooks";
-import { Festival } from "@/lib/filmData";
+import { Festival, fetchFilms } from "@/lib/filmData";
+import useSWR from "swr";
 
 const ShareModal = dynamic(() =>
   import("@/components/ShareModal").then((m) => m.ShareModal),
@@ -190,6 +192,46 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
   const openAboutModal = () => setAboutModalOpen(true);
   const closeAboutModal = () => setAboutModalOpen(false);
 
+  // Fill the Blank functionality
+  const { open: isFillBlankModalOpen, setOpen: setFillBlankModalOpen } = useToggle(false);
+  const openFillBlankModal = () => setFillBlankModalOpen(true);
+  const closeFillBlankModal = () => setFillBlankModalOpen(false);
+  const [timeSelectionStart, setTimeSelectionStart] = useState<Date | null>(null);
+  const [timeSelectionEnd, setTimeSelectionEnd] = useState<Date | null>(null);
+
+  const setTimeSelection = (start: Date | null, end: Date | null) => {
+    // Always ensure start time is before end time
+    if (start && end && start > end) {
+      [start, end] = [end, start];
+    }
+    setTimeSelectionStart(start);
+    setTimeSelectionEnd(end);
+    if (start && end) {
+      openFillBlankModal();
+    }
+  };
+
+  const selectedFestival = useMemo(
+    () => festivals.find((f) => f.id === defaultFestivalId) || festivals[0],
+    [festivals, defaultFestivalId]
+  );
+
+  const { data } = useSWR(
+    [selectedFestival?.id],
+    ([festivalId]) => fetchFilms(festivalId),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  useEffect(() => {
+    if (data?.films) {
+      setFilms(data.films);
+      setFilmsMap(data.filmsMap);
+    }
+  }, [data?.films, data?.filmsMap, setFilms, setFilmsMap]);
+
   return (
     <div className="flex flex-col w-full">
 
@@ -231,6 +273,14 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
 
           openAboutModal,
           openOnboardingModal,
+          
+          // Fill the Blank feature
+          isFillBlankModalOpen,
+          openFillBlankModal,
+          closeFillBlankModal,
+          timeSelectionStart,
+          timeSelectionEnd,
+          setTimeSelection,
         }}
       >
         <SidebarProvider>
@@ -266,6 +316,17 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           }}
           onImport={handleImport}
           filmsMap={filmsMap}
+        />
+
+        <FillBlankModal
+          open={isFillBlankModalOpen}
+          setOpen={setFillBlankModalOpen}
+          startTime={timeSelectionStart}
+          endTime={timeSelectionEnd}
+          films={films}
+          filmsMap={filmsMap}
+          onAddSession={addSession}
+          sections={data?.sections || []}
         />
 
         <OnboardTutorialModal

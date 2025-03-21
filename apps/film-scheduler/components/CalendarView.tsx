@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -23,6 +23,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -50,12 +56,13 @@ function WeekView({
     removeSession,
     revealFilmDetail,
     viewingFilmId,
+    setTimeSelection,
   } = useAppContext();
 
   const startHour = 10;
   const hoursInDay = 14;
 
-  const sessions = joinSessions(selectedSessions, previewSessions)
+  const sessions = joinSessions(selectedSessions, previewSessions);
 
   // Current time state to track "now"
   const [now, setNow] = useState(dayjs());
@@ -75,8 +82,140 @@ function WeekView({
   const nowMinute = now.minute();
   const nowPosition = nowHourOffset * 60 + nowMinute + 30; // Position of the current time in pixels
 
+  // States for time selection
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartDay, setDragStartDay] = useState<dayjs.Dayjs | null>(null);
+  const [dragStartPos, setDragStartPos] = useState<number | null>(null);
+  const [dragEndDay, setDragEndDay] = useState<dayjs.Dayjs | null>(null);
+  const [dragEndPos, setDragEndPos] = useState<number | null>(null);
+  const weekViewRef = useRef<HTMLDivElement>(null);
+
+  // Helper function to convert screen position to time
+  const positionToTime = (day: dayjs.Dayjs, posY: number): Date => {
+    const hourOffset = Math.floor(posY / 60);
+    const minuteOffset = Math.round((posY % 60) / 5) * 5; // Round to nearest 5 min
+    return day.hour(startHour + hourOffset).minute(minuteOffset).toDate();
+  };
+
+  // Handle mouse down to start selection
+  const handleMouseDown = (e: React.MouseEvent, day: dayjs.Dayjs) => {
+    // Only handle left mouse button
+    if (e.button !== 0) return;
+    
+    // Don't start drag if clicked on a session block
+    if ((e.target as HTMLElement).closest('.session-block')) {
+      return;
+    }
+    
+    // Find the position relative to the day column
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const posY = e.clientY - rect.top;
+    
+    setIsDragging(true);
+    setDragStartDay(day);
+    setDragStartPos(posY);
+    setDragEndDay(day);
+    setDragEndPos(posY);
+  };
+
+  // Handle mouse move during selection
+  const handleMouseMove = (e: React.MouseEvent, day: dayjs.Dayjs) => {
+    if (!isDragging) return;
+    
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const posY = e.clientY - rect.top;
+    
+    setDragEndDay(day);
+    setDragEndPos(posY);
+  };
+
+  // Handle mouse up to end selection
+  const handleMouseUp = useCallback(() => {
+    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
+      setIsDragging(false);
+      return;
+    }
+
+    // Convert positions to actual times
+    const startTime = positionToTime(dragStartDay, dragStartPos);
+    const endTime = positionToTime(dragEndDay, dragEndPos);
+    
+    // Call the context method to set the selected time range
+    setTimeSelection(startTime, endTime);
+    
+    // Reset the drag state
+    setIsDragging(false);
+    setDragStartDay(null);
+    setDragStartPos(null);
+    setDragEndDay(null);
+    setDragEndPos(null);
+    
+    // Prevent any click events for the next few milliseconds to avoid triggering session clicks
+    weekViewRef.current?.setAttribute('data-prevent-clicks', 'true');
+    setTimeout(() => {
+      weekViewRef.current?.removeAttribute('data-prevent-clicks');
+    }, 300);
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, setTimeSelection]);
+
+  // Handle mouse leave during selection to cancel it
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      setDragStartDay(null);
+      setDragStartPos(null);
+      setDragEndDay(null);
+      setDragEndPos(null);
+    }
+  };
+
+  // Calculate selection overlay position and dimensions
+  const getSelectionStyle = () => {
+    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
+      return null;
+    }
+
+    const startDayIndex = weekDays.findIndex(day => day.isSame(dragStartDay, 'day'));
+    const endDayIndex = weekDays.findIndex(day => day.isSame(dragEndDay, 'day'));
+    
+    if (startDayIndex === -1 || endDayIndex === -1) return null;
+
+    const minDayIndex = Math.min(startDayIndex, endDayIndex);
+    const maxDayIndex = Math.max(startDayIndex, endDayIndex);
+    const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
+    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
+
+    // Calculate grid column based on day index (adding 2 because of the time column)
+    return {
+      gridColumn: `${minDayIndex + 2} / ${maxDayIndex + 3}`,
+      top: `${minPosY}px`,
+      height: `${maxPosY - minPosY}px`,
+      width: '100%', // This will make it fill the entire grid cell
+      left: '0',
+    };
+  };
+
+  const selectionStyle = getSelectionStyle();
+
+  useEffect(() => {
+    // Add global mouse up handler to catch events outside the calendar
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        handleMouseUp();
+      }
+    };
+
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, handleMouseUp]);
+
   return (
-    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative">
+    <div 
+      className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative"
+      ref={weekViewRef}
+      data-is-dragging={isDragging}
+    >
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
         <div className="relative h-[840px] select-none">
@@ -116,26 +255,47 @@ function WeekView({
         return (
           <div
             key={day.format("YYYY-MM-DD")}
-            className="w-full pb-4 bg-background mb-4 relative"
+            className="w-full pb-4 bg-background mb-4 relative group/day"
           >
-            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
-              <span
-                className={cn({
-                  "font-semibold": isSameDay,
-                })}
-              >
-                {day.format("ddd")}
-              </span>{" "}
-              <span
-                className={cn("p-0.5", {
-                  "bg-red-500 text-white rounded": isSameDay,
-                })}
-              >
-                {day.format("D")}
-              </span>
-            </div>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
+                    onClick={() => {
+                      const startTime = day.hour(10).minute(0).toDate();
+                      const endTime = day.hour(23).minute(59).toDate();
+                      setTimeSelection(startTime, endTime);
+                    }}
+                  >
+                    <span
+                      className={cn({
+                        "font-semibold": isSameDay,
+                      })}
+                    >
+                      {day.format("ddd")}
+                    </span>{" "}
+                    <span
+                      className={cn("p-0.5", {
+                        "bg-red-500 text-white rounded": isSameDay,
+                      })}
+                    >
+                      {day.format("D")}
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>點擊篩選當日影片</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-            <div className="relative h-[840px] border-t border-b border-border">
+            <div 
+              className="relative h-[840px] border-t border-b border-border"
+              onMouseDown={(e) => handleMouseDown(e, day)}
+              onMouseMove={(e) => handleMouseMove(e, day)}
+              onMouseLeave={handleMouseLeave}
+            >
               {Array.from({ length: hoursInDay }, (_, hour) => (
                 <div
                   key={hour}
@@ -165,6 +325,21 @@ function WeekView({
           </div>
         );
       })}
+
+      {/* Selection overlay for time selection */}
+      {selectionStyle && (
+        <div 
+          className="absolute bg-blue-500/30 border-2 border-blue-600 z-30 pointer-events-none shadow-lg backdrop-blur-[1px]"
+          style={selectionStyle}
+        >
+          <div className="absolute -left-2 top-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
+            {positionToTime(dragStartDay!, Math.min(dragStartPos!, dragEndPos!)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </div>
+          <div className="absolute -right-2 bottom-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
+            {positionToTime(dragEndDay!, Math.max(dragStartPos!, dragEndPos!)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -252,7 +427,7 @@ function SessionBlock({
       className={cn(
         "absolute max-w-[calc(100%-10px)] text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
         "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
-        "select-none",
+        "select-none session-block",
         {
           "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
             !isSelectedSession,
@@ -262,11 +437,10 @@ function SessionBlock({
           "p-1": !isTinyCard,
         },
       )}
-      onClick={() => {
+      onClick={() => {        
         if (isPreviewSession) {
           addSession(session);
         }
-
         if (isSelectedSession) {
           revealFilmDetail(film);
         }
@@ -381,9 +555,11 @@ export function CalendarView(props: { className?: string }) {
           </Button>
         </div>
 
-        <Button variant="ghost" onClick={goToToday}>
-          今天
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" onClick={goToToday}>
+            今天
+          </Button>
+        </div>
       </div>
 
       <WeekView
