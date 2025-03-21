@@ -257,29 +257,38 @@ function WeekView({
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative group/day"
           >
-            <div 
-              className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
-              onClick={() => {
-                const startTime = day.hour(10).minute(0).toDate();
-                const endTime = day.hour(23).minute(59).toDate();
-                setTimeSelection(startTime, endTime);
-              }}
-            >
-              <span
-                className={cn({
-                  "font-semibold": isSameDay,
-                })}
-              >
-                {day.format("ddd")}
-              </span>{" "}
-              <span
-                className={cn("p-0.5", {
-                  "bg-red-500 text-white rounded": isSameDay,
-                })}
-              >
-                {day.format("D")}
-              </span>
-            </div>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
+                    onClick={() => {
+                      const startTime = day.hour(10).minute(0).toDate();
+                      const endTime = day.hour(23).minute(59).toDate();
+                      setTimeSelection(startTime, endTime);
+                    }}
+                  >
+                    <span
+                      className={cn({
+                        "font-semibold": isSameDay,
+                      })}
+                    >
+                      {day.format("ddd")}
+                    </span>{" "}
+                    <span
+                      className={cn("p-0.5", {
+                        "bg-red-500 text-white rounded": isSameDay,
+                      })}
+                    >
+                      {day.format("D")}
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>點擊篩選當日影片</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             <div 
               className="relative h-[840px] border-t border-b border-border"
