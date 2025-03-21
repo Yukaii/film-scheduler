@@ -249,7 +249,7 @@ export function FillBlankModal({
           </div>
         </div>
 
-        <ScrollArea className="flex-1 h-[340px] border rounded-md p-2">
+        <ScrollArea className="flex-1 h-[340px] border rounded-md p-2 overflow-y-auto">
           {suggestedFilms.length > 0 ? (
             <div className="space-y-2">
               {suggestedFilms.map((film) => {
