@@ -62,10 +62,38 @@ export function FillBlankModal({
     if (!sections || !Array.isArray(sections)) return [];
     
     const allCategory = { id: "all", name: "全部類別" };
-    const sortedSections = [...sections].sort((a, b) => a.name.localeCompare(b.name));
     
-    return [allCategory, ...sortedSections];
-  }, [sections]);
+    // If there's no valid time window, return all categories
+    if (!startTime || !endTime || selectedDuration <= 0) {
+      const sortedSections = [...sections].sort((a, b) => a.name.localeCompare(b.name));
+      return [allCategory, ...sortedSections];
+    }
+
+    // Get all sections that have films within the time window
+    const validSectionIds = new Set();
+    films.forEach((film) => {
+      if (film.duration > 0 && film.schedule && film.schedule.length > 0) {
+        const selectedStartTime = dayjs(startTime);
+        
+        // Check if film has sessions on the selected day
+        const hasValidSession = film.schedule.some(session => {
+          const sessionStart = dayjs(session.time);
+          return sessionStart.isSame(selectedStartTime, 'day');
+        });
+
+        if (hasValidSession && film.sectionIds) {
+          film.sectionIds.forEach(id => validSectionIds.add(id));
+        }
+      }
+    });
+
+    // Filter and sort sections
+    const validSections = sections
+      .filter(section => validSectionIds.has(section.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    
+    return [allCategory, ...validSections];
+  }, [sections, films, startTime, endTime, selectedDuration]);
 
   // Filter films based on duration, search term, and selected category
   const suggestedFilms = useMemo(() => {
@@ -190,7 +218,7 @@ export function FillBlankModal({
           <DialogDescription>
             {startTime && endTime ? (
               <>
-                 針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
+                  針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
                 的 {selectedDuration} 分鐘時段，建議可觀看的影片
               </>
             ) : (
