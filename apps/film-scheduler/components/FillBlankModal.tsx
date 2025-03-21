@@ -125,44 +125,44 @@ export function FillBlankModal({
   const createSession = (film: Film) => {
     if (!startTime) return null;
     
-    // Find matching session from film's schedule if available
+    // Get the selected day
+    const selectedDate = dayjs(startTime).startOf('day');
     const filmSessions = film.schedule || [];
-    let bestSession: Session | null = null;
-    let bestTimeDiff = Infinity;
     
-    // Try to find a session that's close to our selected time
-    for (const session of filmSessions) {
-      const sessionTime = dayjs(session.time);
-      const selectedStartTime = dayjs(startTime);
-      const timeDiff = Math.abs(sessionTime.diff(selectedStartTime, 'minute'));
+    // Find sessions on the same day as the selected time
+    const sessionsOnSameDay = filmSessions.filter(session => 
+      dayjs(session.time).isSame(selectedDate, 'day')
+    );
+    
+    // If there are sessions on the same day, find the closest one to the selected time
+    if (sessionsOnSameDay.length > 0) {
+      let bestSession = sessionsOnSameDay[0];
+      let bestTimeDiff = Infinity;
       
-      if (timeDiff < bestTimeDiff) {
-        bestTimeDiff = timeDiff;
-        bestSession = session;
+      // Find the session closest to our selected time
+      for (const session of sessionsOnSameDay) {
+        const sessionTime = dayjs(session.time);
+        const selectedStartTime = dayjs(startTime);
+        const timeDiff = Math.abs(sessionTime.diff(selectedStartTime, 'minute'));
+        
+        if (timeDiff < bestTimeDiff) {
+          bestTimeDiff = timeDiff;
+          bestSession = session;
+        }
       }
-    }
-    
-    // If we found a decent match (within 2 hours), use that session
-    if (bestSession && bestTimeDiff < 120) {
+      
+      // Use the exact session as is, without modifying its time
       return {
         ...bestSession,
         id: bestSession.id || generateSessionId(bestSession)
       };
     }
     
-    // Otherwise create a new session but use the location from any session on the same day if available
-    const sessionsOnSameDay = filmSessions.filter(session => 
-      dayjs(session.time).isSame(dayjs(startTime), 'day')
-    );
-    
-    const location = sessionsOnSameDay.length > 0 
-      ? sessionsOnSameDay[0].location 
-      : "場次未定";
-    
+    // Only if no sessions exist on the selected day, create a custom one
     const newSession: Omit<Session, "id"> = {
       filmId: film.id,
       time: startTime.getTime(),
-      location: location,
+      location: "場次未定",
     };
     
     return {
@@ -188,7 +188,7 @@ export function FillBlankModal({
           <DialogDescription>
             {startTime && endTime ? (
               <>
-                     針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
+                       針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
                 （{selectedDuration} 分鐘）找到以下建議的影片：
               </>
             ) : (
@@ -247,27 +247,45 @@ export function FillBlankModal({
         <ScrollArea className="flex-1 h-[340px] border rounded-md p-2">
           {suggestedFilms.length > 0 ? (
             <div className="space-y-2">
-              {suggestedFilms.map((film) => (
-                <div
-                  key={film.id}
-                  className="p-3 hover:bg-muted rounded-md flex justify-between items-center"
-                >
-                  <div>
-                    <div className="font-medium">{film.filmTitle}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {film.directorName} | {film.duration} 分鐘
-                      {film.schedule && film.schedule.length > 0 && (
-                        <> | {film.schedule.filter(s => 
-                          dayjs(s.time).isSame(dayjs(startTime), 'day')
-                        ).length} 場</>
-                      )}
+              {suggestedFilms.map((film) => {
+                // Get all sessions for this film on the selected day
+                const sessionsOnDay = film.schedule?.filter(s => 
+                  dayjs(s.time).isSame(dayjs(startTime), 'day')
+                ).sort((a, b) => dayjs(a.time).diff(dayjs(b.time))) || [];
+                
+                return (
+                  <div
+                    key={film.id}
+                    className="p-3 hover:bg-muted rounded-md flex justify-between"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{film.filmTitle}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {film.directorName} | {film.duration} 分鐘
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {sessionsOnDay.map((session) => (
+                          <div 
+                            key={session.id} 
+                            className={cn(
+                              "text-xs px-2 py-1 rounded-full",
+                              "border border-border",
+                              dayjs(startTime).isSame(dayjs(session.time)) && "bg-primary text-primary-foreground"
+                            )}
+                          >
+                            {dayjs(session.time).format("HH:mm")} @ {session.location}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="ml-4 flex items-start">
+                      <Button size="sm" onClick={() => handleAddSession(film)}>
+                        加入
+                      </Button>
                     </div>
                   </div>
-                  <Button size="sm" onClick={() => handleAddSession(film)}>
-                    加入
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="py-8 text-center text-muted-foreground">
