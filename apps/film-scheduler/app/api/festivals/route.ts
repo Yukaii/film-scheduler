@@ -8,7 +8,10 @@ interface Category {
 }
 
 // Known festival IDs
-const FESTIVALS = ['2024-FF'];
+const FESTIVALS = [
+  '2025-FFF',
+  '2024-FF'
+];
 
 export async function GET() {
   try {
