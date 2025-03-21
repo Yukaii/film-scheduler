@@ -55,7 +55,17 @@ await esbuild.build({
   sourcemap: true,
   loader: {
     '.json': 'json'
-  }
+  },
+  external: [
+    'path',
+    'fs/promises',
+    'url',
+    'util',
+    'child_process',
+    'jsdom',
+    'node-fetch',
+    'inquirer'
+  ]
 });
 
 await copyDataDirectory();
