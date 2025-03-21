@@ -1,24 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import Main from '@/components/Main';
-import { fetchFestivals, Festival } from '@/lib/filmData';
+import { Festival } from '@/lib/filmData';
 
 export default function Home() {
-  const [festivals, setFestivals] = useState<Festival[]>([]);
-  const defaultFestivalId = festivals.length > 0 ? festivals[0].id : '';
-  
-  useEffect(() => {
-    const loadFestivals = async () => {
-      const data = await fetchFestivals();
-      setFestivals(data);
-    };
-    loadFestivals();
-  }, []);
-
   return (
     <div className="flex min-h-screen">
-      <Main festivals={festivals} defaultFestivalId={defaultFestivalId} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <MainWrapper />
+      </Suspense>
     </div>
   );
+}
+
+function MainWrapper() {
+  const [festivals, setFestivals] = useState<Festival[]>([]);
+  const defaultFestivalId = useMemo(() => 
+    festivals.length > 0 ? festivals[0].id : '', 
+    [festivals]
+  );
+
+  useEffect(() => {
+    fetch('/api/festivals')
+      .then(res => res.json())
+      .then(data => setFestivals(data.festivals))
+      .catch(console.error);
+  }, []);
+
+  return <Main festivals={festivals} defaultFestivalId={defaultFestivalId} />;
 }
