@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server';
-import { festivalData } from '@film-scheduler/film-source-golden-horse/data';
-import { Category } from '@film-scheduler/film-source-golden-horse/types';
-import { Config } from '@film-scheduler/film-source-golden-horse/config';
+import { githubDataFetcher } from '@/lib/githubDataFetcher';
+import { CATEGORIES } from '@/lib/config';
+
+interface Category {
+  value: string;
+  label: string;
+}
+
+// Known festival IDs
+const FESTIVALS = ['2024-FF'];
 
 export async function GET() {
   try {
-    // Get available festivals from the data
-    const availableFestivals = Object.keys(festivalData);
-    
+    // Ensure data is loaded for all known festivals
+    await Promise.all(FESTIVALS.map(id => githubDataFetcher.getFestivalData(id)));
+
     // Map festival IDs to more detailed information
-    const festivals = availableFestivals.map(id => {
+    const festivals = FESTIVALS.map(id => {
       const [year, category] = id.split('-');
-      const categoryInfo = Config.CATEGORIES.find((c: Category) => c.value === category);
+      const categoryInfo = CATEGORIES.find((c: Category) => c.value === category);
       
       return {
         id,
@@ -24,9 +31,9 @@ export async function GET() {
     // Sort by year (descending) and then by category
     festivals.sort((a, b) => {
       if (a.year !== b.year) {
-        return parseInt(b.year) - parseInt(a.year); // Descending year
+        return parseInt(b.year) - parseInt(a.year);
       }
-      return a.category.localeCompare(b.category); // Ascending category
+      return a.category.localeCompare(b.category);
     });
     
     return NextResponse.json({ festivals });

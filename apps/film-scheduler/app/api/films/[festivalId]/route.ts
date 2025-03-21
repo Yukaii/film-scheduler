@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { festivalData } from '@film-scheduler/film-source-golden-horse/data';
+import { githubDataFetcher } from '@/lib/githubDataFetcher';
 import { RawFilm } from '@/components/types';
 import { generateSessionId } from '@/lib/utils';
 
@@ -10,29 +10,27 @@ export async function GET(
   try {
     const { festivalId } = params;
     
-    // Check if festival exists
-    if (!festivalData[festivalId]) {
+    // Get festival data from GitHub
+    const festivalData = await githubDataFetcher.getFestivalData(festivalId);
+    if (!festivalData) {
       return NextResponse.json(
         { error: `Festival ${festivalId} not found` },
         { status: 404 }
       );
     }
     
-    // Get film data for the festival
-    const festivalFilms = festivalData[festivalId];
-    
     // Transform raw film data to the format expected by the frontend
-    const films = Object.entries(festivalFilms.filmDetailsCache).map(([id, rawFilm]) => {
-      const { schedule, duration, ...rest } = rawFilm as unknown as RawFilm;
-      
+    const films = Object.entries(festivalData.filmDetailsCache as Record<string, RawFilm>).map(([id, rawFilm]) => {
+      const { schedule = [], duration = "0", ...rest } = rawFilm;
+
       return {
         ...rest,
         id,
-        schedule: schedule.map((sch) => {
+        schedule: schedule.map((sch: { date: string; time: string; location: string }) => {
           const partialSession = {
             filmId: id,
             time: new Date(
-              `${festivalId.split('-')[0]}-${sch.date.replace(".", "-")} ${sch.time} +8`,
+              `${festivalId.split('-')[0]}-${sch.date.replace(".", "-")} ${sch.time} +8`
             ).valueOf(),
             location: sch.location,
           };
@@ -49,7 +47,7 @@ export async function GET(
     return NextResponse.json({ 
       films,
       festivalId,
-      sections: festivalFilms.sectionsCache
+      sections: festivalData.sectionsCache
     });
   } catch (error) {
     console.error('Error fetching films:', error);
