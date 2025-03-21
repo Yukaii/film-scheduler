@@ -181,8 +181,8 @@ function WeekView({
 
     const minDayIndex = Math.min(startDayIndex, endDayIndex);
     const maxDayIndex = Math.max(startDayIndex, endDayIndex);
-    const minPosY = Math.min(dragStartPos, dragEndPos);
-    const maxPosY = Math.max(dragStartPos, dragEndPos);
+    const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
+    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
 
     // Calculate grid column based on day index (adding 2 because of the time column)
     return {
