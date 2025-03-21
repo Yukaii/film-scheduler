@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import useSWR from "swr";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +20,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
 import {
   cn,
@@ -188,6 +192,10 @@ export function AppSidebar() {
   const { isMobile } = useSidebar();
   const {
     films,
+    festivals,
+    defaultFestivalId,
+    setFilms,
+    setFilmsMap,
     setPreviewFilmId,
     previewFilmId,
     onClickSession,
@@ -242,8 +250,68 @@ export function AppSidebar() {
     return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
+
+  useEffect(() => {
+    // Get festival from URL or auto-select if only one available
+    const festivalFromUrl = searchParams.get("festival");
+    if (festivalFromUrl && festivals.some(f => f.id === festivalFromUrl)) {
+      setCurrentFestivalId(festivalFromUrl);
+    } else if (festivals.length === 1) {
+      // Auto-select if only one festival
+      setCurrentFestivalId(festivals[0].id);
+      router.push(`?festival=${festivals[0].id}`);
+    } else if (defaultFestivalId) {
+      setCurrentFestivalId(defaultFestivalId);
+      router.push(`?festival=${defaultFestivalId}`);
+    }
+  }, [festivals, defaultFestivalId, searchParams, router]);
+
+  const handleFestivalChange = (festivalId: string) => {
+    setCurrentFestivalId(festivalId);
+    router.push(`?festival=${festivalId}`);
+  };
+  
+  useSWR(
+    currentFestivalId ? ['films', currentFestivalId] : null,
+    () => fetchFilms(currentFestivalId),
+    {
+      revalidateOnFocus: false,
+      onSuccess: (data) => {
+        if (data) {
+          const { films: newFilms, filmsMap: newFilmsMap } = data;
+          setFilms(newFilms);
+          setFilmsMap(newFilmsMap);
+        }
+      },
+    }
+  );
+
   return (
     <Sidebar>
+      {/* Festival Selector */}
+      <div className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Select
+              value={currentFestivalId}
+              onValueChange={handleFestivalChange}
+            >
+              <SelectTrigger className="w-[250px]">
+                <SelectValue placeholder="Select a festival" />
+              </SelectTrigger>
+              <SelectContent>
+                {festivals.map((festival) => (
+                  <SelectItem key={festival.id} value={festival.id}>
+                    {festival.year} - {festival.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
       <SidebarHeader className="p-4">
         <div className="relative">
           <Input

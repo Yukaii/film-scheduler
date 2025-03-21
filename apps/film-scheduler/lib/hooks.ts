@@ -75,7 +75,6 @@ export function useSessionImport(availableSessions: Session[]) {
     if (sessionsFromUrl.length > 0) {
       setImportSessions(sessionsFromUrl);
       setImportModalOpen(true); // Open modal if there are valid sessions to import
-
     }
   }, [availableSessions, setImportModalOpen]);
 
@@ -94,13 +93,14 @@ export function useSessionImport(availableSessions: Session[]) {
 
   return {
     importSessions,
+    setImportSessions,
     importModalOpen,
     closeImportModal,
     openImportModal,
   };
 }
 
-const getOnboardingStatus = () => typeof localStorage !== 'undefined' &&  localStorage.getItem("hasViewedOnboarding") === "true"
+const getOnboardingStatus = () => typeof localStorage !== 'undefined' && localStorage.getItem("hasViewedOnboarding") === "true"
 
 export function useOnboardingStatus() {
   const [hasViewedOnboarding, setHasViewedOnboarding] = useState(getOnboardingStatus());

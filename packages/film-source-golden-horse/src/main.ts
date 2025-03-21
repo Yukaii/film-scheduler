@@ -1,58 +1,27 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
+import inquirer from 'inquirer';
 
-interface FilmBasicInfo {
-  name: string;
-  imageUrl: string;
-  sectionIds: string[];
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-interface FilmSchedule {
-  date: string;
-  time: string;
-  location: string;
-}
-
-interface FilmDetails {
-  filmTitle: string;
-  filmOriginalTitle: string;
-  directorName: string;
-  directorOriginalName: string;
-  synopsis: string;
-  schedule: FilmSchedule[];
-  duration: string;
-  sectionIds: string[];
-}
-
-interface Category {
-  value: string;
-  label: string;
-}
-
-interface Section {
-  id: string;
-  name: string;
-}
-
-interface FestivalConfig {
-  year: string;
-  parentId: string;
-  name: string;
-}
-
-interface FilmSectionsMap {
-  [filmId: string]: string[];
-}
+import {
+  FilmBasicInfo,
+  FilmSchedule,
+  FilmDetails,
+  Category,
+  Section,
+  FestivalConfig,
+  FilmSectionsMap
+} from './types';
 
 class Config {
   static readonly API_URL = 'https://www.goldenhorse.org.tw/api/film/search';
   static readonly FILM_DETAILS_BASE_URL = 'https://www.goldenhorse.org.tw/film/programme/films/detail';
-  static readonly CACHE_FILE_PATH = './film_list_cache.json';
-  static readonly DETAILS_CACHE_FILE_PATH = './film_details_cache.json';
-  static readonly SECTIONS_CACHE_FILE_PATH = './sections_cache.json';
-  static readonly SECTIONS_MAP_CACHE_FILE_PATH = './film_sections_map.json';
+  static readonly DATA_DIR = path.join(__dirname, 'data');
   static readonly HEADERS = {
     'Accept': 'application/json',
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -65,27 +34,50 @@ class Config {
   ];
 
   static readonly FESTIVALS: FestivalConfig[] = [
-    { year: '2024', parentId: '638', name: '第61屆金馬影展' },
-    { year: '2023', parentId: '637', name: '第60屆金馬影展' },
+    { year: '2025', parentId: '674', category: 'FFF' },
+    { year: '2024', parentId: '638', category: 'FF' },
+    { year: '2023', parentId: '637', category: 'FF' },
   ];
 
-  static readonly ACTIVE_FESTIVAL = Config.FESTIVALS[0];
-
-  static get DEFAULT_YEAR(): string {
-    return this.ACTIVE_FESTIVAL.year;
+  static getCachePaths(festival: FestivalConfig) {
+    const baseDir = path.join(this.DATA_DIR, `${festival.year}-${festival.category}`);
+    return {
+      base: baseDir,
+      filmList: path.join(baseDir, 'film_list.json'),
+      details: path.join(baseDir, 'film_details.json'),
+      sections: path.join(baseDir, 'sections.json'),
+      sectionsMap: path.join(baseDir, 'film_sections_map.json')
+    };
   }
 
-  static get DEFAULT_PARENT_ID(): string {
-    return this.ACTIVE_FESTIVAL.parentId;
-  }
+  static async selectFestival(): Promise<FestivalConfig> {
+    const choices = this.FESTIVALS.map(festival => {
+      const category = this.CATEGORIES.find(c => c.value === festival.category);
+      return {
+        name: `${festival.year} - ${category?.label || festival.category}`,
+        value: festival
+      };
+    });
 
-  static readonly DEFAULT_CATEGORY = 'FF';
+    const { festival } = await inquirer.prompt([{
+      type: 'list',
+      name: 'festival',
+      message: 'Select festival:',
+      choices
+    }]);
+
+    return festival;
+  }
 }
 
 class CacheManager {
-  static async loadCache<T>(filePath: string): Promise<T | null> {
+  static async loadCache<T>(filePath: string, createDir = true): Promise<T | null> {
     try {
-      if (await fs.stat(filePath).catch(() => null)) {
+      if (createDir) {
+        await fs.mkdir(path.dirname(filePath), { recursive: true });
+      }
+      const exists = await fs.stat(filePath).catch(() => null);
+      if (exists) {
         const data = await fs.readFile(filePath, 'utf-8');
         return JSON.parse(data) as T;
       }
@@ -108,22 +100,24 @@ class CacheManager {
 class SectionManager {
   private static sections: Section[] = [];
 
-  static async initialize(): Promise<void> {
-    const cachedSections = await CacheManager.loadCache<Section[]>(Config.SECTIONS_CACHE_FILE_PATH);
+  static async initialize(festival: FestivalConfig): Promise<void> {
+    const cachePaths = Config.getCachePaths(festival);
+    const cachedSections = await CacheManager.loadCache<Section[]>(cachePaths.sections);
     if (cachedSections) {
       this.sections = cachedSections;
       return;
     }
 
-    await this.fetchSectionsFromApi();
+    await this.fetchSectionsFromApi(festival);
   }
 
-  private static async fetchSectionsFromApi(): Promise<void> {
+  private static async fetchSectionsFromApi(festival: FestivalConfig): Promise<void> {
+    const cachePaths = Config.getCachePaths(festival);
     const payload = new URLSearchParams({
       'action': 'get_class_list',
-      'search_year': Config.DEFAULT_YEAR,
-      'search_category': Config.DEFAULT_CATEGORY,
-      'parent_id': Config.DEFAULT_PARENT_ID,
+      'search_year': festival.year,
+      'search_category': festival.category,
+      'parent_id': festival.parentId,
       'ghff_id': '0'
     });
 
@@ -134,7 +128,7 @@ class SectionManager {
       const data = await response.json();
       this.sections = this.parseSectionsFromResponse(data.ghff_list);
 
-      await CacheManager.saveCache(Config.SECTIONS_CACHE_FILE_PATH, this.sections);
+      await CacheManager.saveCache(cachePaths.sections, this.sections);
     } catch (error) {
       console.error('Error fetching sections:', error);
       throw error;
@@ -240,12 +234,17 @@ class ParserService {
 }
 
 class FilmService {
-  static async downloadFilmList(ghffId: string, results: Record<string, FilmBasicInfo> = {}, sectionMap: FilmSectionsMap = {}): Promise<[Record<string, FilmBasicInfo>, FilmSectionsMap]> {
+  static async downloadFilmList(
+    ghffId: string,
+    festival: FestivalConfig,
+    results: Record<string, FilmBasicInfo> = {},
+    sectionMap: FilmSectionsMap = {}
+  ): Promise<[Record<string, FilmBasicInfo>, FilmSectionsMap]> {
     const payload = new URLSearchParams({
       'action': 'get_class_list',
-      'search_year': Config.DEFAULT_YEAR,
-      'search_category': Config.DEFAULT_CATEGORY,
-      'parent_id': Config.DEFAULT_PARENT_ID,
+      'search_year': festival.year,
+      'search_category': festival.category,
+      'parent_id': festival.parentId,
       'ghff_id': ghffId
     });
 
@@ -261,7 +260,7 @@ class FilmService {
         const sections = SectionManager.getSections();
         for (const section of sections) {
           if (section.id !== '0') {
-            await this.downloadFilmList(section.id, results, sectionMap);
+            await this.downloadFilmList(section.id, festival, results, sectionMap);
           }
         }
       } else {
@@ -293,10 +292,12 @@ class FilmService {
 
   static async getFilmDetails(
     filmId: string,
+    festival: FestivalConfig,
     detailsCache: Record<string, FilmDetails>,
     films: Record<string, FilmBasicInfo>,
     sectionMap: FilmSectionsMap
   ): Promise<void> {
+    const cachePaths = Config.getCachePaths(festival);
     if (detailsCache[filmId]) {
       console.log(`Loaded film details for filmId: ${filmId} from cache.`);
       console.log(detailsCache[filmId]);
@@ -318,7 +319,7 @@ class FilmService {
       };
 
       detailsCache[filmId] = filmDetails;
-      await CacheManager.saveCache(Config.DETAILS_CACHE_FILE_PATH, detailsCache);
+      await CacheManager.saveCache(cachePaths.details, detailsCache);
 
       console.log(`Parsed and saved Details for filmId: ${filmId}`);
       console.log(filmDetails);
@@ -328,17 +329,24 @@ class FilmService {
   }
 }
 
-async function main() {
-  await SectionManager.initialize();
+interface MainOptions {
+  testMode?: boolean;
+}
 
-  let results = await CacheManager.loadCache<Record<string, FilmBasicInfo>>(Config.CACHE_FILE_PATH) || {};
-  let detailsCache = await CacheManager.loadCache<Record<string, FilmDetails>>(Config.DETAILS_CACHE_FILE_PATH) || {};
-  let sectionMap = await CacheManager.loadCache<FilmSectionsMap>(Config.SECTIONS_MAP_CACHE_FILE_PATH) || {};
+async function main(options: MainOptions = {}) {
+  const festival = await Config.selectFestival();
+  const cachePaths = Config.getCachePaths(festival);
+  
+  await SectionManager.initialize(festival);
+
+  let results = await CacheManager.loadCache<Record<string, FilmBasicInfo>>(cachePaths.filmList) || {};
+  let detailsCache = await CacheManager.loadCache<Record<string, FilmDetails>>(cachePaths.details) || {};
+  let sectionMap = await CacheManager.loadCache<FilmSectionsMap>(cachePaths.sectionsMap) || {};
 
   if (Object.keys(results).length === 0) {
-    [results, sectionMap] = await FilmService.downloadFilmList('0');
-    await CacheManager.saveCache(Config.CACHE_FILE_PATH, results);
-    await CacheManager.saveCache(Config.SECTIONS_MAP_CACHE_FILE_PATH, sectionMap);
+    [results, sectionMap] = await FilmService.downloadFilmList('0', festival, {}, {});
+    await CacheManager.saveCache(cachePaths.filmList, results);
+    await CacheManager.saveCache(cachePaths.sectionsMap, sectionMap);
     console.log("Saved film list and section map to cache.");
   }
 
@@ -348,10 +356,13 @@ async function main() {
   console.log(JSON.stringify(sectionMap, null, 2));
 
   const filmIds = Object.keys(results).filter(filmId => filmId !== '0');
-  for (const filmId of filmIds) {
-    await FilmService.getFilmDetails(filmId, detailsCache, results, sectionMap);
+  // In test mode, only process first 10 films
+  const filmsToProcess = options.testMode ? filmIds.slice(0, 10) : filmIds;
+  
+  for (const filmId of filmsToProcess) {
+    await FilmService.getFilmDetails(filmId, festival, detailsCache, results, sectionMap);
     await new Promise(resolve => setTimeout(resolve, 700));
   }
 }
 
-main().catch(console.error);
+main({ testMode: process.env.NODE_ENV !== 'production' }).catch(console.error);

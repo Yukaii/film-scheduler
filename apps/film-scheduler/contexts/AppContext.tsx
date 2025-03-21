@@ -1,9 +1,14 @@
 import { Film, FilmsMap, Session } from "@/components/types";
+import { Festival } from "@/lib/filmData";
 import React, { Dispatch, SetStateAction } from "react";
 
 export type AppContextType = {
+  festivals: Festival[];
+  defaultFestivalId: string;
   films: Film[];
   filmsMap: FilmsMap;
+  setFilms: Dispatch<SetStateAction<Film[]>>;
+  setFilmsMap: Dispatch<SetStateAction<FilmsMap>>;
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
@@ -34,8 +39,12 @@ export type AppContextType = {
 const noop = () => {};
 
 export const AppContext = React.createContext<AppContextType>({
+  festivals: [],
+  defaultFestivalId: "",
   films: [],
   filmsMap: new Map(),
+  setFilms: noop,
+  setFilmsMap: noop,
   selectedSessions: [],
   previewSessions: [],
   previewFilmId: undefined,

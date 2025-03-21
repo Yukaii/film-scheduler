@@ -25,12 +25,21 @@ import {
   useSessionImport,
   useOnboardingStatus,
 } from "@/lib/hooks";
+import { Festival } from "@/lib/filmData";
 
 const ShareModal = dynamic(() =>
   import("@/components/ShareModal").then((m) => m.ShareModal),
 );
 
-export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
+interface MainProps {
+  festivals: Festival[];
+  defaultFestivalId: string;
+}
+
+export default function Main({ festivals, defaultFestivalId }: MainProps) {
+  const [films, setFilms] = useState<Film[]>([]);
+  const [filmsMap, setFilmsMap] = useState<FilmsMap>(new Map());
+
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
   );
@@ -58,20 +67,20 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   }, [selectedSessions, setSelectedSessions]);
 
   const availableSessions = useMemo(() => {
-    return props.films.reduce((prev, film) => {
+    return films.reduce((prev, film) => {
       return [...prev, ...film.schedule];
     }, [] as Session[]);
-  }, [props.films]);
+  }, [films]);
 
   // Preview sessions based on the selected film
   const previewSessions = useMemo(() => {
     if (!previewFilmId) return [];
 
-    const film = props.filmsMap.get(previewFilmId);
+    const film = filmsMap.get(previewFilmId);
     if (!film) return [];
 
     return [...film.schedule];
-  }, [previewFilmId, props.filmsMap]);
+  }, [previewFilmId, filmsMap]);
 
   // Add session to selectedSessions
   const addSession = (session: Session) => {
@@ -182,83 +191,90 @@ export default function Main(props: { films: Film[]; filmsMap: FilmsMap }) {
   const closeAboutModal = () => setAboutModalOpen(false);
 
   return (
-    <AppContext.Provider
-      value={{
-        films: props.films,
-        filmsMap: props.filmsMap,
-        previewSessions,
-        selectedSessions,
-        currentDate,
-        previewFilmId,
-        setPreviewFilmId,
-        onClickSession,
-        setCurrentDate,
-        starredFilmIds,
-        starFilm,
-        unstarFilm,
-        addSession,
-        removeSession,
-        viewingFilmId,
-        revealFilmDetail,
-        setPanelOpen,
-        togglePanelOpen,
+    <div className="flex flex-col w-full">
 
-        // share related
-        isShareModalOpen,
-        closeShareModal,
-        openShareModal,
+      <AppContext.Provider
+        value={{
+          films,
+          filmsMap,
+          setFilms,
+          setFilmsMap,
+          festivals,
+          defaultFestivalId,
+          previewSessions,
+          selectedSessions,
+          currentDate,
+          previewFilmId,
+          setPreviewFilmId,
+          onClickSession,
+          setCurrentDate,
+          starredFilmIds,
+          starFilm,
+          unstarFilm,
+          addSession,
+          removeSession,
+          viewingFilmId,
+          revealFilmDetail,
+          setPanelOpen,
+          togglePanelOpen,
 
-        // Import related
-        importSessions,
-        importModalOpen,
-        closeImportModal,
-        openImportModal,
+          // share related
+          isShareModalOpen,
+          closeShareModal,
+          openShareModal,
 
-        openAboutModal,
-        openOnboardingModal,
-      }}
-    >
-      <SidebarProvider>
-        <AppSidebar />
-        <CalendarView
-          className={cn({
-            "md:pr-[16rem]": panelOpen && !!viewingFilmId,
-          })}
-        />
-      </SidebarProvider>
+          // Import related
+          importSessions,
+          importModalOpen,
+          closeImportModal,
+          openImportModal,
 
-      <FilmSidebar
-        open={panelOpen && !!viewingFilmId}
-        setOpen={(open: boolean) => setPanelOpen(open)}
-      />
-
-      <ShareModal
-        open={isShareModalOpen}
-        sessions={selectedSessions}
-        setOpen={setShareModalOpen}
-        filmsMap={props.filmsMap}
-      />
-
-      <ImportModal
-        sessions={importSessions}
-        open={importModalOpen}
-        setOpen={(open: boolean) => {
-          if (open) {
-            openImportModal();
-          } else {
-            closeImportModal();
-          }
+          openAboutModal,
+          openOnboardingModal,
         }}
-        onImport={handleImport}
-        filmsMap={props.filmsMap}
-      />
+      >
+        <SidebarProvider>
+          <AppSidebar />
+          <CalendarView
+            className={cn({
+              "md:pr-[16rem]": panelOpen && !!viewingFilmId,
+            })}
+          />
+        </SidebarProvider>
 
-      <OnboardTutorialModal
-        open={isTutorialModalOpen}
-        onClose={handleTutorialClose}
-      />
+        <FilmSidebar
+          open={panelOpen && !!viewingFilmId}
+          setOpen={(open: boolean) => setPanelOpen(open)}
+        />
 
-      <AboutModal open={isAboutModalOpen} onClose={closeAboutModal} />
-    </AppContext.Provider>
+        <ShareModal
+          open={isShareModalOpen}
+          sessions={selectedSessions}
+          setOpen={setShareModalOpen}
+          filmsMap={filmsMap}
+        />
+
+        <ImportModal
+          sessions={importSessions}
+          open={importModalOpen}
+          setOpen={(open: boolean) => {
+            if (open) {
+              openImportModal();
+            } else {
+              closeImportModal();
+            }
+          }}
+          onImport={handleImport}
+          filmsMap={filmsMap}
+        />
+
+        <OnboardTutorialModal
+          open={isTutorialModalOpen}
+          onClose={handleTutorialClose}
+        />
+
+        <AboutModal open={isAboutModalOpen} onClose={closeAboutModal} />
+      </AppContext.Provider>
+    </div>
   );
 }
