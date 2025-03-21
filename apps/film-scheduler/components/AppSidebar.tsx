@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import useSWR from "swr";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
 import {
   cn,
@@ -188,6 +191,10 @@ export function AppSidebar() {
   const { isMobile } = useSidebar();
   const {
     films,
+    festivals,
+    defaultFestivalId,
+    setFilms,
+    setFilmsMap,
     setPreviewFilmId,
     previewFilmId,
     onClickSession,
@@ -242,8 +249,46 @@ export function AppSidebar() {
     return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
 
+  const [currentFestivalId, setCurrentFestivalId] = useState(defaultFestivalId);
+  
+  useSWR(
+    currentFestivalId ? ['films', currentFestivalId] : null,
+    () => fetchFilms(currentFestivalId),
+    {
+      revalidateOnFocus: false,
+      onSuccess: (data) => {
+        if (data) {
+          const { films: newFilms, filmsMap: newFilmsMap } = data;
+          setFilms(newFilms);
+          setFilmsMap(newFilmsMap);
+        }
+      },
+    }
+  );
+
   return (
     <Sidebar>
+      {/* Festival Selector */}
+      <div className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Select
+              value={currentFestivalId}
+              onValueChange={setCurrentFestivalId}
+            >
+              <SelectTrigger className="w-[250px]">
+                <SelectValue placeholder="Select a festival" />
+              </SelectTrigger>
+              <SelectContent>
+                {festivals.map((festival) => (
+                  <SelectItem key={festival.id} value={festival.id}>
+                    {festival.year} - {festival.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
       <SidebarHeader className="p-4">
         <div className="relative">
           <Input
