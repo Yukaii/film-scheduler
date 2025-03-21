@@ -40,7 +40,7 @@ class GithubDataFetcher {
     return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`;
   }
 
-  private async fetchJson<T>(path: string): Promise<T> {
+  private async fetchJsonWithFallback<T>(path: string, defaultValue?: T): Promise<T> {
     try {
       // Try main branch first
       const mainUrl = this.getGithubRawUrl(path, true);
@@ -58,9 +58,17 @@ class GithubDataFetcher {
         }
       }
 
+      // Return default value if provided
+      if (defaultValue !== undefined) {
+        return defaultValue;
+      }
+
       throw new Error(`Failed to fetch data from both main and fallback: ${path}`);
     } catch (error) {
-      console.error(`Error fetching ${path}:`, error);
+      if (defaultValue !== undefined) {
+        console.warn(`Using default value for ${path} due to error:`, error);
+        return defaultValue;
+      }
       throw error;
     }
   }
@@ -73,9 +81,9 @@ class GithubDataFetcher {
     const basePath = `${this.config.basePath}/${festivalId}`;
     try {
       const [filmDetails, sections, filmSectionsMap] = await Promise.all([
-        this.fetchJson<Record<string, unknown>>(`${basePath}/film_details.json`),
-        this.fetchJson<Array<{ id: string; name: string }>>(`${basePath}/sections.json`),
-        this.fetchJson<Record<string, string[]>>(`${basePath}/film_sections_map.json`)
+        this.fetchJsonWithFallback<Record<string, unknown>>(`${basePath}/film_details.json`),
+        this.fetchJsonWithFallback<Array<{ id: string; name: string }>>(`${basePath}/sections.json`, []),
+        this.fetchJsonWithFallback<Record<string, string[]>>(`${basePath}/film_sections_map.json`, {})
       ]);
 
       this.data[festivalId] = {
