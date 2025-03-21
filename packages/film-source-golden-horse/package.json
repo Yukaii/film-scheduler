@@ -4,12 +4,14 @@
   "type": "module",
   "exports": {
     "./data": "./dist/data/index.js",
-    "./types": "./dist/types.js"
+    "./types": "./dist/types.js",
+    "./config": "./dist/config.js"
   },
   "typesVersions": {
     "*": {
       "data": ["./dist/data/index.d.ts"],
-      "types": ["./dist/types.d.ts"]
+      "types": ["./dist/types.d.ts"],
+      "config": ["./dist/config.d.ts"]
     }
   },
   "files": [
