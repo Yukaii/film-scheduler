@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -16,7 +16,7 @@ import {
   joinSessions,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
-import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen, ClockIcon } from "lucide-react";
+import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -130,7 +130,7 @@ function WeekView({
   };
 
   // Handle mouse up to end selection
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
       setIsDragging(false);
       return;
@@ -155,7 +155,7 @@ function WeekView({
     setTimeout(() => {
       weekViewRef.current?.removeAttribute('data-prevent-clicks');
     }, 300);
-  };
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, setTimeSelection]);
 
   // Handle mouse leave during selection to cancel it
   const handleMouseLeave = () => {
@@ -437,7 +437,7 @@ function SessionBlock({
           "p-1": !isTinyCard,
         },
       )}
-      onClick={(e) => {        
+      onClick={() => {        
         if (isPreviewSession) {
           addSession(session);
         }
@@ -483,7 +483,7 @@ function SessionBlock({
 }
 
 export function CalendarView(props: { className?: string }) {
-  const { currentDate, previewSessions, selectedSessions, setCurrentDate, openFillBlankModal } =
+  const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
   const currentWeekStart = useMemo(
     () => dayjs(currentDate).startOf("week"),

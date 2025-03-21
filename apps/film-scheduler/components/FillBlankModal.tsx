@@ -40,7 +40,6 @@ export function FillBlankModal({
   startTime,
   endTime,
   films,
-  filmsMap,
   onAddSession,
   sections,
 }: FillBlankModalProps) {
@@ -101,7 +100,6 @@ export function FillBlankModal({
 
     // Get the selected day and time
     const selectedStartTime = dayjs(startTime);
-    const selectedEndTime = dayjs(endTime);
     
     // Filter films based on duration
     let filteredFilms = films.filter((film) => film.duration > 0);

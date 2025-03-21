@@ -41,7 +41,6 @@ interface MainProps {
 export default function Main({ festivals, defaultFestivalId }: MainProps) {
   const [films, setFilms] = useState<Film[]>([]);
   const [filmsMap, setFilmsMap] = useState<FilmsMap>(new Map());
-  const [sections, setSections] = useState<Array<{ id: string; name: string }>>([]);
 
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
@@ -217,7 +216,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
     [festivals, defaultFestivalId]
   );
 
-  const { data, error } = useSWR(
+  const { data } = useSWR(
     [selectedFestival?.id],
     ([festivalId]) => fetchFilms(festivalId),
     {
@@ -231,7 +230,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
       setFilms(data.films);
       setFilmsMap(data.filmsMap);
     }
-  }, [data?.films, setFilms, setFilmsMap]);
+  }, [data?.films, data?.filmsMap, setFilms, setFilmsMap]);
 
   return (
     <div className="flex flex-col w-full">
