@@ -257,7 +257,14 @@ function WeekView({
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative group/day"
           >
-            <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
+            <div 
+              className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
+              onClick={() => {
+                const startTime = day.hour(10).minute(0).toDate();
+                const endTime = day.hour(23).minute(59).toDate();
+                setTimeSelection(startTime, endTime);
+              }}
+            >
               <span
                 className={cn({
                   "font-semibold": isSameDay,
@@ -543,20 +550,6 @@ export function CalendarView(props: { className?: string }) {
           <Button variant="ghost" onClick={goToToday}>
             今天
           </Button>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={openFillBlankModal}>
-                  <ClockIcon size={16} className="mr-1" /> 填滿時段
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>使用此功能來找尋適合時間長度的電影</p>
-                <p className="text-xs text-muted-foreground">直接在行事曆上拖曳以選擇時間區間</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </div>
 
