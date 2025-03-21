@@ -1,95 +1,119 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { loadSessionIdsFromUrl } from "@/lib/utils";
 import { Session } from "@/components/types";
 
-export function useToggle(initialState = false) {
-  const [open, setOpen] = useState(initialState);
-  const toggle = useCallback(() => setOpen((state) => !state), []);
-  return { open, setOpen, toggle };
+export function useToggle(defaultValue = false) {
+  const [open, setOpen] = useState(defaultValue);
+  const toggle = () => setOpen((o) => !o);
+
+  return {
+    open,
+    setOpen,
+    toggle,
+  };
 }
 
-export function useOnboardingStatus() {
-  const [hasViewedOnboarding, setHasViewedOnboarding] = useState(false);
+// Function to dehydrate the state before storing it in localStorage
+function dehydrate<T>(value: T): string {
+  return JSON.stringify(value, (_, val) => {
+    if (val instanceof Set) {
+      return { dataType: "Set", value: Array.from(val) }; // Convert Set to an array
+    }
+    if (val instanceof Date) {
+      return { dataType: "Date", value: val.toISOString() }; // Convert Date to ISO string
+    }
+    return val;
+  });
+}
+
+// Function to rehydrate the state when loading it from localStorage
+function rehydrate<T>(value: string): T {
+  return JSON.parse(value, (_, val) => {
+    if (val && val.dataType === "Set") {
+      return new Set(val.value); // Convert back to Set
+    }
+    if (val && val.dataType === "Date") {
+      return new Date(val.value); // Convert back to Date
+    }
+    return val;
+  });
+}
+
+// A custom hook to manage state with localStorage persistence
+export function useLocalStorageState<T>(key: string, defaultValue: T) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const storedValue = localStorage.getItem(key);
+      return storedValue ? rehydrate<T>(storedValue) : defaultValue;
+    } catch (error) {
+      console.error("Error loading from localStorage:", error);
+      return defaultValue;
+    }
+  });
 
   useEffect(() => {
-    // Only access localStorage on the client side
-    if (typeof window !== 'undefined') {
-      const storedValue = localStorage.getItem("hasViewedOnboarding");
-      setHasViewedOnboarding(storedValue === "true");
+    try {
+      const serializedState = dehydrate(state);
+      localStorage.setItem(key, serializedState);
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
     }
-  }, []);
+  }, [key, state]);
 
-  const markOnboardingAsViewed = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem("hasViewedOnboarding", "true");
-      setHasViewedOnboarding(true);
-    }
-  }, []);
-
-  return { hasViewedOnboarding, markOnboardingAsViewed };
+  return [state, setState] as const;
 }
 
-export function useSessionImport(_availableSessions: Session[]) {
+// Hook to check if URL has session info, extract it, and manage the import modal state
+export function useSessionImport(availableSessions: Session[]) {
   const [importSessions, setImportSessions] = useState<Session[]>([]);
-  const [importModalOpen, setImportModalOpen] = useState(false);
+  const { open: importModalOpen, setOpen: setImportModalOpen } =
+    useToggle(false);
 
-  const openImportModal = useCallback(() => {
-    setImportModalOpen(true);
-  }, []);
+  useEffect(() => {
+    // Load session ids from the URL and check against available sessions
+    const sessionsFromUrl = loadSessionIdsFromUrl(availableSessions);
+    if (sessionsFromUrl.length > 0) {
+      setImportSessions(sessionsFromUrl);
+      setImportModalOpen(true); // Open modal if there are valid sessions to import
+    }
+  }, [availableSessions, setImportModalOpen]);
 
-  const closeImportModal = useCallback(() => {
+  // Close the modal and reset the import sessions
+  const closeImportModal = () => {
     setImportModalOpen(false);
     setImportSessions([]);
-  }, []);
+
+    // Clean the URL query params after extracting sessions
+    const url = new URL(window.location.href);
+    url.searchParams.delete("sessions");
+    window.history.replaceState({}, document.title, url.toString());
+  };
+
+  const openImportModal = () => setImportModalOpen(true);
 
   return {
     importSessions,
     setImportSessions,
     importModalOpen,
-    openImportModal,
     closeImportModal,
+    openImportModal,
   };
 }
 
-export function useLocalStorageState<T>(key: string, initialValue: T) {
-  // Initialize state with initialValue
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
+const getOnboardingStatus = () => typeof localStorage !== 'undefined' && localStorage.getItem("hasViewedOnboarding") === "true"
 
-  // Load the stored value from localStorage on component mount
+export function useOnboardingStatus() {
+  const [hasViewedOnboarding, setHasViewedOnboarding] = useState(getOnboardingStatus());
+
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const item = localStorage.getItem(key);
-        if (item) {
-          setStoredValue(JSON.parse(item));
-        }
-      }
-    } catch (error) {
-      console.error("Error loading from localStorage:", error);
-    }
-  }, [key]);
+    const viewed = getOnboardingStatus();
+    setHasViewedOnboarding(viewed);
+  }, []);
 
-  // Return a wrapped version of useState's setter function that
-  // persists the new value to localStorage
-  const setValue = useCallback(
-    (value: T | ((val: T) => T)) => {
-      try {
-        // Allow value to be a function so we have the same API as useState
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
-        
-        // Save state
-        setStoredValue(valueToStore);
-        
-        // Save to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(key, JSON.stringify(valueToStore));
-        }
-      } catch (error) {
-        console.error("Error saving to localStorage:", error);
-      }
-    },
-    [key, storedValue]
-  );
+  const markOnboardingAsViewed = () => {
+    localStorage.setItem("hasViewedOnboarding", "true");
+    setHasViewedOnboarding(true);
+  };
 
-  return [storedValue, setValue] as const;
+  return { hasViewedOnboarding, markOnboardingAsViewed };
 }
