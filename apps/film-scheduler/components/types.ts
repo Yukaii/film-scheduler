@@ -4,11 +4,10 @@ export interface Film {
   filmOriginalTitle: string;
   directorName: string;
   directorOriginalName: string;
-  schedule: Session[];
   synopsis: string;
-
-  // in minutes
-  duration: number
+  schedule: Session[];
+  duration: number;
+  sectionIds: string[];
 }
 
 export type FilmsMap = Map<string, Film>;

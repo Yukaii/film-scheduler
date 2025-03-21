@@ -8,7 +8,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Film, Session } from "./types";
 import dayjs from "dayjs";
 import { Input } from "@/components/ui/input";
@@ -32,6 +31,7 @@ interface FillBlankModalProps {
   films: Film[];
   filmsMap: Map<string, Film>;
   onAddSession: (session: Session) => void;
+  sections: Array<{ id: string; name: string }>;
 }
 
 export function FillBlankModal({
@@ -42,6 +42,7 @@ export function FillBlankModal({
   films,
   filmsMap,
   onAddSession,
+  sections,
 }: FillBlankModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -56,18 +57,17 @@ export function FillBlankModal({
     return dayjs(endTime).diff(dayjs(startTime), "minute");
   }, [startTime, endTime]);
 
-  // Get unique categories from films
+  // Get unique categories with names
   const categories = useMemo(() => {
-    const categoriesSet = new Set<string>();
-    films.forEach((film) => {
-      if (film.sectionIds && Array.isArray(film.sectionIds)) {
-        film.sectionIds.forEach((id) => categoriesSet.add(id));
-      }
-    });
-    return Array.from(categoriesSet);
-  }, [films]);
+    if (!sections || !Array.isArray(sections)) return [];
+    
+    return [
+      { id: "all", name: "全部類別" },
+      ...sections
+    ].sort((a, b) => a.name.localeCompare(b.name));
+  }, [sections]);
 
-  // Filter films based on duration, search term, selected category, and selected date
+  // Filter films based on duration, search term, and selected category
   const suggestedFilms = useMemo(() => {
     if (!startTime || !endTime || selectedDuration <= 0) return [];
 
@@ -111,10 +111,7 @@ export function FillBlankModal({
     // Apply category filter if provided
     if (selectedCategory !== "all") {
       filteredFilms = filteredFilms.filter(
-        (film) => 
-          film.sectionIds && 
-          Array.isArray(film.sectionIds) && 
-          film.sectionIds.includes(selectedCategory)
+        (film) => film.sectionIds?.includes(selectedCategory)
       );
     }
 
@@ -124,7 +121,7 @@ export function FillBlankModal({
       const bDiff = Math.abs(selectedDuration - b.duration);
       return aDiff - bDiff;
     });
-  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory, flexibilityMinutes]);
+  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory]);
 
   // Create a session from a film
   const createSession = (film: Film) => {
@@ -193,25 +190,28 @@ export function FillBlankModal({
           <DialogDescription>
             {startTime && endTime ? (
               <>
-                            針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
-                （{selectedDuration} 分鐘）找到以下建議的影片：
+                針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
+                的 {selectedDuration} 分鐘時段，建議可觀看的影片
               </>
             ) : (
-              <>請先選擇時段</>
+              "請選擇時段"
             )}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="duration" className="col-span-1">時間彈性</Label>
-            <div className="col-span-3 flex items-center gap-2">
+            <Label htmlFor="flexibility" className="col-span-1">
+              彈性時間
+            </Label>
+            <div className="flex items-center gap-4 col-span-3">
               <Slider
-                id="duration"
+                id="flexibility"
                 defaultValue={[flexibilityMinutes]}
-                max={30}
+                max={60}
                 step={5}
-                onValueChange={(values) => setFlexibilityMinutes(values[0])}
+                className="flex-1"
+                onValueChange={([value]) => setFlexibilityMinutes(value)}
               />
               <span className="w-12 text-right">+{flexibilityMinutes}分</span>
             </div>
@@ -227,10 +227,9 @@ export function FillBlankModal({
                 <SelectValue placeholder="全部類別" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部類別</SelectItem>
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -266,12 +265,13 @@ export function FillBlankModal({
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{film.filmTitle}</div>
                       <div className="text-sm text-muted-foreground">
-                        {film.directorName} | {film.duration} 分鐘
+                        {film.directorName} | {film.duration} 分鐘 | {film.sectionIds.map(id => sections.find(s => s.id === id)?.name).filter(Boolean).join(', ')}
                       </div>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {sessionsOnDay.map((session) => {
                           const sessionStart = dayjs(session.time);
                           const sessionEnd = sessionStart.add(film.duration, 'minute');
+
                           const isOverlapping = (
                             sessionStart.isBefore(dayjs(endTime)) && 
                             sessionEnd.isAfter(dayjs(startTime))
