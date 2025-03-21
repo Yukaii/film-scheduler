@@ -71,23 +71,28 @@ export function FillBlankModal({
   const suggestedFilms = useMemo(() => {
     if (!startTime || !endTime || selectedDuration <= 0) return [];
 
-    // Get the selected day
-    const selectedDate = dayjs(startTime).startOf('day');
+    // Get the selected day and time
+    const selectedStartTime = dayjs(startTime);
+    const selectedEndTime = dayjs(endTime);
     
-    // Filter films based on duration (with flexibility)
-    const maxDuration = selectedDuration + flexibilityMinutes;
-    let filteredFilms = films.filter(
-      (film) => film.duration > 0 && film.duration <= maxDuration
-    );
+    // Filter films based on duration
+    let filteredFilms = films.filter((film) => film.duration > 0);
     
-    // Always filter to only include films that have sessions on the selected day
+    // Filter to only include films that have appropriate sessions on the selected day
     filteredFilms = filteredFilms.filter(film => {
       if (!film.schedule || film.schedule.length === 0) return false;
       
-      // Check if any of the film's sessions are on the selected day
+      // Check if any of the film's sessions are on the selected day AND
+      // could potentially be watched during the selected time window
       return film.schedule.some(session => {
-        const sessionDate = dayjs(session.time).startOf('day');
-        return sessionDate.isSame(selectedDate, 'day');
+        const sessionStart = dayjs(session.time);
+        
+        // Must be on the same day
+        if (!sessionStart.isSame(selectedStartTime, 'day')) return false;
+
+        // Include any session that starts on the selected day
+        // This will show all available sessions for that day
+        return true;
       });
     });
 
@@ -188,7 +193,7 @@ export function FillBlankModal({
           <DialogDescription>
             {startTime && endTime ? (
               <>
-                       針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
+                            針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
                 （{selectedDuration} 分鐘）找到以下建議的影片：
               </>
             ) : (
@@ -264,18 +269,28 @@ export function FillBlankModal({
                         {film.directorName} | {film.duration} 分鐘
                       </div>
                       <div className="mt-1 flex flex-wrap gap-2">
-                        {sessionsOnDay.map((session) => (
-                          <div 
-                            key={session.id} 
-                            className={cn(
-                              "text-xs px-2 py-1 rounded-full",
-                              "border border-border",
-                              dayjs(startTime).isSame(dayjs(session.time)) && "bg-primary text-primary-foreground"
-                            )}
-                          >
-                            {dayjs(session.time).format("HH:mm")} @ {session.location}
-                          </div>
-                        ))}
+                        {sessionsOnDay.map((session) => {
+                          const sessionStart = dayjs(session.time);
+                          const sessionEnd = sessionStart.add(film.duration, 'minute');
+                          const isOverlapping = (
+                            sessionStart.isBefore(dayjs(endTime)) && 
+                            sessionEnd.isAfter(dayjs(startTime))
+                          );
+                          
+                          return (
+                            <div 
+                              key={session.id} 
+                              className={cn(
+                                "text-xs px-2 py-1 rounded-full",
+                                "border border-border",
+                                isOverlapping ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                              )}
+                              title={isOverlapping ? "此場次與選取時段重疊" : "此場次在選取時段外"}
+                            >
+                              {dayjs(session.time).format("HH:mm")} @ {session.location}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                     <div className="ml-4 flex items-start">
