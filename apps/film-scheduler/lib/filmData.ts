@@ -16,7 +16,7 @@ export interface Section {
 export async function fetchFestivals(): Promise<Festival[]> {
   try {
     // Use absolute URL
-    const response = await fetch('http://localhost:4000/api/festivals');
+    const response = await fetch('/api/festivals');
     if (!response.ok) {
       throw new Error(`Failed to fetch festivals: ${response.statusText}`);
     }
@@ -36,7 +36,7 @@ export async function fetchFilms(festivalId: string): Promise<{
 }> {
   try {
     // Use absolute URL
-    const response = await fetch(`http://localhost:4000/api/films/${festivalId}`);
+    const response = await fetch(`/api/films/${festivalId}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch films: ${response.statusText}`);
     }
