@@ -9,6 +9,7 @@ import { FilmSidebar } from "@/components/FilmSidebar";
 import { AboutModal } from "@/components/AboutModal";
 import { ImportModal } from "@/components/ImportModal";
 import { OnboardTutorialModal } from "@/components/OnboardTutorialModal";
+import { FillBlankModal } from "@/components/FillBlankModal";
 import { Film, FilmsMap, Session } from "./types";
 import { AppContext } from "@/contexts/AppContext";
 import dayjs from "dayjs";
@@ -190,6 +191,25 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
   const openAboutModal = () => setAboutModalOpen(true);
   const closeAboutModal = () => setAboutModalOpen(false);
 
+  // Fill the Blank functionality
+  const { open: isFillBlankModalOpen, setOpen: setFillBlankModalOpen } = useToggle(false);
+  const openFillBlankModal = () => setFillBlankModalOpen(true);
+  const closeFillBlankModal = () => setFillBlankModalOpen(false);
+  const [timeSelectionStart, setTimeSelectionStart] = useState<Date | null>(null);
+  const [timeSelectionEnd, setTimeSelectionEnd] = useState<Date | null>(null);
+
+  const setTimeSelection = (start: Date | null, end: Date | null) => {
+    // Always ensure start time is before end time
+    if (start && end && start > end) {
+      [start, end] = [end, start];
+    }
+    setTimeSelectionStart(start);
+    setTimeSelectionEnd(end);
+    if (start && end) {
+      openFillBlankModal();
+    }
+  };
+
   return (
     <div className="flex flex-col w-full">
 
@@ -231,6 +251,14 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
 
           openAboutModal,
           openOnboardingModal,
+          
+          // Fill the Blank feature
+          isFillBlankModalOpen,
+          openFillBlankModal,
+          closeFillBlankModal,
+          timeSelectionStart,
+          timeSelectionEnd,
+          setTimeSelection,
         }}
       >
         <SidebarProvider>
@@ -266,6 +294,16 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           }}
           onImport={handleImport}
           filmsMap={filmsMap}
+        />
+
+        <FillBlankModal
+          open={isFillBlankModalOpen}
+          setOpen={setFillBlankModalOpen}
+          startTime={timeSelectionStart}
+          endTime={timeSelectionEnd}
+          films={films}
+          filmsMap={filmsMap}
+          onAddSession={addSession}
         />
 
         <OnboardTutorialModal

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "dayjs";
@@ -16,13 +16,19 @@ import {
   joinSessions,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
-import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen, ClockIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -50,12 +56,13 @@ function WeekView({
     removeSession,
     revealFilmDetail,
     viewingFilmId,
+    setTimeSelection,
   } = useAppContext();
 
   const startHour = 10;
   const hoursInDay = 14;
 
-  const sessions = joinSessions(selectedSessions, previewSessions)
+  const sessions = joinSessions(selectedSessions, previewSessions);
 
   // Current time state to track "now"
   const [now, setNow] = useState(dayjs());
@@ -75,8 +82,127 @@ function WeekView({
   const nowMinute = now.minute();
   const nowPosition = nowHourOffset * 60 + nowMinute + 30; // Position of the current time in pixels
 
+  // States for time selection
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartDay, setDragStartDay] = useState<dayjs.Dayjs | null>(null);
+  const [dragStartPos, setDragStartPos] = useState<number | null>(null);
+  const [dragEndDay, setDragEndDay] = useState<dayjs.Dayjs | null>(null);
+  const [dragEndPos, setDragEndPos] = useState<number | null>(null);
+  const weekViewRef = useRef<HTMLDivElement>(null);
+
+  // Helper function to convert screen position to time
+  const positionToTime = (day: dayjs.Dayjs, posY: number): Date => {
+    const hourOffset = Math.floor(posY / 60);
+    const minuteOffset = Math.round((posY % 60) / 5) * 5; // Round to nearest 5 min
+    return day.hour(startHour + hourOffset).minute(minuteOffset).toDate();
+  };
+
+  // Handle mouse down to start selection
+  const handleMouseDown = (e: React.MouseEvent, day: dayjs.Dayjs) => {
+    // Only handle left mouse button
+    if (e.button !== 0) return;
+    
+    // Find the position relative to the day column
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const posY = e.clientY - rect.top;
+    
+    setIsDragging(true);
+    setDragStartDay(day);
+    setDragStartPos(posY);
+    setDragEndDay(day);
+    setDragEndPos(posY);
+  };
+
+  // Handle mouse move during selection
+  const handleMouseMove = (e: React.MouseEvent, day: dayjs.Dayjs) => {
+    if (!isDragging) return;
+    
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const posY = e.clientY - rect.top;
+    
+    setDragEndDay(day);
+    setDragEndPos(posY);
+  };
+
+  // Handle mouse up to end selection
+  const handleMouseUp = () => {
+    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
+      setIsDragging(false);
+      return;
+    }
+
+    // Convert positions to actual times
+    const startTime = positionToTime(dragStartDay, dragStartPos);
+    const endTime = positionToTime(dragEndDay, dragEndPos);
+    
+    // Call the context method to set the selected time range
+    setTimeSelection(startTime, endTime);
+    
+    // Reset the drag state
+    setIsDragging(false);
+    setDragStartDay(null);
+    setDragStartPos(null);
+    setDragEndDay(null);
+    setDragEndPos(null);
+  };
+
+  // Handle mouse leave during selection to cancel it
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      setDragStartDay(null);
+      setDragStartPos(null);
+      setDragEndDay(null);
+      setDragEndPos(null);
+    }
+  };
+
+  // Calculate selection overlay position and dimensions
+  const getSelectionStyle = () => {
+    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
+      return null;
+    }
+
+    const startDayIndex = weekDays.findIndex(day => day.isSame(dragStartDay, 'day'));
+    const endDayIndex = weekDays.findIndex(day => day.isSame(dragEndDay, 'day'));
+    
+    if (startDayIndex === -1 || endDayIndex === -1) return null;
+
+    const minDayIndex = Math.min(startDayIndex, endDayIndex);
+    const maxDayIndex = Math.max(startDayIndex, endDayIndex);
+    const minPosY = Math.min(dragStartPos, dragEndPos);
+    const maxPosY = Math.max(dragStartPos, dragEndPos);
+
+    // Calculate grid column based on day index (adding 2 because of the time column)
+    return {
+      gridColumnStart: minDayIndex + 2,
+      gridColumnEnd: maxDayIndex + 3,
+      top: `${minPosY}px`,
+      height: `${maxPosY - minPosY}px`,
+    };
+  };
+
+  const selectionStyle = getSelectionStyle();
+
+  useEffect(() => {
+    // Add global mouse up handler to catch events outside the calendar
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        handleMouseUp();
+      }
+    };
+
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos]);
+
   return (
-    <div className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative">
+    <div 
+      className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative"
+      ref={weekViewRef}
+    >
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4">
         <div className="relative h-[840px] select-none">
@@ -135,7 +261,12 @@ function WeekView({
               </span>
             </div>
 
-            <div className="relative h-[840px] border-t border-b border-border">
+            <div 
+              className="relative h-[840px] border-t border-b border-border"
+              onMouseDown={(e) => handleMouseDown(e, day)}
+              onMouseMove={(e) => handleMouseMove(e, day)}
+              onMouseLeave={handleMouseLeave}
+            >
               {Array.from({ length: hoursInDay }, (_, hour) => (
                 <div
                   key={hour}
@@ -165,6 +296,14 @@ function WeekView({
           </div>
         );
       })}
+
+      {/* Selection overlay for time selection */}
+      {selectionStyle && (
+        <div 
+          className="absolute bg-blue-500/30 border border-blue-600 z-30 pointer-events-none rounded-sm"
+          style={selectionStyle}
+        />
+      )}
     </div>
   );
 }
@@ -309,7 +448,7 @@ function SessionBlock({
 }
 
 export function CalendarView(props: { className?: string }) {
-  const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
+  const { currentDate, previewSessions, selectedSessions, setCurrentDate, openFillBlankModal } =
     useAppContext();
   const currentWeekStart = useMemo(
     () => dayjs(currentDate).startOf("week"),
@@ -381,9 +520,25 @@ export function CalendarView(props: { className?: string }) {
           </Button>
         </div>
 
-        <Button variant="ghost" onClick={goToToday}>
-          今天
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" onClick={goToToday}>
+            今天
+          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" onClick={openFillBlankModal}>
+                  <ClockIcon size={16} className="mr-1" /> 填滿時段
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>使用此功能來找尋適合時間長度的電影</p>
+                <p className="text-xs text-muted-foreground">直接在行事曆上拖曳以選擇時間區間</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
       <WeekView

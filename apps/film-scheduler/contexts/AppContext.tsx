@@ -34,6 +34,14 @@ export type AppContextType = {
   openImportModal: () => void;
   openAboutModal: () => void;
   openOnboardingModal: () => void;
+  
+  // Fill the Blank feature
+  isFillBlankModalOpen: boolean;
+  openFillBlankModal: () => void;
+  closeFillBlankModal: () => void;
+  timeSelectionStart: Date | null;
+  timeSelectionEnd: Date | null;
+  setTimeSelection: (start: Date | null, end: Date | null) => void;
 };
 
 const noop = () => {};
@@ -70,6 +78,14 @@ export const AppContext = React.createContext<AppContextType>({
   openImportModal: noop,
   openAboutModal: noop,
   openOnboardingModal: noop,
+  
+  // Fill the Blank feature defaults
+  isFillBlankModalOpen: false,
+  openFillBlankModal: noop,
+  closeFillBlankModal: noop,
+  timeSelectionStart: null,
+  timeSelectionEnd: null,
+  setTimeSelection: noop,
 });
 
 export const useAppContext = () => React.useContext(AppContext);
