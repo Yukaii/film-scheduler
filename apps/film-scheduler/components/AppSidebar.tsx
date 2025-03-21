@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import {
   Sidebar,
@@ -249,7 +250,29 @@ export function AppSidebar() {
     return films.filter((f) => starredFilmIds.includes(f.id));
   }, [starredFilmIds, films]);
 
-  const [currentFestivalId, setCurrentFestivalId] = useState(defaultFestivalId);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
+
+  useEffect(() => {
+    // Get festival from URL or auto-select if only one available
+    const festivalFromUrl = searchParams.get("festival");
+    if (festivalFromUrl && festivals.some(f => f.id === festivalFromUrl)) {
+      setCurrentFestivalId(festivalFromUrl);
+    } else if (festivals.length === 1) {
+      // Auto-select if only one festival
+      setCurrentFestivalId(festivals[0].id);
+      router.push(`?festival=${festivals[0].id}`);
+    } else if (defaultFestivalId) {
+      setCurrentFestivalId(defaultFestivalId);
+      router.push(`?festival=${defaultFestivalId}`);
+    }
+  }, [festivals, defaultFestivalId, searchParams, router]);
+
+  const handleFestivalChange = (festivalId: string) => {
+    setCurrentFestivalId(festivalId);
+    router.push(`?festival=${festivalId}`);
+  };
   
   useSWR(
     currentFestivalId ? ['films', currentFestivalId] : null,
@@ -273,7 +296,7 @@ export function AppSidebar() {
           <div className="flex items-center gap-2">
             <Select
               value={currentFestivalId}
-              onValueChange={setCurrentFestivalId}
+              onValueChange={handleFestivalChange}
             >
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder="Select a festival" />

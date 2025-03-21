@@ -1,3 +1,5 @@
+'use client';
+
 import { Film } from "@/components/types";
 
 export interface Festival {
@@ -15,7 +17,6 @@ export interface Section {
 // This function will be used to fetch festivals from the API
 export async function fetchFestivals(): Promise<Festival[]> {
   try {
-    // Use absolute URL
     const response = await fetch('/api/festivals');
     if (!response.ok) {
       throw new Error(`Failed to fetch festivals: ${response.statusText}`);
@@ -35,7 +36,6 @@ export async function fetchFilms(festivalId: string): Promise<{
   sections: Section[];
 }> {
   try {
-    // Use absolute URL
     const response = await fetch(`/api/films/${festivalId}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch films: ${response.statusText}`);
