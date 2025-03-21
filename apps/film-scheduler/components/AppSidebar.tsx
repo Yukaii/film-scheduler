@@ -65,9 +65,9 @@ function FilmListItem({
     <div
       key={film.id}
       className={cn(
-        "py-2 px-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 mb-2",
+        "py-2 px-2 pr-10 rounded-md transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-800 mb-2 border border-transparent relative",
         {
-          "bg-gray-200 dark:bg-gray-800": isPreviewing,
+          "bg-gray-100 dark:bg-gray-800 border-border": isPreviewing,
         },
       )}
     >
@@ -80,11 +80,11 @@ function FilmListItem({
             }
           }}
           className={cn(
-            "text-left w-full py-2 px-4 rounded flex gap-1 items-center justify-between",
+            "text-left w-full py-2 px-3 rounded-md flex gap-2 items-center justify-between font-medium",
           )}
         >
-          {film.filmTitle}
-          <span className="text-xs whitespace-nowrap">
+          <span className="truncate">{film.filmTitle}</span>
+          <span className="text-xs whitespace-nowrap text-muted-foreground">
             [{film.duration} 分鐘]
           </span>
         </button>
@@ -94,31 +94,31 @@ function FilmListItem({
             e.stopPropagation();
             onStarToggle(film);
           }}
-          className="ml-2 p-2"
+          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors absolute right-2 top-1/2 -translate-y-1/2"
           title={isStarred ? "Unstar this film" : "Star this film"}
         >
           <Star
-            className={cn({
-              "text-yellow-500": isStarred,
-              "text-gray-500": !isStarred,
+            className={cn("transition-colors", {
+              "text-yellow-500 fill-yellow-500": isStarred,
+              "text-gray-400": !isStarred,
             })}
-            size={16}
+            size={18}
           />
         </button>
       </div>
 
       {isPreviewing && (
-        <div className="pl-8 mt-2">
+        <div className="pl-8 mt-2 space-y-1.5">
           {film.schedule.map((session, index) => (
             <div
               key={index}
-              className="cursor-pointer text-sm hover:underline"
+              className="cursor-pointer text-sm hover:bg-gray-200 dark:hover:bg-gray-700 py-1 px-2 rounded-md transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 onClickSession(session);
               }}
             >
-              {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+              <span className="font-medium">{dayjs(session.time).format("MM/DD HH:mm")}</span> - {session.location}
             </div>
           ))}
         </div>
@@ -143,18 +143,20 @@ function SessionListItem({
   const film = filmsMap.get(session.filmId);
 
   return (
-    <div className="flex justify-between items-center py-2 px-4 border-b border-border">
+    <div className="flex justify-between items-center py-2.5 px-4 border-b border-border hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-sm">
       <a
         onClick={(e) => {
           e.preventDefault();
           onClickSession(session);
         }}
-        className="hover:underline hover:cursor-pointer"
+        className="hover:underline hover:cursor-pointer truncate"
       >
-        {film?.filmTitle} {dayjs(session.time).format("MM/DD HH:mm")} -{" "}
-        {session.location}
+        <span className="font-medium">{film?.filmTitle}</span>{" "}
+        <span className="text-muted-foreground">
+          {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
+        </span>
       </a>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-2 shrink-0">
         <Button
           variant="outline"
           size="sm"
@@ -171,17 +173,17 @@ function SessionListItem({
                 <CalendarIcon size={16} className="mr-1" />
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p> 加入日曆</p>
+                <p>加入日曆</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </Button>
         <button
           onClick={handleRemoveClick}
-          className="ml-2 p-1"
+          className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           title="Remove session"
         >
-          <X className="text-gray-500" size={16} />
+          <X className="text-gray-500 hover:text-red-500 transition-colors" size={16} />
         </button>
       </div>
     </div>
@@ -292,13 +294,13 @@ export function AppSidebar() {
   return (
     <Sidebar>
       {/* Festival Selector */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b bg-muted/30">
           <div className="flex items-center gap-2">
             <Select
               value={currentFestivalId}
               onValueChange={handleFestivalChange}
             >
-              <SelectTrigger className="w-[250px]">
+              <SelectTrigger className="w-full bg-background shadow-sm border-muted-foreground/20">
                 <SelectValue placeholder="Select a festival" />
               </SelectTrigger>
               <SelectContent>
@@ -312,19 +314,20 @@ export function AppSidebar() {
           </div>
         </div>
 
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-4 border-b">
         <div className="relative">
           <Input
             placeholder="篩選影片"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="pr-8 shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
           />
           {search.length > 0 && (
             <div
               onClick={() => setSearch("")}
-              className="cursor-pointer absolute right-2 top-3"
+              className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
-              <X size={14} />
+              <X size={14} className="text-muted-foreground" />
             </div>
           )}
         </div>
@@ -334,11 +337,11 @@ export function AppSidebar() {
         {/* Selected Sessions Section */}
         <Collapsible
           defaultOpen
-          className="group/collapsible overflow-y-auto max-h-[240px] "
+          className="group/collapsible overflow-y-auto max-h-[240px]"
         >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky bg-sidebar top-0">
+              <CollapsibleTrigger className="sticky bg-background top-0 font-medium text-sm py-2.5 border-b border-t border-border/50 z-10">
                 已選擇場次
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
@@ -355,7 +358,7 @@ export function AppSidebar() {
                     />
                   ))
                 ) : (
-                  <p className="text-sm p-4 text-gray-500">沒有選擇的場次</p>
+                  <p className="text-sm p-4 text-muted-foreground italic text-center">沒有選擇的場次</p>
                 )}
               </SidebarGroupContent>
             </CollapsibleContent>
@@ -366,14 +369,14 @@ export function AppSidebar() {
         <Collapsible className="group/collapsible max-h-[240px] overflow-y-auto">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky bg-sidebar top-0">
+              <CollapsibleTrigger className="sticky bg-background top-0 font-medium text-sm py-2.5 border-b border-border/50 z-10">
                 已追蹤影片
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
 
             <CollapsibleContent>
-              <SidebarGroupContent className="max-h-full">
+              <SidebarGroupContent className="max-h-full p-2">
                 {starredFilms.map((film) => {
                   const isPreviewing = previewFilmId === film.id;
                   return (
@@ -391,7 +394,7 @@ export function AppSidebar() {
                 })}
 
                 {starredFilms.length === 0 && (
-                  <p className="text-sm p-4 text-gray-500">沒有追蹤的影片</p>
+                  <p className="text-sm p-4 text-muted-foreground italic text-center">沒有追蹤的影片</p>
                 )}
               </SidebarGroupContent>
             </CollapsibleContent>
@@ -405,36 +408,40 @@ export function AppSidebar() {
         >
           <SidebarGroup>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="sticky top-0 bg-sidebar">
+              <CollapsibleTrigger className="sticky top-0 bg-background font-medium text-sm py-2.5 border-b border-border/50 z-10">
                 影片列表
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
 
             <CollapsibleContent>
-              <SidebarGroupContent className="max-h-full">
-                {filteredFilms.map((film) => {
-                  const isPreviewing = previewFilmId === film.id;
-                  return (
-                    <FilmListItem
-                      key={film.id}
-                      film={film}
-                      isPreviewing={isPreviewing}
-                      handleFilmClick={handleFilmClick}
-                      onClickSession={onClickSession}
-                      isStarred={starredFilmIds.includes(film.id)}
-                      onStarToggle={handleStarToggle}
-                      onClickViewDetail={revealFilmDetail}
-                    />
-                  );
-                })}
+              <SidebarGroupContent className="max-h-full p-2">
+                {filteredFilms.length > 0 ? (
+                  filteredFilms.map((film) => {
+                    const isPreviewing = previewFilmId === film.id;
+                    return (
+                      <FilmListItem
+                        key={film.id}
+                        film={film}
+                        isPreviewing={isPreviewing}
+                        handleFilmClick={handleFilmClick}
+                        onClickSession={onClickSession}
+                        isStarred={starredFilmIds.includes(film.id)}
+                        onStarToggle={handleStarToggle}
+                        onClickViewDetail={revealFilmDetail}
+                      />
+                    );
+                  })
+                ) : (
+                  <p className="text-sm p-4 text-muted-foreground italic text-center">沒有符合條件的影片</p>
+                )}
               </SidebarGroupContent>
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="p-3 border-t bg-muted/30">
         <div className="flex gap-2 justify-end">
           <ModeToggle />
           <TooltipProvider>
@@ -444,8 +451,9 @@ export function AppSidebar() {
                   onClick={openOnboardingModal}
                   variant="outline"
                   size="icon"
+                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
                 >
-                  <Compass />
+                  <Compass className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -457,8 +465,13 @@ export function AppSidebar() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={openAboutModal} variant="outline" size="icon">
-                  <Info />
+                <Button 
+                  onClick={openAboutModal} 
+                  variant="outline" 
+                  size="icon"
+                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
+                >
+                  <Info className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -470,8 +483,13 @@ export function AppSidebar() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={openShareModal} variant="outline" size="icon">
-                  <ExternalLink />
+                <Button 
+                  onClick={openShareModal} 
+                  variant="outline" 
+                  size="icon"
+                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
+                >
+                  <ExternalLink className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
