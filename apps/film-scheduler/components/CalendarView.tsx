@@ -186,10 +186,11 @@ function WeekView({
 
     // Calculate grid column based on day index (adding 2 because of the time column)
     return {
-      gridColumnStart: minDayIndex + 2,
-      gridColumnEnd: maxDayIndex + 3,
+      gridColumn: `${minDayIndex + 2} / ${maxDayIndex + 3}`,
       top: `${minPosY}px`,
       height: `${maxPosY - minPosY}px`,
+      width: '100%', // This will make it fill the entire grid cell
+      left: '0',
     };
   };
 
@@ -254,7 +255,7 @@ function WeekView({
         return (
           <div
             key={day.format("YYYY-MM-DD")}
-            className="w-full pb-4 bg-background mb-4 relative"
+            className="w-full pb-4 bg-background mb-4 relative group/day"
           >
             <div className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none">
               <span
@@ -312,9 +313,16 @@ function WeekView({
       {/* Selection overlay for time selection */}
       {selectionStyle && (
         <div 
-          className="absolute bg-blue-500/30 border border-blue-600 z-30 pointer-events-none rounded-sm"
+          className="absolute bg-blue-500/30 border-2 border-blue-600 z-30 pointer-events-none shadow-lg backdrop-blur-[1px]"
           style={selectionStyle}
-        />
+        >
+          <div className="absolute -left-2 top-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
+            {positionToTime(dragStartDay!, Math.min(dragStartPos!, dragEndPos!)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </div>
+          <div className="absolute -right-2 bottom-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
+            {positionToTime(dragEndDay!, Math.max(dragStartPos!, dragEndPos!)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </div>
+        </div>
       )}
     </div>
   );
