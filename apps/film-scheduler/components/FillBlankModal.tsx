@@ -61,10 +61,10 @@ export function FillBlankModal({
   const categories = useMemo(() => {
     if (!sections || !Array.isArray(sections)) return [];
     
-    return [
-      { id: "all", name: "全部類別" },
-      ...sections
-    ].sort((a, b) => a.name.localeCompare(b.name));
+    const allCategory = { id: "all", name: "全部類別" };
+    const sortedSections = [...sections].sort((a, b) => a.name.localeCompare(b.name));
+    
+    return [allCategory, ...sortedSections];
   }, [sections]);
 
   // Filter films based on duration, search term, and selected category
@@ -190,7 +190,7 @@ export function FillBlankModal({
           <DialogDescription>
             {startTime && endTime ? (
               <>
-                針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
+                 針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
                 的 {selectedDuration} 分鐘時段，建議可觀看的影片
               </>
             ) : (
