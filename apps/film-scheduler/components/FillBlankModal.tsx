@@ -218,7 +218,6 @@ export function FillBlankModal({
     const session = createSession(film);
     if (session) {
       onAddSession(session);
-      onClose();
     }
   };
 
@@ -226,7 +225,6 @@ export function FillBlankModal({
     const session = createSession(film);
     if (session) {
       onRemoveSession(session);
-      onClose();
     }
   };
 
@@ -371,7 +369,7 @@ export function FillBlankModal({
 
         <DialogFooter className="pt-4">
           <Button variant="outline" onClick={onClose}>
-            取消
+            完成
           </Button>
         </DialogFooter>
       </DialogContent>
