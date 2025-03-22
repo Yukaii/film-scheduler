@@ -31,7 +31,9 @@ interface FillBlankModalProps {
   films: Film[];
   filmsMap: Map<string, Film>;
   onAddSession: (session: Session) => void;
+  onRemoveSession?: (session: Session) => void;
   sections: Array<{ id: string; name: string }>;
+  selectedSessions: Session[];
 }
 
 export function FillBlankModal({
@@ -41,7 +43,9 @@ export function FillBlankModal({
   endTime,
   films,
   onAddSession,
+  onRemoveSession = () => {},
   sections,
+  selectedSessions,
 }: FillBlankModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -200,11 +204,35 @@ export function FillBlankModal({
   };
 
   // Handle adding a session
+  const isSessionSelected = (film: Film) => {
+    const possibleSession = createSession(film);
+    if (!possibleSession) return false;
+    
+    return selectedSessions.some((selectedSession: Session) => 
+      selectedSession.filmId === film.id &&
+      dayjs(selectedSession.time).isSame(dayjs(possibleSession.time))
+    );
+  };
+
   const handleAddSession = (film: Film) => {
     const session = createSession(film);
     if (session) {
       onAddSession(session);
-      onClose();
+    }
+  };
+
+  const handleRemoveSession = (film: Film) => {
+    const session = createSession(film);
+    if (session) {
+      onRemoveSession(session);
+    }
+  };
+
+  const handleSessionAction = (film: Film) => {
+    if (isSessionSelected(film)) {
+      handleRemoveSession(film);
+    } else {
+      handleAddSession(film);
     }
   };
 
@@ -320,8 +348,12 @@ export function FillBlankModal({
                       </div>
                     </div>
                     <div className="ml-4 flex items-start">
-                      <Button size="sm" onClick={() => handleAddSession(film)}>
-                        加入
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleSessionAction(film)}
+                        variant={isSessionSelected(film) ? "destructive" : "default"}
+                      >
+                        {isSessionSelected(film) ? "移除" : "加入"}
                       </Button>
                     </div>
                   </div>
@@ -337,7 +369,7 @@ export function FillBlankModal({
 
         <DialogFooter className="pt-4">
           <Button variant="outline" onClick={onClose}>
-            取消
+            完成
           </Button>
         </DialogFooter>
       </DialogContent>

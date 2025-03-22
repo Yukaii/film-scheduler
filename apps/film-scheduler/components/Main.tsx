@@ -326,7 +326,9 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           films={films}
           filmsMap={filmsMap}
           onAddSession={addSession}
+          onRemoveSession={removeSession}
           sections={data?.sections || []}
+          selectedSessions={selectedSessions}
         />
 
         <OnboardTutorialModal
