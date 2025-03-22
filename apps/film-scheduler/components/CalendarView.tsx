@@ -16,6 +16,7 @@ import {
   VIRTUAL_SCROLL_EVENT,
   VIRTUAL_SCROLL_TO_NOW_EVENT,
   VirtualScrollToSessionEvent,
+  scrollNowIndicatorIntoView,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
 import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -774,8 +775,7 @@ export function CalendarView(props: { className?: string }) {
   // Modified to not use scrollIntoView - the event listener will handle scrolling now
   const goToToday = () => {
     setCurrentDate(new Date());
-    // Instead of direct scrolling, dispatch the event
-    document.dispatchEvent(new CustomEvent(VIRTUAL_SCROLL_TO_NOW_EVENT, { bubbles: true }));
+    scrollNowIndicatorIntoView();
   };
 
   return (
