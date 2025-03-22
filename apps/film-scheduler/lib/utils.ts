@@ -64,26 +64,50 @@ export function joinSessions(array1: Session[], array2: Session[]): Session[] {
   return resultArray;
 }
 
-export function scrollSessionIntoView(session: Session) {
-  const sessionId = session.id;
-  const sessionElement = document.getElementById(sessionId);
-
-  if (sessionElement) {
-    sessionElement.scrollIntoView({
-      behavior: "smooth", // Smooth scrolling
-      block: "center", // Center the session in view
-    });
-  }
+// Custom event for virtual scrolling to a specific element
+export interface VirtualScrollToSessionEvent {
+  sessionId: string;
+  date: Date;
+  time: Date;
 }
 
+// Define a custom event for virtual scrolling
+export const VIRTUAL_SCROLL_EVENT = 'virtual-scroll-to-session';
+
+/**
+ * Trigger a virtual scroll to bring a session into view.
+ * This uses a custom event that the CalendarView component listens for.
+ * 
+ * @param session The session to scroll into view
+ */
+export function scrollSessionIntoView(session: Session) {
+  const event = new CustomEvent<VirtualScrollToSessionEvent>(VIRTUAL_SCROLL_EVENT, {
+    detail: {
+      sessionId: session.id,
+      date: new Date(session.time),
+      time: new Date(session.time)
+    },
+    bubbles: true
+  });
+  
+  // Dispatch event on document so it can be picked up by any listener
+  document.dispatchEvent(event);
+}
+
+// Define a custom event for virtual scrolling to the now indicator
+export const VIRTUAL_SCROLL_TO_NOW_EVENT = 'virtual-scroll-to-now';
+
+/**
+ * Trigger a virtual scroll to bring the current time indicator into view.
+ * This uses a custom event that the CalendarView component listens for.
+ */
 export function scrollNowIndicatorIntoView() {
-  const element = document.getElementById("now-indicator");
-  if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }
+  const event = new CustomEvent(VIRTUAL_SCROLL_TO_NOW_EVENT, {
+    bubbles: true
+  });
+  
+  // Dispatch event on document so it can be picked up by any listener
+  document.dispatchEvent(event);
 }
 
 export const getSessionDuration = (s: Session, filmsMap: FilmsMap) =>
