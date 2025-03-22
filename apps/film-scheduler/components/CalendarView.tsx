@@ -436,7 +436,7 @@ function WeekView({
 
   // Calculate selection overlay position and dimensions
   const getSelectionStyle = () => {
-    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null) {
+    if (!isDragging || !dragStartDay || !dragEndDay || dragStartPos === null || dragEndPos === null || !weekviewRect) {
       return null;
     }
 
@@ -447,21 +447,29 @@ function WeekView({
 
     const minDayIndex = Math.min(startDayIndex, endDayIndex);
     const maxDayIndex = Math.max(startDayIndex, endDayIndex);
-    const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
-    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
+    
+    // Account for vertical scrolling offset when calculating top position
+    const minPosY = Math.min(dragStartPos, dragEndPos) + 30 - dayTranslateOffsetY;
+    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30 - dayTranslateOffsetY;
 
-    // Calculate grid column based on day index (adding 2 because of the time column)
+    // Calculate horizontal position that accounts for virtual scrolling
+    // The offset in days (from virtual window start) to adjust the grid columns
+    const dayOffset = Math.floor(dayTranslateOffset / dayWidth);
+    
+    // Calculate position relative to weekViewRef for absolute positioning
     return {
-      gridColumn: `${minDayIndex + 2} / ${maxDayIndex + 3}`,
-      top: `${minPosY}px`,
+      position: 'absolute' as const,
+      top: `${minPosY + dayTranslateOffsetY}px`,
       height: `${maxPosY - minPosY}px`,
-      width: '100%', // This will make it fill the entire grid cell
-      left: '0',
+      width: (maxDayIndex - minDayIndex + 1) * dayWidth + 'px',
+      left: ((minDayIndex - dayOffset + 1) * dayWidth) + 'px',
+      zIndex: 40,
     };
   };
 
   const selectionStyle = getSelectionStyle();
 
+  // Updated useEffect to also handle window resize for selection overlay
   useEffect(() => {
     // Add global mouse up handler to catch events outside the calendar
     const handleGlobalMouseUp = () => {
