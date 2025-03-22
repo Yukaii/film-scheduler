@@ -641,16 +641,17 @@ function WeekView({
         </div>
       )}
       
-      {/* Debug info - can be removed in production */}
-      
-      <div className="absolute bottom-2 right-2 bg-black/70 text-white p-2 rounded text-xs z-50">
-        <div>Window size: {virtualWindowSize} days</div>
-        <div>Window start: {virtualWindowStart.format("MM/DD")}</div>
-        <div>Offset X: {Math.round(dayTranslateOffset)}px ({Math.floor(dayTranslateOffset/dayWidth)} days)</div>
-        <div>Offset Y: {Math.round(dayTranslateOffsetY)}px</div>
-        <div>Visible days: {visibleDaysRange}</div>
-        <div>Date range: {actualDaysRange}</div>
-      </div>
+      {/* Debug info - shown only in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute bottom-2 right-2 bg-black/70 text-white p-2 rounded text-xs z-50">
+          <div>Window size: {virtualWindowSize} days</div>
+          <div>Window start: {virtualWindowStart.format("MM/DD")}</div>
+          <div>Offset X: {Math.round(dayTranslateOffset)}px ({Math.floor(dayTranslateOffset/dayWidth)} days)</div>
+          <div>Offset Y: {Math.round(dayTranslateOffsetY)}px</div>
+          <div>Visible days: {visibleDaysRange}</div>
+          <div>Date range: {actualDaysRange}</div>
+        </div>
+      )}
      
     </div>
   );
