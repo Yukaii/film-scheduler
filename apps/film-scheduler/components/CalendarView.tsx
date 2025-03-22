@@ -379,15 +379,7 @@ function WeekView({
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [
-    virtualWindowStart,
-    virtualWindowSize,
-    dayWidth,
-    dayTranslateOffsetRef,
-    dayTranslateOffsetYRef,
-    hoursInDay,
-    isScrolling,
-  ]);
+  }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef, dayTranslateOffsetYRef, hoursInDay, isScrolling, setDayTranslateOffset, setDayTranslateOffsetY]);
 
   // Only recalculate translation offset when day width changes or window start changes,
   // but ONLY if the window hasn't been modified by scroll
@@ -397,7 +389,7 @@ function WeekView({
       const offset = today.diff(virtualWindowStart, "day");
       setDayTranslateOffset(offset * dayWidth);
     }
-  }, [dayWidth, virtualWindowStart, windowModifiedByScroll]);
+  }, [dayWidth, setDayTranslateOffset, virtualWindowStart, windowModifiedByScroll]);
 
   // Reset the window modified flag when current week changes from UI controls
   useEffect(() => {
@@ -480,15 +472,7 @@ function WeekView({
     setTimeout(() => {
       weekViewRef.current?.removeAttribute("data-prevent-clicks");
     }, 300);
-  }, [
-    isDragging,
-    dragStartDay,
-    dragEndDay,
-    dragStartPos,
-    dragEndPos,
-    setTimeSelection,
-    dayTranslateOffsetY,
-  ]);
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, positionToTime, setTimeSelection]);
 
   // Handle mouse leave during selection to cancel it
   const handleMouseLeave = () => {
