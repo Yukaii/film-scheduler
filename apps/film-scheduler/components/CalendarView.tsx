@@ -372,10 +372,12 @@ function WeekView({
 
   return (
     <div 
-      className="grid grid-cols-[repeat(15,var(--day-width))] relative overflow-hidden max-h-full"
+      className="relative overflow-hidden max-h-full"
       style={{
         '--day-width': `${dayWidth}px`,
         height: 'calc(100vh - 68px)',
+        display: 'grid',
+        gridTemplateColumns: `var(--day-width) repeat(${virtualWindowSize}, var(--day-width))`,
       } as React.CSSProperties}
       ref={weekViewRef}
       data-is-dragging={isDragging}
