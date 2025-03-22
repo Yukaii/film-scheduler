@@ -25,7 +25,6 @@ import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
 import {
   cn,
-  generateGoogleCalendarUrl,
 } from "@/lib/utils";
 import dayjs from "dayjs";
 import {
@@ -35,7 +34,6 @@ import {
   ExternalLink,
   Info,
   Compass,
-  CalendarIcon,
 } from "lucide-react";
 import {
   Collapsible,
@@ -157,27 +155,6 @@ function SessionListItem({
         </span>
       </a>
       <div className="flex items-center gap-2 ml-2 shrink-0">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            const url = generateGoogleCalendarUrl(film!, session);
-            window.open(url, "_blank");
-          }}
-          className="hover:no-underline"
-        >
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger>
-                <CalendarIcon size={16} className="mr-1" />
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>加入日曆</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </Button>
         <button
           onClick={handleRemoveClick}
           className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"

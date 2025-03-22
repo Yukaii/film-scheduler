@@ -1,10 +1,8 @@
 import React, { useMemo } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn } from "@/lib/utils";
-import { X, CalendarIcon } from "lucide-react";
+import { X } from "lucide-react";
 import dayjs from "dayjs";
-import { generateGoogleCalendarUrl } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 export type FilmSidebarProps = {
   open: boolean;
@@ -81,19 +79,6 @@ export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
                   >
                     {dayjs(session.time).format("MM/DD HH:mm")} - {session.location}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const url = generateGoogleCalendarUrl(viewingFilm, session);
-                      window.open(url, "_blank");
-                    }}
-                    className="ml-2 hover:no-underline"
-                  >
-                    <CalendarIcon className="h-4 w-4 mr-1" />
-                    加入日曆
-                  </Button>
                 </div>
               ))}
             </div>
