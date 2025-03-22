@@ -128,6 +128,9 @@ function WeekView({
     return offset * dayWidth;
   })());
 
+  // Add a new state for vertical scrolling
+  const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] = useStateRef<number>(0);
+
   // Track whether the window has been modified by scrolling
   // This prevents the offset being reset when the window is extended
   const [windowModifiedByScroll, setWindowModifiedByScroll] = useState(false);
@@ -141,65 +144,81 @@ function WeekView({
     const weekViewElement = weekViewRef.current;
     
     const handleScroll = (e: WheelEvent) => {
-      const scrollOffset = e.deltaX;
-      
-      // Calculate new offset
-      const newOffset = dayTranslateOffsetRef.current + scrollOffset;
-      setDayTranslateOffset(newOffset);
-      
-      // Calculate visible range in the virtual window
-      const daysScrolledFromStart = Math.floor(newOffset / dayWidth);
-      const visibleDaysEndIndex = daysScrolledFromStart + 7; // 7 visible days
-      
-      // Check if we're approaching start or end of virtual window
-      const daysFromStart = daysScrolledFromStart;
-      const daysFromEnd = virtualWindowSize - visibleDaysEndIndex;
-      
-      // Extend in either direction if needed
-      let newStart = virtualWindowStart;
-      let offsetAdjustment = 0;
-      let sizeAdjustment = 0;
-      
-      // If approaching start, prepend days
-      if (daysFromStart < extendThreshold) {
-        const daysToAdd = 7; // Add a week at a time
-        newStart = virtualWindowStart.subtract(daysToAdd, "day");
-        offsetAdjustment = daysToAdd * dayWidth;
-        sizeAdjustment = daysToAdd;
+      // Handle horizontal scroll
+      if (e.deltaX !== 0) {
+        const scrollOffset = e.deltaX;
         
-        // Trim from end if window gets too large
-        if (virtualWindowSize + daysToAdd > 30) {
-          const daysToTrim = Math.min(daysToAdd, virtualWindowSize - (7 + trimThreshold));
-          sizeAdjustment = daysToAdd - daysToTrim;
+        // Calculate new offset
+        const newOffset = dayTranslateOffsetRef.current + scrollOffset;
+        setDayTranslateOffset(newOffset);
+        
+        // Calculate visible range in the virtual window
+        const daysScrolledFromStart = Math.floor(newOffset / dayWidth);
+        const visibleDaysEndIndex = daysScrolledFromStart + 7; // 7 visible days
+        
+        // Check if we're approaching start or end of virtual window
+        const daysFromStart = daysScrolledFromStart;
+        const daysFromEnd = virtualWindowSize - visibleDaysEndIndex;
+        
+        // Extend in either direction if needed
+        let newStart = virtualWindowStart;
+        let offsetAdjustment = 0;
+        let sizeAdjustment = 0;
+        
+        // If approaching start, prepend days
+        if (daysFromStart < extendThreshold) {
+          const daysToAdd = 7; // Add a week at a time
+          newStart = virtualWindowStart.subtract(daysToAdd, "day");
+          offsetAdjustment = daysToAdd * dayWidth;
+          sizeAdjustment = daysToAdd;
+          
+          // Trim from end if window gets too large
+          if (virtualWindowSize + daysToAdd > 30) {
+            const daysToTrim = Math.min(daysToAdd, virtualWindowSize - (7 + trimThreshold));
+            sizeAdjustment = daysToAdd - daysToTrim;
+          }
+        }
+        // If approaching end, append days
+        else if (daysFromEnd < extendThreshold) {
+          const daysToAdd = 7; // Add a week at a time
+          sizeAdjustment = daysToAdd;
+          
+          // Trim from start if window gets too large
+          if (virtualWindowSize + daysToAdd > 30) {
+            const daysToTrim = Math.min(daysToAdd, virtualWindowSize - (7 + trimThreshold));
+            newStart = virtualWindowStart.add(daysToTrim, "day");
+            // When trimming from start AND scrolling toward the end, we need to adjust the offset
+            // to maintain the visual position of what the user is currently viewing
+            offsetAdjustment = -daysToTrim * dayWidth;
+            sizeAdjustment = daysToAdd - daysToTrim;
+          }
+        }
+        
+        // Apply changes if needed
+        if (offsetAdjustment !== 0 || sizeAdjustment !== 0) {
+          setWindowModifiedByScroll(true); // Mark window as modified by scroll
+          
+          // Update in a single batch to prevent visual jank
+          const updatedVirtualWindowSize = virtualWindowSize + sizeAdjustment;
+          const updatedOffset = dayTranslateOffsetRef.current + offsetAdjustment;
+          
+          setVirtualWindowStart(newStart);
+          setVirtualWindowSize(updatedVirtualWindowSize);
+          setDayTranslateOffset(updatedOffset);
         }
       }
-      // If approaching end, append days
-      else if (daysFromEnd < extendThreshold) {
-        const daysToAdd = 7; // Add a week at a time
-        sizeAdjustment = daysToAdd;
-        
-        // Trim from start if window gets too large
-        if (virtualWindowSize + daysToAdd > 30) {
-          const daysToTrim = Math.min(daysToAdd, virtualWindowSize - (7 + trimThreshold));
-          newStart = virtualWindowStart.add(daysToTrim, "day");
-          // When trimming from start AND scrolling toward the end, we need to adjust the offset
-          // to maintain the visual position of what the user is currently viewing
-          offsetAdjustment = -daysToTrim * dayWidth;
-          sizeAdjustment = daysToAdd - daysToTrim;
-        }
-      }
       
-      // Apply changes if needed
-      if (offsetAdjustment !== 0 || sizeAdjustment !== 0) {
-        setWindowModifiedByScroll(true); // Mark window as modified by scroll
+      // Handle vertical scroll
+      if (e.deltaY !== 0) {
+        // Update vertical offset
+        const newOffsetY = dayTranslateOffsetYRef.current + e.deltaY;
         
-        // Update in a single batch to prevent visual jank
-        const updatedVirtualWindowSize = virtualWindowSize + sizeAdjustment;
-        const updatedOffset = dayTranslateOffsetRef.current + offsetAdjustment;
+        // Limit the vertical scroll to stay within reasonable bounds
+        // Height of the full calendar content is hoursInDay * 60 pixels
+        const maxScrollY = hoursInDay * 60 - 400; // Subtract viewport height approximate
+        const limitedOffsetY = Math.max(0, Math.min(newOffsetY, maxScrollY));
         
-        setVirtualWindowStart(newStart);
-        setVirtualWindowSize(updatedVirtualWindowSize);
-        setDayTranslateOffset(updatedOffset);
+        setDayTranslateOffsetY(limitedOffsetY);
       }
       
       e.preventDefault();
@@ -213,7 +232,7 @@ function WeekView({
         weekViewElement.removeEventListener("wheel", handleScroll);
       }
     };
-  }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef]);
+  }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef, dayTranslateOffsetYRef, hoursInDay]);
 
   // Only recalculate translation offset when day width changes or window start changes,
   // but ONLY if the window hasn't been modified by scroll
@@ -232,8 +251,10 @@ function WeekView({
 
   // Helper function to convert screen position to time
   const positionToTime = (day: dayjs.Dayjs, posY: number): Date => {
-    const hourOffset = Math.floor(posY / 60);
-    const minuteOffset = Math.round((posY % 60) / 5) * 5; // Round to nearest 5 min
+    // Adjust posY by the vertical offset to get accurate time
+    const adjustedPosY = posY + dayTranslateOffsetY;
+    const hourOffset = Math.floor(adjustedPosY / 60);
+    const minuteOffset = Math.round((adjustedPosY % 60) / 5) * 5; // Round to nearest 5 min
     return day.hour(startHour + hourOffset).minute(minuteOffset).toDate();
   };
 
@@ -295,7 +316,7 @@ function WeekView({
     setTimeout(() => {
       weekViewRef.current?.removeAttribute('data-prevent-clicks');
     }, 300);
-  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, setTimeSelection]);
+  }, [isDragging, dragStartDay, dragEndDay, dragStartPos, dragEndPos, setTimeSelection, dayTranslateOffsetY]);
 
   // Handle mouse leave during selection to cancel it
   const handleMouseLeave = () => {
@@ -372,10 +393,11 @@ function WeekView({
 
   return (
     <div 
-      className="relative overflow-hidden max-h-full grid"
+      className="relative overflow-hidden max-h-full"
       style={{
         '--day-width': `${dayWidth}px`,
         height: 'calc(100vh - 68px)',
+        display: 'grid',
         gridTemplateColumns: `var(--day-width) repeat(${virtualWindowSize}, var(--day-width))`,
       } as React.CSSProperties}
       ref={weekViewRef}
@@ -383,7 +405,7 @@ function WeekView({
     >
       {/* Time Labels Column */}
       <div className="w-full pb-4 py-7 bg-background mb-4 z-10 md:px-4 px-1">
-        <div className="relative h-[840px] select-none">
+        <div className="relative h-[840px] select-none" style={{ transform: `translateY(${-dayTranslateOffsetY}px)` }}>
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
               key={hour}
@@ -405,7 +427,10 @@ function WeekView({
         <div
           className="absolute left-0 w-full h-[1px] bg-red-500 z-10"
           id="now-indicator"
-          style={{ top: `${nowPosition}px` }}
+          style={{ 
+            top: `${nowPosition - dayTranslateOffsetY}px`,
+            display: (nowPosition - dayTranslateOffsetY < 0 || nowPosition - dayTranslateOffsetY > 840) ? 'none' : 'block'
+          }}
         >
           <span className="absolute bg-red-500 text-white text-xs px-1 rounded-b left-2">
             Now {now.format("HH:mm")}
@@ -463,6 +488,7 @@ function WeekView({
               onMouseDown={(e) => handleMouseDown(e, day)}
               onMouseMove={(e) => handleMouseMove(e, day)}
               onMouseLeave={handleMouseLeave}
+              style={{ transform: `translateY(${-dayTranslateOffsetY}px)` }}
             >
               {Array.from({ length: hoursInDay }, (_, hour) => (
                 <div
@@ -514,7 +540,8 @@ function WeekView({
       <div className="absolute bottom-2 right-2 bg-black/70 text-white p-2 rounded text-xs z-50">
         <div>Window size: {virtualWindowSize} days</div>
         <div>Window start: {virtualWindowStart.format("MM/DD")}</div>
-        <div>Offset: {Math.round(dayTranslateOffset)}px ({Math.floor(dayTranslateOffset/dayWidth)} days)</div>
+        <div>Offset X: {Math.round(dayTranslateOffset)}px ({Math.floor(dayTranslateOffset/dayWidth)} days)</div>
+        <div>Offset Y: {Math.round(dayTranslateOffsetY)}px</div>
         <div>Visible days: {visibleDaysRange}</div>
         <div>Date range: {actualDaysRange}</div>
       </div>
