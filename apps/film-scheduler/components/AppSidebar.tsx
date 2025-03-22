@@ -421,7 +421,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-3 border-t bg-muted/30">
         <div className="flex gap-2 justify-end">
           <ModeToggle />
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -439,7 +439,7 @@ export function AppSidebar() {
             </Tooltip>
           </TooltipProvider>
 
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
@@ -457,7 +457,7 @@ export function AppSidebar() {
             </Tooltip>
           </TooltipProvider>
 
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
