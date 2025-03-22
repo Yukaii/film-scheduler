@@ -84,6 +84,11 @@ function WeekView({
   const startHour = 10;
   const hoursInDay = 14;
 
+  // Add state for magnetic snapping and transition effects
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [useTransition, setUseTransition] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const sessions = joinSessions(selectedSessions, previewSessions);
 
   // Current time state to track "now"
@@ -210,6 +215,17 @@ function WeekView({
     const weekViewElement = weekViewRef.current;
     
     const handleScroll = (e: WheelEvent) => {
+      // Clear any existing timeout to identify when scrolling stops
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Set scrolling state to true
+      if (!isScrolling) {
+        setIsScrolling(true);
+        setUseTransition(false);
+      }
+      
       // Handle horizontal scroll
       if (e.deltaX !== 0) {
         const scrollOffset = e.deltaX;
@@ -287,6 +303,25 @@ function WeekView({
         setDayTranslateOffsetY(limitedOffsetY);
       }
       
+      // Start a timeout to detect when scrolling stops
+      scrollTimeoutRef.current = setTimeout(() => {
+        // Scrolling has stopped, apply magnetic snapping
+        if (isScrolling) {
+          // Calculate nearest day snap point
+          const currentDayOffset = dayTranslateOffsetRef.current / dayWidth;
+          const nearestDay = Math.round(currentDayOffset);
+          
+          // Apply the transition effect when snapping
+          setUseTransition(true);
+          
+          // Set the new offset with magnetic snapping
+          setDayTranslateOffset(nearestDay * dayWidth);
+          
+          // Reset scrolling state
+          setIsScrolling(false);
+        }
+      }, 50); // 150ms delay to detect end of scroll
+      
       e.preventDefault();
     };
 
@@ -297,8 +332,12 @@ function WeekView({
       if (weekViewElement) {
         weekViewElement.removeEventListener("wheel", handleScroll);
       }
+      // Clear any remaining timeout on unmount
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
-  }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef, dayTranslateOffsetYRef, hoursInDay]);
+  }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef, dayTranslateOffsetYRef, hoursInDay, isScrolling]);
 
   // Only recalculate translation offset when day width changes or window start changes,
   // but ONLY if the window hasn't been modified by scroll
@@ -514,6 +553,7 @@ function WeekView({
             className="w-full pb-4 bg-background mb-4 relative group/day"
             style={{
               transform: `translateX(${-dayTranslateOffset}px)`,
+              transition: useTransition ? 'transform 0.3s ease-out' : 'none',
             }}
           >
             <TooltipProvider delayDuration={0}>
