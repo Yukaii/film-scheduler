@@ -29,6 +29,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useBoundingClientRect from "@/hooks/useBoundingClientRect";
+import useStateRef from "@/hooks/useStateRef";
 
 dayjs.extend(isBetween);
 dayjs.locale("en");
@@ -47,9 +49,21 @@ function WeekView({
   selectedSessions,
   previewSessions,
 }: WeekViewProps) {
-  const weekDays = Array.from({ length: 7 }, (_, i) =>
-    currentWeekStart.add(i, "day"),
+  const virtualWeekviewWindowSize = 14;
+  const virtualWeekviewWindowStart = currentWeekStart.subtract(
+    virtualWeekviewWindowSize / 2,
+    "day",
   );
+  const virtualWeekviewWindowEnd = currentWeekStart.add(
+    virtualWeekviewWindowSize / 2 + 7,
+    "day",
+  );
+
+  const weekDays = Array.from(
+    { length: virtualWeekviewWindowSize },
+    (_, i) => virtualWeekviewWindowStart.add(i, "day"),
+  );
+
   const {
     filmsMap,
     addSession,
@@ -89,6 +103,47 @@ function WeekView({
   const [dragEndDay, setDragEndDay] = useState<dayjs.Dayjs | null>(null);
   const [dragEndPos, setDragEndPos] = useState<number | null>(null);
   const weekViewRef = useRef<HTMLDivElement>(null);
+
+  const weekviewRect = useBoundingClientRect(weekViewRef);
+  const weekviewWidth = useMemo(
+    () => weekviewRect?.width || 0,
+    [weekviewRect],
+  );
+  const dayWidth = useMemo(
+    () => weekviewWidth / 7, // Assuming 7 days in a week
+    [weekviewWidth],
+  );
+
+  const [dayTranslateOffset, setDayTranslateOffset, dayTranslateOffsetRef] = useStateRef<number>((() => {
+    // use today to calculate the offset
+    const today = dayjs();
+    const offset = today.diff(virtualWeekviewWindowStart, "day");
+
+    return offset * dayWidth;
+  })());
+
+  // register the scroll/wheel event
+  useEffect(() => {
+    const weekViewElement = weekViewRef.current;
+    const handleScroll = (e: WheelEvent) => {
+      const scrollOffset = e.deltaX;
+      console.log(scrollOffset, dayTranslateOffsetRef.current, 'scrollOffset');
+      
+      const newOffset = dayTranslateOffsetRef.current + scrollOffset;
+      setDayTranslateOffset(newOffset);
+      e.preventDefault();
+    };
+
+    if (weekViewElement) {
+      weekViewElement.addEventListener("wheel", handleScroll);
+    }
+    return () => {
+      if (weekViewElement) {
+        weekViewElement.removeEventListener("wheel", handleScroll);
+      }
+    };
+  }, [weekviewRect]);
+
 
   // Helper function to convert screen position to time
   const positionToTime = (day: dayjs.Dayjs, posY: number): Date => {
@@ -212,12 +267,16 @@ function WeekView({
 
   return (
     <div 
-      className="grid grid-cols-[30px_repeat(7,_minmax(0,1fr))] md:grid-cols-[60px_repeat(7,_minmax(0,1fr))] md:px-4 px-1 relative"
+      className="grid grid-cols-[repeat(15,var(--day-width))] relative overflow-hidden max-h-full"
+      style={{
+        '--day-width': `${dayWidth}px`,
+        height: 'calc(100vh - 68px)',
+      } as React.CSSProperties}
       ref={weekViewRef}
       data-is-dragging={isDragging}
     >
       {/* Time Labels Column */}
-      <div className="w-full pb-4 py-7 bg-background mb-4">
+      <div className="w-full pb-4 py-7 bg-background mb-4 z-10 md:px-4 px-1">
         <div className="relative h-[840px] select-none">
           {Array.from({ length: hoursInDay + 1 }, (_, hour) => (
             <div
@@ -249,19 +308,22 @@ function WeekView({
       )}
 
       {/* Week Days Columns */}
-      {weekDays.map((day) => {
+      {weekDays.map((day, index) => {
         const isSameDay = now.isSame(day, "day");
 
         return (
           <div
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative group/day"
+            style={{
+              transform: `translateX(${-dayTranslateOffset}px)`,
+            }}
           >
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div 
-                    className="md:text-sm pb-2 text-xs text-center h-7 sticky md:top-[68px] top-[50px] bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
+                    className="md:text-sm pb-2 text-xs text-center h-7 sticky top-0 bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
                     onClick={() => {
                       const startTime = day.hour(10).minute(0).toDate();
                       const endTime = day.hour(23).minute(59).toDate();

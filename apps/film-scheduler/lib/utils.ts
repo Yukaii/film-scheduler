@@ -79,10 +79,10 @@ export function scrollSessionIntoView(session: Session) {
 export function scrollNowIndicatorIntoView() {
   const element = document.getElementById("now-indicator");
   if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    // element.scrollIntoView({
+    //   behavior: "smooth",
+    //   block: "center",
+    // });
   }
 }
 
