@@ -448,9 +448,9 @@ function WeekView({
     const minDayIndex = Math.min(startDayIndex, endDayIndex);
     const maxDayIndex = Math.max(startDayIndex, endDayIndex);
     
-    // Account for vertical scrolling offset when calculating top position
-    const minPosY = Math.min(dragStartPos, dragEndPos) + 30 - dayTranslateOffsetY;
-    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30 - dayTranslateOffsetY;
+    // Get min and max positions without adjusting for scroll
+    const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
+    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
 
     // Calculate horizontal position that accounts for virtual scrolling
     // The offset in days (from virtual window start) to adjust the grid columns
@@ -459,7 +459,7 @@ function WeekView({
     // Calculate position relative to weekViewRef for absolute positioning
     return {
       position: 'absolute' as const,
-      top: `${minPosY + dayTranslateOffsetY}px`,
+      top: `${minPosY - dayTranslateOffsetY}px`, // No offset adjustment needed since mouse positions are already relative to visible area
       height: `${maxPosY - minPosY}px`,
       width: (maxDayIndex - minDayIndex + 1) * dayWidth + 'px',
       left: ((minDayIndex - dayOffset + 1) * dayWidth) + 'px',
