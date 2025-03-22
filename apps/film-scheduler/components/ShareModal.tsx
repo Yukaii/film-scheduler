@@ -24,7 +24,7 @@ import {
   generateCalendarICS,
 } from "@/lib/utils";
 import { Session, FilmsMap } from "@/components/types";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Share, CalendarArrowDown, ClipboardCopy } from "lucide-react";
 import { saveAs } from "file-saver";
 
 interface ShareModalProps {
@@ -45,6 +45,13 @@ export function ShareModal({
   );
   const [state, copyToClipboard] = useCopyToClipboard();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isNativeShareSupported, setIsNativeShareSupported] = useState(false);
+
+  useEffect(() => {
+    setIsNativeShareSupported(
+      typeof navigator !== "undefined" && !!navigator.share
+    );
+  }, []);
 
   const onClose = () => setOpen(false);
 
@@ -177,18 +184,54 @@ export function ShareModal({
           </Collapsible>
         </div>
 
-        <DialogFooter className="gap-2">
-          <Input value={shareUrl} readOnly className="w-full" />
-          <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
-            複製到剪貼簿
-          </Button>
-          <Button variant="default" onClick={handleDownloadICS}>
-            下載 ICS
-          </Button>
-          <Button variant="secondary" onClick={onClose}>
-            關閉
-          </Button>
-        </DialogFooter>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Input value={shareUrl} readOnly className="flex-grow" />
+            <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
+              <ClipboardCopy className="mr-1" />
+              複製到剪貼簿
+            </Button>
+          </div>
+          
+          <DialogFooter className="flex flex-wrap gap-2 justify-end">
+            {isNativeShareSupported && (
+              <Button
+                variant="default"
+                className="flex-1 sm:flex-none"
+                onClick={async () => {
+                  try {
+                    const shareData: ShareData = {
+                      title: "金馬影展場次分享",
+                      text: "我選的金馬影展場次",
+                      url: shareUrl,
+                    };
+                    await navigator.share(shareData);
+                  } catch (error) {
+                    console.error("Error sharing:", error);
+                  }
+                }}
+              >
+                <Share className="mr-1" />
+                分享
+              </Button>
+            )}
+            <Button 
+              variant="default" 
+              className="flex-1 sm:flex-none"
+              onClick={handleDownloadICS}
+            >
+              <CalendarArrowDown className="mr-1" />
+              下載 ICS
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="flex-1 sm:flex-none"
+              onClick={onClose}
+            >
+              關閉
+            </Button>
+          </DialogFooter>
+        </div>
 
         <div>
           {state.error ? (
