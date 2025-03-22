@@ -397,7 +397,7 @@ function WeekView({
   }, [currentWeekStart]);
 
   // Helper function to convert screen position to time
-  const positionToTime = (day: dayjs.Dayjs, posY: number): Date => {
+  const positionToTime = useCallback((day: dayjs.Dayjs, posY: number): Date => {
     // Adjust posY by the vertical offset to get accurate time
     const adjustedPosY = posY + dayTranslateOffsetY;
     const hourOffset = Math.floor(adjustedPosY / 60);
@@ -406,7 +406,7 @@ function WeekView({
       .hour(startHour + hourOffset)
       .minute(minuteOffset)
       .toDate();
-  };
+  }, [dayTranslateOffsetY, startHour]);
 
   // Handle mouse down to start selection
   const handleMouseDown = (e: React.MouseEvent, day: dayjs.Dayjs) => {
