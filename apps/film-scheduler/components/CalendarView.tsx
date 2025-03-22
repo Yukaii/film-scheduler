@@ -12,8 +12,10 @@ import {
   findSessionIndex,
   getSessionDuration,
   includesSession,
-  scrollNowIndicatorIntoView,
   joinSessions,
+  VIRTUAL_SCROLL_EVENT,
+  VIRTUAL_SCROLL_TO_NOW_EVENT,
+  VirtualScrollToSessionEvent,
 } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
 import { X, CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -138,6 +140,69 @@ function WeekView({
   // Thresholds for extending virtual window (in days)
   const extendThreshold = 3; // Extend when we're within 3 days of an edge
   const trimThreshold = 7; // Keep at least 7 days on each side after trimming
+
+  // Event listener for virtual scrolling to a specific session
+  useEffect(() => {
+    const handleVirtualScrollToSession = (event: CustomEvent<VirtualScrollToSessionEvent>) => {
+      const { date, sessionId } = event.detail;
+      
+      // Find the day in the virtual window
+      const targetDayIndex = weekDays.findIndex(day => day.isSame(date, 'day'));
+      
+      if (targetDayIndex !== -1) {
+        // Calculate the new horizontal offset to center the day
+        const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
+        setDayTranslateOffset(newHorizontalOffset);
+        setWindowModifiedByScroll(true);
+        
+        // Find the session element to determine vertical position
+        setTimeout(() => {
+          const sessionElement = document.getElementById(sessionId);
+          if (sessionElement) {
+            // Get top position and calculate vertical offset
+            const rect = sessionElement.getBoundingClientRect();
+            const sessionTop = parseInt(sessionElement.style.top);
+            
+            // Calculate vertical offset to position the session in the middle of the visible area
+            const visibleHeight = weekviewRect?.height || 600;
+            const newVerticalOffset = Math.max(0, sessionTop - (visibleHeight / 2) + 60);
+            
+            setDayTranslateOffsetY(newVerticalOffset);
+          }
+        }, 100); // Small delay to ensure DOM is updated
+      }
+    };
+    
+    // Event listener for scrolling to the current time indicator
+    const handleVirtualScrollToNow = () => {
+      // Find today's index in the virtual window
+      const todayIndex = weekDays.findIndex(day => day.isSame(dayjs(), 'day'));
+      
+      if (todayIndex !== -1) {
+        // Calculate the new horizontal offset to center today
+        const newHorizontalOffset = (todayIndex - 3) * dayWidth; // Center it with a few days before
+        setDayTranslateOffset(newHorizontalOffset);
+        setWindowModifiedByScroll(true);
+        
+        // Calculate vertical offset to show current time
+        // Position the now indicator in the middle of the visible area
+        const visibleHeight = weekviewRect?.height || 600;
+        const newVerticalOffset = Math.max(0, nowPosition - (visibleHeight / 2));
+        
+        setDayTranslateOffsetY(newVerticalOffset);
+      }
+    };
+    
+    // Add event listeners
+    document.addEventListener(VIRTUAL_SCROLL_EVENT, handleVirtualScrollToSession as EventListener);
+    document.addEventListener(VIRTUAL_SCROLL_TO_NOW_EVENT, handleVirtualScrollToNow);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener(VIRTUAL_SCROLL_EVENT, handleVirtualScrollToSession as EventListener);
+      document.removeEventListener(VIRTUAL_SCROLL_TO_NOW_EVENT, handleVirtualScrollToNow);
+    };
+  }, [weekDays, dayWidth, setDayTranslateOffset, setDayTranslateOffsetY, weekviewRect, nowPosition]);
 
   // Handle scroll/wheel event with infinite scroll logic
   useEffect(() => {
@@ -706,9 +771,11 @@ export function CalendarView(props: { className?: string }) {
   };
 
   const { open, isMobile, openMobile, toggleSidebar } = useSidebar();
+  // Modified to not use scrollIntoView - the event listener will handle scrolling now
   const goToToday = () => {
     setCurrentDate(new Date());
-    scrollNowIndicatorIntoView();
+    // Instead of direct scrolling, dispatch the event
+    document.dispatchEvent(new CustomEvent(VIRTUAL_SCROLL_TO_NOW_EVENT, { bubbles: true }));
   };
 
   return (
