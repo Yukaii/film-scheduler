@@ -50,7 +50,7 @@ function WeekView({
   previewSessions,
 }: WeekViewProps) {
   // Initial virtual window settings
-  const [virtualWindowSize, setVirtualWindowSize] = useState(14);
+  const [virtualWindowSize, setVirtualWindowSize] = useState(28);
   const [virtualWindowStart, setVirtualWindowStart] = useState(
     currentWeekStart.subtract(virtualWindowSize / 2, "day")
   );
