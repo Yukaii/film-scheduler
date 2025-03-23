@@ -23,6 +23,7 @@ export function CalendarView(props: { className?: string }) {
   const [viewWeekStart, setViewWeekStart] = useState(() =>
     dayjs(currentDate).startOf("week")
   );
+  const [highlightDate, setHighlightDate] = useState(currentDate);
 
   // Update navigate week to use viewWeekStart instead of currentDate
   const navigateWeek = (direction: "previous" | "next") => {
@@ -82,6 +83,7 @@ export function CalendarView(props: { className?: string }) {
                     const newWeekStart = dayjs(date).startOf("week");
                     setViewWeekStart(newWeekStart);
                     setCurrentDate(date);
+                    setHighlightDate(date);
                   }
                 }}
                 initialFocus
@@ -107,7 +109,7 @@ export function CalendarView(props: { className?: string }) {
 
       <WeekView
         viewWeekStart={viewWeekStart}
-        highlightDate={currentDate}
+        highlightDate={highlightDate}
         onWeekStartChange={(d: Dayjs) => {
           setViewWeekStart(d);
         }}

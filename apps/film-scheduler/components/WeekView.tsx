@@ -102,7 +102,7 @@ export function WeekView({
       // Set a timeout to clear the highlight after 2 seconds
       const timer = setTimeout(() => {
         setIsHighlightActive(false);
-      }, 2000);
+      }, 1000);
       
       return () => clearTimeout(timer);
     }
