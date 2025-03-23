@@ -26,6 +26,15 @@ import useBoundingClientRect from "@/hooks/useBoundingClientRect";
 import useStateRef from "@/hooks/useStateRef";
 import { SessionBlock } from "./SessionBlock";
 
+// Thresholds for extending virtual window (in days)
+const extendThreshold = 3; // Extend when we're within 3 days of an edge
+const trimThreshold = 7; // Keep at least 7 days on each side after trimming
+
+const startHour = 10;
+const hoursInDay = 14;
+
+const INITIAL_VIRTUAL_WINDOW_SIZE = 28; // Initial size of the virtual window in days
+
 export interface WeekViewProps {
   initialWeekStart: dayjs.Dayjs;
   selectedSessions: Session[];
@@ -33,52 +42,7 @@ export interface WeekViewProps {
   onWeekStartChange: (date: dayjs.Dayjs) => void;
 }
 
-export function WeekView({
-  initialWeekStart,
-  selectedSessions,
-  previewSessions,
-}: // onWeekStartChange,
-WeekViewProps) {
-  // Initial virtual window settings
-  const [virtualWindowSize, setVirtualWindowSize] = useState(28);
-  const [virtualWindowStart, setVirtualWindowStart] = useState(
-    initialWeekStart.subtract(virtualWindowSize / 2, "day")
-  );
-
-  // Update virtual window when current week changes
-  useEffect(() => {
-    // When deliberately changing weeks via UI controls, re-center the window
-    setVirtualWindowStart(
-      initialWeekStart.subtract(virtualWindowSize / 2, "day")
-    );
-  }, [initialWeekStart, virtualWindowSize]);
-
-  // Generate days array based on virtual window
-  const weekDays = useMemo(() => {
-    return Array.from({ length: virtualWindowSize }, (_, i) =>
-      virtualWindowStart.add(i, "day")
-    );
-  }, [virtualWindowStart, virtualWindowSize]);
-
-  const {
-    filmsMap,
-    addSession,
-    removeSession,
-    revealFilmDetail,
-    viewingFilmId,
-    setTimeSelection,
-  } = useAppContext();
-
-  const startHour = 10;
-  const hoursInDay = 14;
-
-  // Add state for magnetic snapping and transition effects
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [useTransition, setUseTransition] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const sessions = joinSessions(selectedSessions, previewSessions);
-
+function useNowIndicator() {
   // Current time state to track "now"
   const [now, setNow] = useState(dayjs());
 
@@ -97,6 +61,51 @@ WeekViewProps) {
   const nowMinute = now.minute();
   const nowPosition = nowHourOffset * 60 + nowMinute + 30; // Position of the current time in pixels
 
+  return {
+    now,
+    nowHourOffset,
+    nowPosition,
+  };
+}
+
+export function WeekView({
+  initialWeekStart,
+  selectedSessions,
+  previewSessions,
+}: // onWeekStartChange,
+WeekViewProps) {
+  const {
+    filmsMap,
+    addSession,
+    removeSession,
+    revealFilmDetail,
+    viewingFilmId,
+    setTimeSelection,
+  } = useAppContext();
+  const { nowPosition, now, nowHourOffset } = useNowIndicator();
+
+  const sessions = joinSessions(selectedSessions, previewSessions);
+
+  // Initial virtual window settings
+  const [virtualWindowSize, setVirtualWindowSize] = useState(
+    INITIAL_VIRTUAL_WINDOW_SIZE
+  );
+  const [virtualWindowStart, setVirtualWindowStart] = useState(
+    initialWeekStart.subtract(virtualWindowSize / 2, "day")
+  );
+
+  // Generate days array based on virtual window
+  const weekDays = useMemo(() => {
+    return Array.from({ length: virtualWindowSize }, (_, i) =>
+      virtualWindowStart.add(i, "day")
+    );
+  }, [virtualWindowStart, virtualWindowSize]);
+
+  // Add state for magnetic snapping and transition effects
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [useTransition, setUseTransition] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // States for time selection
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartDay, setDragStartDay] = useState<dayjs.Dayjs | null>(null);
@@ -113,24 +122,12 @@ WeekViewProps) {
   );
 
   // Initialize dayTranslateOffset based on today's date
-  const [dayTranslateOffset, setDayTranslateOffset, dayTranslateOffsetRef] =
-    useStateRef<number>(
-      (() => {
-        // use today to calculate the offset
-        const today = dayjs();
-        const offset = today.diff(virtualWindowStart, "day") + 7; // Offset to center the current day in the window
-
-        return offset * dayWidth;
-      })()
-    );
+  const [dayTranslateOffsetX, setDayTranslateOffsetX, dayTranslateOffsetXRef] =
+    useStateRef<number>(0);
 
   // Add a new state for vertical scrolling
   const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] =
     useStateRef<number>(0);
-
-  // Thresholds for extending virtual window (in days)
-  const extendThreshold = 3; // Extend when we're within 3 days of an edge
-  const trimThreshold = 7; // Keep at least 7 days on each side after trimming
 
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
@@ -147,7 +144,7 @@ WeekViewProps) {
       if (targetDayIndex !== -1) {
         // Calculate the new horizontal offset to center the day
         const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
-        setDayTranslateOffset(newHorizontalOffset);
+        setDayTranslateOffsetX(newHorizontalOffset);
 
         // Find the session element to determine vertical position
         setTimeout(() => {
@@ -179,7 +176,7 @@ WeekViewProps) {
       if (todayIndex !== -1) {
         // Calculate the new horizontal offset to center today
         const newHorizontalOffset = (todayIndex - 3) * dayWidth; // Center it with a few days before
-        setDayTranslateOffset(newHorizontalOffset);
+        setDayTranslateOffsetX(newHorizontalOffset);
 
         // Calculate vertical offset to show current time
         // Position the now indicator in the middle of the visible area
@@ -214,7 +211,7 @@ WeekViewProps) {
   }, [
     weekDays,
     dayWidth,
-    setDayTranslateOffset,
+    setDayTranslateOffsetX,
     setDayTranslateOffsetY,
     weekviewRect,
     nowPosition,
@@ -241,8 +238,8 @@ WeekViewProps) {
         const scrollOffset = e.deltaX;
 
         // Calculate new offset
-        const newOffset = dayTranslateOffsetRef.current + scrollOffset;
-        setDayTranslateOffset(newOffset);
+        const newOffset = dayTranslateOffsetXRef.current + scrollOffset;
+        setDayTranslateOffsetX(newOffset);
 
         // Calculate visible range in the virtual window
         const daysScrolledFromStart = Math.floor(newOffset / dayWidth);
@@ -297,11 +294,11 @@ WeekViewProps) {
           // Update in a single batch to prevent visual jank
           const updatedVirtualWindowSize = virtualWindowSize + sizeAdjustment;
           const updatedOffset =
-            dayTranslateOffsetRef.current + offsetAdjustment;
+            dayTranslateOffsetXRef.current + offsetAdjustment;
 
           setVirtualWindowStart(newStart);
           setVirtualWindowSize(updatedVirtualWindowSize);
-          setDayTranslateOffset(updatedOffset);
+          setDayTranslateOffsetX(updatedOffset);
         }
       }
 
@@ -323,14 +320,14 @@ WeekViewProps) {
         // Scrolling has stopped, apply magnetic snapping
         if (isScrolling) {
           // Calculate nearest day snap point
-          const currentDayOffset = dayTranslateOffsetRef.current / dayWidth;
+          const currentDayOffset = dayTranslateOffsetXRef.current / dayWidth;
           const nearestDay = Math.round(currentDayOffset);
 
           // Apply the transition effect when snapping
           setUseTransition(true);
 
           // Set the new offset with magnetic snapping
-          setDayTranslateOffset(nearestDay * dayWidth);
+          setDayTranslateOffsetX(nearestDay * dayWidth);
 
           // Reset scrolling state
           setIsScrolling(false);
@@ -356,11 +353,10 @@ WeekViewProps) {
     virtualWindowStart,
     virtualWindowSize,
     dayWidth,
-    dayTranslateOffsetRef,
+    dayTranslateOffsetXRef,
     dayTranslateOffsetYRef,
-    hoursInDay,
     isScrolling,
-    setDayTranslateOffset,
+    setDayTranslateOffsetX,
     setDayTranslateOffsetY,
   ]);
 
@@ -376,7 +372,7 @@ WeekViewProps) {
         .minute(minuteOffset)
         .toDate();
     },
-    [dayTranslateOffsetY, startHour]
+    [dayTranslateOffsetY]
   );
 
   // Handle mouse down to start selection
@@ -495,7 +491,7 @@ WeekViewProps) {
 
     // Calculate horizontal position that accounts for virtual scrolling
     // The offset in days (from virtual window start) to adjust the grid columns
-    const dayOffset = Math.floor(dayTranslateOffset / dayWidth);
+    const dayOffset = Math.floor(dayTranslateOffsetX / dayWidth);
 
     // Calculate position relative to weekViewRef for absolute positioning
     return {
@@ -533,13 +529,13 @@ WeekViewProps) {
   ]);
 
   const visibleDaysRange = useMemo(() => {
-    const startIndex = Math.floor(dayTranslateOffset / dayWidth);
+    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
     return `${startIndex} to ${startIndex + 7}`;
-  }, [dayTranslateOffset, dayWidth]);
+  }, [dayTranslateOffsetX, dayWidth]);
 
   const [visibleStartDay, visibleEndDay] = useMemo(() => {
     if (weekDays.length === 0) return [null, null];
-    const startIndex = Math.floor(dayTranslateOffset / dayWidth);
+    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
     const endIndex = Math.min(startIndex + 7, weekDays.length);
 
     if (startIndex >= weekDays.length || endIndex <= 0) {
@@ -551,7 +547,7 @@ WeekViewProps) {
     const visibleEndDay = weekDays[Math.min(endIndex - 1, weekDays.length - 1)];
 
     return [visibleStartDay, visibleEndDay] as const;
-  }, [dayTranslateOffset, dayWidth, weekDays]);
+  }, [dayTranslateOffsetX, dayWidth, weekDays]);
 
   const actualDaysRange = useMemo(() => {
     if (!visibleStartDay || !visibleEndDay) return "";
@@ -625,7 +621,7 @@ WeekViewProps) {
             key={day.format("YYYY-MM-DD")}
             className="w-full pb-4 bg-background mb-4 relative group/day"
             style={{
-              transform: `translateX(${-dayTranslateOffset}px)`,
+              transform: `translateX(${-dayTranslateOffsetX}px)`,
               transition: useTransition ? "transform 0.3s ease-out" : "none",
             }}
           >
@@ -726,8 +722,8 @@ WeekViewProps) {
           <div>Window size: {virtualWindowSize} days</div>
           <div>Window start: {virtualWindowStart.format("MM/DD")}</div>
           <div>
-            Offset X: {Math.round(dayTranslateOffset)}px (
-            {Math.floor(dayTranslateOffset / dayWidth)} days)
+            Offset X: {Math.round(dayTranslateOffsetX)}px (
+            {Math.floor(dayTranslateOffsetX / dayWidth)} days)
           </div>
           <div>Offset Y: {Math.round(dayTranslateOffsetY)}px</div>
           <div>Visible days: {visibleDaysRange}</div>
