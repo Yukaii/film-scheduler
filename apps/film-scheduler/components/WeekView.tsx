@@ -26,6 +26,7 @@ import useBoundingClientRect from "@/hooks/useBoundingClientRect";
 import useStateRef from "@/hooks/useStateRef";
 import { useVirtualScroll } from "@/hooks/useVirtualScroll";
 import { SessionBlock } from "./SessionBlock";
+import useTailwindBreakpoints from "@/hooks/useTailwindBreakpoints";
 
 // Thresholds for extending virtual window (in days)
 const extendThreshold = 3; // Extend when we're within 3 days of an edge
@@ -88,6 +89,11 @@ export function WeekView({
     setTimeSelection,
   } = useAppContext();
   const { nowPosition, now, nowHourOffset } = useNowIndicator();
+  const { sm } = useTailwindBreakpoints();
+
+  const timeColumnWidth = useMemo(() => {
+    return sm ? TIME_COLUMN_WIDTH : 45;
+  }, [sm]);
 
   // State to track if highlight is active
   const [isHighlightActive, setIsHighlightActive] = useState(false);
@@ -150,8 +156,8 @@ export function WeekView({
   const weekviewWidth = useMemo(() => weekviewRect?.width || 0, [weekviewRect]);
   const dayWidth = useMemo(
     // days * days width + time column
-    () => (weekviewWidth - TIME_COLUMN_WIDTH) / 7,
-    [weekviewWidth]
+    () => (weekviewWidth - timeColumnWidth) / 7,
+    [weekviewWidth, timeColumnWidth]
   );
 
   // Add a new state for vertical scrolling
@@ -586,7 +592,7 @@ export function WeekView({
           "--day-width": `${dayWidth}px`,
           height: "calc(100vh - 68px)",
           display: "grid",
-          gridTemplateColumns: `${TIME_COLUMN_WIDTH}px repeat(${virtualWindowSize}, var(--day-width))`,
+          gridTemplateColumns: `${timeColumnWidth}px repeat(${virtualWindowSize}, var(--day-width))`,
         } as React.CSSProperties
       }
       ref={weekViewRef}

@@ -49,7 +49,7 @@ export function CalendarView(props: { className?: string }) {
 
   return (
     <div className={cn("w-full", props.className)}>
-      <div className="py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-20 md:px-4">
+      <div className="py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-20 md:px-4 px-2">
         <div className="flex items-center">
           <Button variant="ghost" onClick={toggleSidebar}>
             {(isMobile ? openMobile : open) ? (
