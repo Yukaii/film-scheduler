@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import useBoundingClientRect from "@/hooks/useBoundingClientRect";
 import useStateRef from "@/hooks/useStateRef";
+import { useVirtualScroll } from "@/hooks/useVirtualScroll";
 import { SessionBlock } from "./SessionBlock";
 
 // Thresholds for extending virtual window (in days)
@@ -129,6 +130,18 @@ WeekViewProps) {
   const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] =
     useStateRef<number>(0);
 
+  // Initialize virtual scroll hook
+  const { scrollToSession, scrollToNow } = useVirtualScroll({
+    weekDays,
+    dayWidth,
+    virtualWindowSize,
+    weekviewRect,
+    startHour,
+    setDayTranslateOffsetX,
+    setDayTranslateOffsetY,
+    setVirtualWindowStart,
+  });
+
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
     const handleVirtualScrollToSession = (
@@ -136,114 +149,19 @@ WeekViewProps) {
     ) => {
       const { sessionId } = event.detail;
       
-      // Find the session in the data rather than DOM
+      // Find the session in the data
       const targetSession = sessions.find(session => session.id === sessionId);
       if (!targetSession) {
         console.warn(`Session with id ${sessionId} not found`);
         return;
       }
       
-      const sessionDate = dayjs(targetSession.time);
-      
-      // Find the day in the virtual window
-      const targetDayIndex = weekDays.findIndex((day) =>
-        day.isSame(sessionDate, "day")
-      );
-
-      if (targetDayIndex !== -1) {
-        // Today is in the current virtual window - scroll to it
-        // Calculate the new horizontal offset to center the day
-        const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
-        setDayTranslateOffsetX(newHorizontalOffset);
-
-        // Calculate the session's position based on its time
-        const sessionHour = sessionDate.hour();
-        const sessionMinute = sessionDate.minute();
-        const hourOffset = sessionHour - startHour;
-        const sessionPosition = hourOffset * 60 + sessionMinute;
-
-        // Calculate vertical offset to position the session in the middle of the visible area
-        const visibleHeight = weekviewRect?.height || 600;
-        const newVerticalOffset = Math.max(
-          0,
-          sessionPosition - visibleHeight / 2 + 60
-        );
-
-        setDayTranslateOffsetY(newVerticalOffset);
-      } else {
-        // The day is not in the current virtual window - need to adjust the window first
-        // Recenter the virtual window around the target date
-        const newStart = sessionDate.subtract(Math.floor(virtualWindowSize / 2), "day");
-        setVirtualWindowStart(newStart);
-        
-        // Reset the offset to center the day in view
-        // The day will be at index 'virtualWindowSize/2' in the new window
-        const targetIndex = Math.floor(virtualWindowSize / 2);
-        const newHorizontalOffset = (targetIndex - 3) * dayWidth;
-        
-        // Apply new position with slight delay to allow window update
-        setTimeout(() => {
-          setDayTranslateOffsetX(newHorizontalOffset);
-          
-          // Calculate the session's position based on its time
-          const sessionHour = sessionDate.hour();
-          const sessionMinute = sessionDate.minute();
-          const hourOffset = sessionHour - startHour;
-          const sessionPosition = hourOffset * 60 + sessionMinute;
-          
-          // Set vertical offset to show the session
-          const visibleHeight = weekviewRect?.height || 600;
-          const newVerticalOffset = Math.max(
-            0,
-            sessionPosition - visibleHeight / 2 + 60
-          );
-          setDayTranslateOffsetY(newVerticalOffset);
-        }, 50);
-      }
+      scrollToSession(targetSession);
     };
 
     // Event listener for scrolling to the current time indicator
     const handleVirtualScrollToNow = () => {
-      const today = dayjs();
-      
-      // Find today's index in the virtual window
-      const todayIndex = weekDays.findIndex((day) => 
-        day.isSame(today, "day")
-      );
-
-      if (todayIndex !== -1) {
-        // Today is in the current virtual window - scroll to it
-        // Calculate the new horizontal offset to center today
-        const newHorizontalOffset = (todayIndex - 3) * dayWidth; // Center it with a few days before
-        setDayTranslateOffsetX(newHorizontalOffset);
-
-        // Calculate vertical offset to show current time
-        // Position the now indicator in the middle of the visible area
-        const visibleHeight = weekviewRect?.height || 600;
-        const newVerticalOffset = Math.max(0, nowPosition - visibleHeight / 2);
-
-        setDayTranslateOffsetY(newVerticalOffset);
-      } else {
-        // Today is not in the current virtual window - need to adjust the window first
-        // Recenter the virtual window around today
-        const newStart = today.subtract(Math.floor(virtualWindowSize / 2), "day");
-        setVirtualWindowStart(newStart);
-        
-        // Reset the offset to center today in view
-        // Today will be at index 'virtualWindowSize/2' in the new window
-        const targetIndex = Math.floor(virtualWindowSize / 2);
-        const newHorizontalOffset = (targetIndex - 3) * dayWidth;
-        
-        // Apply new position with slight delay to allow window update
-        setTimeout(() => {
-          setDayTranslateOffsetX(newHorizontalOffset);
-          
-          // Set vertical offset to show current time
-          const visibleHeight = weekviewRect?.height || 600;
-          const newVerticalOffset = Math.max(0, nowPosition - visibleHeight / 2);
-          setDayTranslateOffsetY(newVerticalOffset);
-        }, 50);
-      }
+      scrollToNow();
     };
 
     // Add event listeners
@@ -267,17 +185,9 @@ WeekViewProps) {
         handleVirtualScrollToNow
       );
     };
-  }, [
-    weekDays,
-    dayWidth,
-    setDayTranslateOffsetX,
-    setDayTranslateOffsetY,
-    weekviewRect,
-    nowPosition,
-    virtualWindowSize,
-    sessions,
-  ]);
+  }, [sessions, scrollToSession, scrollToNow]);
 
+  // Add a new state for vertical scrolling
   const maxScrollY = useMemo(
     () => (hoursInDay + 1) * 60 - (weekviewRect?.height || 300),
     [weekviewRect]
