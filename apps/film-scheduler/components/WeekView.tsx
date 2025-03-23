@@ -134,35 +134,71 @@ WeekViewProps) {
     const handleVirtualScrollToSession = (
       event: CustomEvent<VirtualScrollToSessionEvent>
     ) => {
-      const { date, sessionId } = event.detail;
-
+      const { sessionId } = event.detail;
+      
+      // Find the session in the data rather than DOM
+      const targetSession = sessions.find(session => session.id === sessionId);
+      if (!targetSession) {
+        console.warn(`Session with id ${sessionId} not found`);
+        return;
+      }
+      
+      const sessionDate = dayjs(targetSession.time);
+      
       // Find the day in the virtual window
       const targetDayIndex = weekDays.findIndex((day) =>
-        day.isSame(date, "day")
+        day.isSame(sessionDate, "day")
       );
 
       if (targetDayIndex !== -1) {
+        // Today is in the current virtual window - scroll to it
         // Calculate the new horizontal offset to center the day
         const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
         setDayTranslateOffsetX(newHorizontalOffset);
 
-        // Find the session element to determine vertical position
+        // Calculate the session's position based on its time
+        const sessionHour = sessionDate.hour();
+        const sessionMinute = sessionDate.minute();
+        const hourOffset = sessionHour - startHour;
+        const sessionPosition = hourOffset * 60 + sessionMinute;
+
+        // Calculate vertical offset to position the session in the middle of the visible area
+        const visibleHeight = weekviewRect?.height || 600;
+        const newVerticalOffset = Math.max(
+          0,
+          sessionPosition - visibleHeight / 2 + 60
+        );
+
+        setDayTranslateOffsetY(newVerticalOffset);
+      } else {
+        // The day is not in the current virtual window - need to adjust the window first
+        // Recenter the virtual window around the target date
+        const newStart = sessionDate.subtract(Math.floor(virtualWindowSize / 2), "day");
+        setVirtualWindowStart(newStart);
+        
+        // Reset the offset to center the day in view
+        // The day will be at index 'virtualWindowSize/2' in the new window
+        const targetIndex = Math.floor(virtualWindowSize / 2);
+        const newHorizontalOffset = (targetIndex - 3) * dayWidth;
+        
+        // Apply new position with slight delay to allow window update
         setTimeout(() => {
-          const sessionElement = document.getElementById(sessionId);
-          if (sessionElement) {
-            // Get top position and calculate vertical offset
-            const sessionTop = parseInt(sessionElement.style.top);
-
-            // Calculate vertical offset to position the session in the middle of the visible area
-            const visibleHeight = weekviewRect?.height || 600;
-            const newVerticalOffset = Math.max(
-              0,
-              sessionTop - visibleHeight / 2 + 60
-            );
-
-            setDayTranslateOffsetY(newVerticalOffset);
-          }
-        }, 100); // Small delay to ensure DOM is updated
+          setDayTranslateOffsetX(newHorizontalOffset);
+          
+          // Calculate the session's position based on its time
+          const sessionHour = sessionDate.hour();
+          const sessionMinute = sessionDate.minute();
+          const hourOffset = sessionHour - startHour;
+          const sessionPosition = hourOffset * 60 + sessionMinute;
+          
+          // Set vertical offset to show the session
+          const visibleHeight = weekviewRect?.height || 600;
+          const newVerticalOffset = Math.max(
+            0,
+            sessionPosition - visibleHeight / 2 + 60
+          );
+          setDayTranslateOffsetY(newVerticalOffset);
+        }, 50);
       }
     };
 
@@ -239,6 +275,7 @@ WeekViewProps) {
     weekviewRect,
     nowPosition,
     virtualWindowSize,
+    sessions,
   ]);
 
   const maxScrollY = useMemo(
