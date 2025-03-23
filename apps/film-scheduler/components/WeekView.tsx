@@ -629,7 +629,7 @@ WeekViewProps) {
                     </span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side="bottom">
                   <p>點擊篩選當日影片</p>
                 </TooltipContent>
               </Tooltip>
