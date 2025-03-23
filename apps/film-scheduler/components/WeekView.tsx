@@ -384,10 +384,8 @@ export function WeekView({
   // Helper function to convert screen position to time
   const positionToTime = useCallback(
     (day: dayjs.Dayjs, posY: number): Date => {
-      // Adjust posY by the vertical offset to get accurate time
-      const adjustedPosY = posY + dayTranslateOffsetY;
-      const hourOffset = Math.floor(adjustedPosY / 60);
-      const minuteOffset = Math.round((adjustedPosY % 60) / 5) * 5; // Round to nearest 5 min
+      const hourOffset = Math.floor(posY / 60);
+      const minuteOffset = Math.round((posY % 60) / 5) * 5; // Round to nearest 5 min
       return day
         .hour(startHour + hourOffset)
         .minute(minuteOffset)
@@ -503,9 +501,6 @@ export function WeekView({
 
     if (startDayIndex === -1 || endDayIndex === -1) return null;
 
-    const minDayIndex = Math.min(startDayIndex, endDayIndex);
-    const maxDayIndex = Math.max(startDayIndex, endDayIndex);
-
     // Get min and max positions without adjusting for scroll
     const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
     const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
@@ -518,10 +513,9 @@ export function WeekView({
     return {
       position: "absolute" as const,
       transform: `translateY(${minPosY - dayTranslateOffsetY}px)`,
-      // top: `${minPosY - dayTranslateOffsetY}px`, // No offset adjustment needed since mouse positions are already relative to visible area
       height: `${maxPosY - minPosY}px`,
-      width: (maxDayIndex - minDayIndex + 1) * dayWidth + "px",
-      left: (minDayIndex - dayOffset + 1) * dayWidth + "px",
+      width: dayWidth + "px",
+      left: (startDayIndex - dayOffset) * dayWidth + timeColumnWidth + "px",
       zIndex: 40,
     };
   };
