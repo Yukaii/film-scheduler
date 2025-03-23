@@ -37,90 +37,104 @@ export function useVirtualScroll({
   }, [startHour]);
 
   /**
+   * Check if a date is within the current virtual window
+   * @returns The index of the day if found, or -1 if not in the window
+   */
+  const isDateInVirtualWindow = useCallback((targetDate: dayjs.Dayjs): number => {
+    if (!weekDays.length) return -1;
+    
+    return weekDays.findIndex((day) => day.isSame(targetDate, "day"));
+  }, [weekDays]);
+
+  /**
+   * Adjust the virtual window to include the target date
+   */
+  const adjustVirtualWindowForDate = useCallback((targetDate: dayjs.Dayjs): Promise<void> => {
+    // Center the virtual window around the target date
+    const newStart = targetDate.subtract(Math.floor(virtualWindowSize / 2), "day");
+    
+    return new Promise((resolve) => {
+      setVirtualWindowStart(newStart);
+      // Allow time for the window update to take effect
+      setTimeout(resolve, 50);
+    });
+  }, [virtualWindowSize, setVirtualWindowStart]);
+
+  /**
+   * Check if a date is visible in the current view (not just in virtual window)
+   * If not, prepare the virtual window to make it visible
+   * @returns An object with the day index and whether the window was adjusted
+   */
+  const ensureDateIsVisible = useCallback(async (
+    targetDate: dayjs.Dayjs
+  ): Promise<{ dayIndex: number; windowAdjusted: boolean }> => {
+    // First check if the target day is in the current virtual window
+    let targetDayIndex = isDateInVirtualWindow(targetDate);
+    let windowAdjusted = false;
+    
+    // If the day is not in the current window, adjust the window
+    if (targetDayIndex === -1) {
+      await adjustVirtualWindowForDate(targetDate);
+      windowAdjusted = true;
+      
+      // After window adjustment, find the new index
+      // It should be roughly in the middle of the window
+      targetDayIndex = Math.floor(virtualWindowSize / 2);
+    }
+    
+    return { dayIndex: targetDayIndex, windowAdjusted };
+  }, [isDateInVirtualWindow, adjustVirtualWindowForDate, virtualWindowSize]);
+
+  /**
    * Scroll to a specific date and time
    */
-  const scrollToTime = useCallback((targetDate: dayjs.Dayjs, alignment: "center" | "left" | "right" = "center") => {
-    // Find the day in the virtual window
-    const targetDayIndex = weekDays.findIndex((day) =>
-      day.isSame(targetDate, "day")
-    );
-
+  const scrollToTime = useCallback(async (targetDate: dayjs.Dayjs, alignment: "center" | "left" | "right" = "center") => {
     const visibleHeight = weekviewRect?.height || 600;
     const timePosition = calculateTimePosition(targetDate);
     
-    if (targetDayIndex !== -1) {
-      // Target day is in the current virtual window - scroll to it
-      // Calculate horizontal offset to center the day
-      let newHorizontalOffset = 0;
-      switch (alignment) {
-        case "left":
-          newHorizontalOffset = targetDayIndex * dayWidth;
-          break;
-        case "right":
-          newHorizontalOffset = (targetDayIndex + 1) * dayWidth;
-          break;
-        case "center":
-        default:
-          newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
-          break;
-      }
-      
-      setDayTranslateOffsetX(newHorizontalOffset);
-
-      // Calculate vertical offset to position the time in the middle
-      let newVerticalOffset = Math.max(
-        0,
-        timePosition - visibleHeight / 2 + 60
-      );
-      
-      // Respect maxScrollY if provided
-      if (maxScrollY !== undefined) {
-        newVerticalOffset = Math.min(newVerticalOffset, maxScrollY);
-      }
-      
-      setDayTranslateOffsetY(newVerticalOffset);
-      
-      return true;
-    } else {
-      // Target day is not in the current virtual window - adjust the window first
-      // Recenter the virtual window around the target date
-      const newStart = targetDate.subtract(Math.floor(virtualWindowSize / 2), "day");
-      setVirtualWindowStart(newStart);
-      
-      // Reset the offset to center the day in view
-      const targetIndex = Math.floor(virtualWindowSize / 2);
-      const newHorizontalOffset = (targetIndex - 3) * dayWidth;
-      
-      // Apply new position with slight delay to allow window update
-      setTimeout(() => {
-        setDayTranslateOffsetX(newHorizontalOffset);
-        
-        // Set vertical offset to show the time
-        let newVerticalOffset = Math.max(
-          0,
-          timePosition - visibleHeight / 2 + 60
-        );
-        
-        // Respect maxScrollY if provided
-        if (maxScrollY !== undefined) {
-          newVerticalOffset = Math.min(newVerticalOffset, maxScrollY);
-        }
-        
-        setDayTranslateOffsetY(newVerticalOffset);
-      }, 50);
-      
-      return false;
+    // Ensure the target date is visible
+    const { dayIndex: targetDayIndex, windowAdjusted } = await ensureDateIsVisible(targetDate);
+    
+    // Calculate the new horizontal offset based on alignment
+    let newHorizontalOffset = 0;
+    switch (alignment) {
+      case "left":
+        newHorizontalOffset = targetDayIndex * dayWidth;
+        break;
+      case "right":
+        newHorizontalOffset = (targetDayIndex + 1) * dayWidth;
+        break;
+      case "center":
+      default:
+        newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center with days before
+        break;
     }
+    
+    // Apply horizontal offset
+    setDayTranslateOffsetX(newHorizontalOffset);
+
+    // Set vertical scroll position
+    let newVerticalOffset = Math.max(
+      0,
+      timePosition - visibleHeight / 2 + 60
+    );
+    
+    // Respect maxScrollY if provided
+    if (maxScrollY !== undefined) {
+      newVerticalOffset = Math.min(newVerticalOffset, maxScrollY);
+    }
+    
+    setDayTranslateOffsetY(newVerticalOffset);
+    
+    return { success: true, windowAdjusted };
   }, [
-    weekDays,
-    dayWidth,
-    virtualWindowSize,
     weekviewRect,
     calculateTimePosition,
-    maxScrollY, // Add maxScrollY to dependencies
+    ensureDateIsVisible,
+    dayWidth,
+    maxScrollY,
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
-    setVirtualWindowStart,
   ]);
 
   /**
@@ -144,5 +158,7 @@ export function useVirtualScroll({
     scrollToSession,
     scrollToNow,
     calculateTimePosition,
+    isDateInVirtualWindow,
+    ensureDateIsVisible,
   };
 }

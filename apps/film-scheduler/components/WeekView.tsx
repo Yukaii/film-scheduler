@@ -154,6 +154,7 @@ export function WeekView({
   // Only run this effect when the component mounts or when viewWeekStart changes
   useEffect(() => {
     if (dayWidth > 0 && weekDays.length > 0) {
+      // The scrollToTime function now handles cases where the day is outside the virtual window
       scrollToTime(viewWeekStart, "left");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,6 +174,7 @@ export function WeekView({
         return;
       }
       
+      // scrollToSession now handles cases where the session's day is outside the virtual window
       scrollToSession(targetSession);
     };
 
