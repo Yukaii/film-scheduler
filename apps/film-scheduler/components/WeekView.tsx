@@ -152,6 +152,7 @@ WeekViewProps) {
   });
 
   // Set initial scroll position to center on initialWeekStart
+  // Only run this effect when the component mounts or when initialWeekStart changes
   useEffect(() => {
     if (dayWidth > 0 && weekDays.length > 0) {
       // Find the index of initialWeekStart in weekDays
@@ -166,7 +167,8 @@ WeekViewProps) {
         setDayTranslateOffsetX(initialOffset);
       }
     }
-  }, [initialWeekStart, weekDays, dayWidth, setDayTranslateOffsetX]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialWeekStart, dayWidth, setDayTranslateOffsetX]);
 
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
