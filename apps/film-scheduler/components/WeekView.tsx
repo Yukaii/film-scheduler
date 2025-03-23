@@ -43,6 +43,7 @@ export interface WeekViewProps {
   selectedSessions: Session[];
   previewSessions: Session[];
   onWeekStartChange: (date: dayjs.Dayjs) => void;
+  highlightDate?: Date;
 }
 
 function useNowIndicator() {
@@ -76,6 +77,7 @@ export function WeekView({
   selectedSessions,
   previewSessions,
   onWeekStartChange,
+  highlightDate,
 }: WeekViewProps) {
   const {
     filmsMap,
@@ -86,6 +88,25 @@ export function WeekView({
     setTimeSelection,
   } = useAppContext();
   const { nowPosition, now, nowHourOffset } = useNowIndicator();
+
+  // State to track if highlight is active
+  const [isHighlightActive, setIsHighlightActive] = useState(false);
+  const [currentHighlightDate, setCurrentHighlightDate] = useState<Date | undefined>(undefined);
+
+  // Effect to manage highlight timeout
+  useEffect(() => {
+    if (highlightDate) {
+      setIsHighlightActive(true);
+      setCurrentHighlightDate(highlightDate);
+      
+      // Set a timeout to clear the highlight after 2 seconds
+      const timer = setTimeout(() => {
+        setIsHighlightActive(false);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [highlightDate]);
 
   const sessions = joinSessions(selectedSessions, previewSessions);
 
@@ -616,11 +637,15 @@ export function WeekView({
       {/* Week Days Columns */}
       {weekDays.map((day) => {
         const isSameDay = now.isSame(day, "day");
+        const shouldHighlight = isHighlightActive && currentHighlightDate && day.isSame(dayjs(currentHighlightDate), "day");
 
         return (
           <div
             key={day.format("YYYY-MM-DD")}
-            className="w-full pb-4 bg-background mb-4 relative group/day"
+            className={cn(
+              "w-full pb-4 bg-background mb-4 relative group/day transition-colors",
+              shouldHighlight && "bg-blue-50 dark:bg-blue-950/30"
+            )}
             style={{
               transform: `translateX(${-dayTranslateOffsetX}px)`,
               transition: useTransition ? "transform 0.3s ease-out" : "none",
@@ -630,7 +655,10 @@ export function WeekView({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="md:text-sm pb-2 text-xs text-center h-7 sticky top-0 bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors"
+                    className={cn(
+                      "md:text-sm pb-2 text-xs text-center h-7 sticky top-0 bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors",
+                      shouldHighlight && "bg-blue-100 dark:bg-blue-900/50"
+                    )}
                     onClick={() => {
                       const startTime = day.hour(10).minute(0).toDate();
                       const endTime = day.hour(23).minute(59).toDate();
@@ -647,6 +675,7 @@ export function WeekView({
                     <span
                       className={cn("p-0.5", {
                         "bg-red-500 text-white rounded": isSameDay,
+                        "bg-blue-500 text-white rounded": shouldHighlight && !isSameDay,
                       })}
                     >
                       {day.format("D")}
@@ -660,7 +689,10 @@ export function WeekView({
             </TooltipProvider>
 
             <div
-              className="relative h-[840px] border-t border-b border-border"
+              className={cn(
+                "relative h-[840px] border-t border-b border-border",
+                shouldHighlight && "bg-blue-50/70 dark:bg-blue-950/20"
+              )}
               onMouseDown={(e) => handleMouseDown(e, day)}
               onMouseMove={(e) => handleMouseMove(e, day)}
               onMouseLeave={handleMouseLeave}
