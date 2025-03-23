@@ -75,6 +75,7 @@ export function WeekView({
   viewWeekStart,
   selectedSessions,
   previewSessions,
+  onWeekStartChange,
 }: WeekViewProps) {
   const {
     filmsMap,
@@ -155,7 +156,7 @@ export function WeekView({
   useEffect(() => {
     if (dayWidth > 0 && weekDays.length > 0) {
       // The scrollToTime function now handles cases where the day is outside the virtual window
-      scrollToTime(viewWeekStart, "left");
+      scrollToTime(viewWeekStart, false, "left");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewWeekStart, dayWidth]);
@@ -319,8 +320,11 @@ export function WeekView({
 
           // Reset scrolling state
           setIsScrolling(false);
+          
+          // Calculate which week is now visible and notify parent component
+          onWeekStartChange(visibleStartDayRef.current!);
         }
-      }, 50); // 150ms delay to detect end of scroll
+      }, 50); // 50ms delay to detect end of scroll
 
       e.preventDefault();
     };
@@ -724,6 +728,7 @@ export function WeekView({
           <div>Offset Y: {Math.round(dayTranslateOffsetY)}px</div>
           <div>Visible days: {visibleDaysRange}</div>
           <div>Date range: {actualDaysRange}</div>
+          <div>View week start: {viewWeekStart.format("MM/DD")}</div>
         </div>
       )}
     </div>

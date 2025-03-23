@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
 import dayjs from "@/lib/dayjs";
@@ -18,24 +18,31 @@ import { Dayjs } from "dayjs";
 export function CalendarView(props: { className?: string }) {
   const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
     useAppContext();
-  const currentWeekStart = useMemo(
-    () => dayjs(currentDate).startOf("week"),
-    [currentDate]
+
+  // Add state to track the current view week from infinite scroll
+  const [viewWeekStart, setViewWeekStart] = useState(() =>
+    dayjs(currentDate).startOf("week")
   );
 
+  // Update navigate week to use viewWeekStart instead of currentDate
   const navigateWeek = (direction: "previous" | "next") => {
-    setCurrentDate((prev) => {
-      const currentDayjs = dayjs(prev);
-      return direction === "next"
-        ? currentDayjs.add(1, "week").toDate()
-        : currentDayjs.subtract(1, "week").toDate();
-    });
+    const newWeekStart = direction === "next"
+      ? viewWeekStart.add(1, "week")
+      : viewWeekStart.subtract(1, "week");
+
+    setViewWeekStart(newWeekStart);
+    setCurrentDate(newWeekStart.toDate());
   };
 
   const { open, isMobile, openMobile, toggleSidebar } = useSidebar();
-  // Modified to not use scrollIntoView - the event listener will handle scrolling now
+
+  // Modified to update both current date and view week
   const goToToday = () => {
-    setCurrentDate(new Date());
+    const today = new Date();
+    const todayWeekStart = dayjs(today).startOf("week");
+
+    setCurrentDate(today);
+    setViewWeekStart(todayWeekStart);
     scrollNowIndicatorIntoView();
   };
 
@@ -62,7 +69,7 @@ export function CalendarView(props: { className?: string }) {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="mx-2">
-                {dayjs(currentDate).format("YYYY/MM")}{" "}
+                {viewWeekStart.format("YYYY/MM")}{" "}
                 <CalendarIcon className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -72,6 +79,8 @@ export function CalendarView(props: { className?: string }) {
                 selected={currentDate}
                 onSelect={(date) => {
                   if (date) {
+                    const newWeekStart = dayjs(date).startOf("week");
+                    setViewWeekStart(newWeekStart);
                     setCurrentDate(date);
                   }
                 }}
@@ -97,9 +106,9 @@ export function CalendarView(props: { className?: string }) {
       </div>
 
       <WeekView
-        viewWeekStart={currentWeekStart}
+        viewWeekStart={viewWeekStart}
         onWeekStartChange={(d: Dayjs) => {
-          setCurrentDate(d.toDate());
+          setViewWeekStart(d);
         }}
         selectedSessions={selectedSessions}
         previewSessions={previewSessions}

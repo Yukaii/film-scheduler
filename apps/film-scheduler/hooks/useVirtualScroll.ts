@@ -88,7 +88,7 @@ export function useVirtualScroll({
   /**
    * Scroll to a specific date and time
    */
-  const scrollToTime = useCallback(async (targetDate: dayjs.Dayjs, alignment: "center" | "left" | "right" = "center") => {
+  const scrollToTime = useCallback(async (targetDate: dayjs.Dayjs, adjustY = true, alignment: "center" | "left" | "right" = "center") => {
     const visibleHeight = weekviewRect?.height || 600;
     const timePosition = calculateTimePosition(targetDate);
     
@@ -112,6 +112,8 @@ export function useVirtualScroll({
     
     // Apply horizontal offset
     setDayTranslateOffsetX(newHorizontalOffset);
+
+    if (!adjustY) return { success: true, windowAdjusted };
 
     // Set vertical scroll position
     let newVerticalOffset = Math.max(
