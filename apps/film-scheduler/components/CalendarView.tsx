@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/en";
 import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
@@ -48,29 +48,31 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Taipei");
 
 interface WeekViewProps {
-  currentWeekStart: dayjs.Dayjs;
+  initialWeekStart: dayjs.Dayjs;
   selectedSessions: Session[];
   previewSessions: Session[];
+  onWeekStartChange: (date: dayjs.Dayjs) => void;
 }
 
 function WeekView({
-  currentWeekStart,
+  initialWeekStart,
   selectedSessions,
   previewSessions,
+  // onWeekStartChange,
 }: WeekViewProps) {
   // Initial virtual window settings
   const [virtualWindowSize, setVirtualWindowSize] = useState(28);
   const [virtualWindowStart, setVirtualWindowStart] = useState(
-    currentWeekStart.subtract(virtualWindowSize / 2, "day")
+    initialWeekStart.subtract(virtualWindowSize / 2, "day")
   );
 
   // Update virtual window when current week changes
   useEffect(() => {
     // When deliberately changing weeks via UI controls, re-center the window
     setVirtualWindowStart(
-      currentWeekStart.subtract(virtualWindowSize / 2, "day")
+      initialWeekStart.subtract(virtualWindowSize / 2, "day")
     );
-  }, [currentWeekStart, virtualWindowSize]);
+  }, [initialWeekStart, virtualWindowSize]);
 
   // Generate days array based on virtual window
   const weekDays = useMemo(() => {
@@ -147,10 +149,6 @@ function WeekView({
   const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] =
     useStateRef<number>(0);
 
-  // Track whether the window has been modified by scrolling
-  // This prevents the offset being reset when the window is extended
-  const [windowModifiedByScroll, setWindowModifiedByScroll] = useState(false);
-
   // Thresholds for extending virtual window (in days)
   const extendThreshold = 3; // Extend when we're within 3 days of an edge
   const trimThreshold = 7; // Keep at least 7 days on each side after trimming
@@ -171,7 +169,6 @@ function WeekView({
         // Calculate the new horizontal offset to center the day
         const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
         setDayTranslateOffset(newHorizontalOffset);
-        setWindowModifiedByScroll(true);
 
         // Find the session element to determine vertical position
         setTimeout(() => {
@@ -204,7 +201,6 @@ function WeekView({
         // Calculate the new horizontal offset to center today
         const newHorizontalOffset = (todayIndex - 3) * dayWidth; // Center it with a few days before
         setDayTranslateOffset(newHorizontalOffset);
-        setWindowModifiedByScroll(true);
 
         // Calculate vertical offset to show current time
         // Position the now indicator in the middle of the visible area
@@ -319,8 +315,6 @@ function WeekView({
 
         // Apply changes if needed
         if (offsetAdjustment !== 0 || sizeAdjustment !== 0) {
-          setWindowModifiedByScroll(true); // Mark window as modified by scroll
-
           // Update in a single batch to prevent visual jank
           const updatedVirtualWindowSize = virtualWindowSize + sizeAdjustment;
           const updatedOffset =
@@ -380,21 +374,6 @@ function WeekView({
       }
     };
   }, [virtualWindowStart, virtualWindowSize, dayWidth, dayTranslateOffsetRef, dayTranslateOffsetYRef, hoursInDay, isScrolling, setDayTranslateOffset, setDayTranslateOffsetY]);
-
-  // Only recalculate translation offset when day width changes or window start changes,
-  // but ONLY if the window hasn't been modified by scroll
-  useEffect(() => {
-    if (dayWidth > 0 && !windowModifiedByScroll) {
-      const today = dayjs();
-      const offset = today.diff(virtualWindowStart, "day");
-      setDayTranslateOffset(offset * dayWidth);
-    }
-  }, [dayWidth, setDayTranslateOffset, virtualWindowStart, windowModifiedByScroll]);
-
-  // Reset the window modified flag when current week changes from UI controls
-  useEffect(() => {
-    setWindowModifiedByScroll(false);
-  }, [currentWeekStart]);
 
   // Helper function to convert screen position to time
   const positionToTime = useCallback((day: dayjs.Dayjs, posY: number): Date => {
@@ -982,7 +961,10 @@ export function CalendarView(props: { className?: string }) {
       </div>
 
       <WeekView
-        currentWeekStart={currentWeekStart}
+        initialWeekStart={currentWeekStart}
+        onWeekStartChange={(d: Dayjs) => {
+          setCurrentDate(d.toDate());
+        }}
         selectedSessions={selectedSessions}
         previewSessions={previewSessions}
       />
