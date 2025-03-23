@@ -217,6 +217,11 @@ WeekViewProps) {
     nowPosition,
   ]);
 
+  const maxScrollY = useMemo(
+    () => (hoursInDay + 1) * 60 - (weekviewRect?.height || 300),
+    [weekviewRect]
+  );
+
   // Handle scroll/wheel event with infinite scroll logic
   useEffect(() => {
     const weekViewElement = weekViewRef.current;
@@ -309,7 +314,6 @@ WeekViewProps) {
 
         // Limit the vertical scroll to stay within reasonable bounds
         // Height of the full calendar content is hoursInDay * 60 pixels
-        const maxScrollY = hoursInDay * 60 - 400; // Subtract viewport height approximate
         const limitedOffsetY = Math.max(0, Math.min(newOffsetY, maxScrollY));
 
         setDayTranslateOffsetY(limitedOffsetY);
@@ -358,6 +362,7 @@ WeekViewProps) {
     isScrolling,
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
+    maxScrollY,
   ]);
 
   // Helper function to convert screen position to time
