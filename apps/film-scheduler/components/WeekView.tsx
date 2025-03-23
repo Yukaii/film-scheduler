@@ -36,6 +36,7 @@ const hoursInDay = 14;
 
 const INITIAL_VIRTUAL_WINDOW_SIZE = 28; // Initial size of the virtual window in days
 
+const TIME_COLUMN_WIDTH = 80; // Width of the time column in pixels
 export interface WeekViewProps {
   initialWeekStart: dayjs.Dayjs;
   selectedSessions: Session[];
@@ -126,7 +127,8 @@ WeekViewProps) {
   const weekviewRect = useBoundingClientRect(weekViewRef);
   const weekviewWidth = useMemo(() => weekviewRect?.width || 0, [weekviewRect]);
   const dayWidth = useMemo(
-    () => weekviewWidth / 8, // days + time column
+    // days * days width + time column
+    () => (weekviewWidth - TIME_COLUMN_WIDTH) / 7,
     [weekviewWidth]
   );
 
@@ -559,7 +561,7 @@ WeekViewProps) {
           "--day-width": `${dayWidth}px`,
           height: "calc(100vh - 68px)",
           display: "grid",
-          gridTemplateColumns: `var(--day-width) repeat(${virtualWindowSize}, var(--day-width))`,
+          gridTemplateColumns: `${TIME_COLUMN_WIDTH}px repeat(${virtualWindowSize}, var(--day-width))`,
         } as React.CSSProperties
       }
       ref={weekViewRef}
