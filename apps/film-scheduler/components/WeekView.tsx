@@ -501,7 +501,8 @@ WeekViewProps) {
     // Calculate position relative to weekViewRef for absolute positioning
     return {
       position: "absolute" as const,
-      top: `${minPosY - dayTranslateOffsetY}px`, // No offset adjustment needed since mouse positions are already relative to visible area
+      transform: `translateY(${minPosY - dayTranslateOffsetY}px)`,
+      // top: `${minPosY - dayTranslateOffsetY}px`, // No offset adjustment needed since mouse positions are already relative to visible area
       height: `${maxPosY - minPosY}px`,
       width: (maxDayIndex - minDayIndex + 1) * dayWidth + "px",
       left: (minDayIndex - dayOffset + 1) * dayWidth + "px",
