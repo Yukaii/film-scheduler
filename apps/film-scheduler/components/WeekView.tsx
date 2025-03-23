@@ -351,6 +351,7 @@ export function WeekView({
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
     maxScrollY,
+    onWeekStartChange,
   ]);
 
   // Helper function to convert screen position to time
