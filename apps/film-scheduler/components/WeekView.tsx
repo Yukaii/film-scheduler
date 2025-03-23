@@ -168,12 +168,15 @@ WeekViewProps) {
 
     // Event listener for scrolling to the current time indicator
     const handleVirtualScrollToNow = () => {
+      const today = dayjs();
+      
       // Find today's index in the virtual window
-      const todayIndex = weekDays.findIndex((day) =>
-        day.isSame(dayjs(), "day")
+      const todayIndex = weekDays.findIndex((day) => 
+        day.isSame(today, "day")
       );
 
       if (todayIndex !== -1) {
+        // Today is in the current virtual window - scroll to it
         // Calculate the new horizontal offset to center today
         const newHorizontalOffset = (todayIndex - 3) * dayWidth; // Center it with a few days before
         setDayTranslateOffsetX(newHorizontalOffset);
@@ -184,6 +187,26 @@ WeekViewProps) {
         const newVerticalOffset = Math.max(0, nowPosition - visibleHeight / 2);
 
         setDayTranslateOffsetY(newVerticalOffset);
+      } else {
+        // Today is not in the current virtual window - need to adjust the window first
+        // Recenter the virtual window around today
+        const newStart = today.subtract(Math.floor(virtualWindowSize / 2), "day");
+        setVirtualWindowStart(newStart);
+        
+        // Reset the offset to center today in view
+        // Today will be at index 'virtualWindowSize/2' in the new window
+        const targetIndex = Math.floor(virtualWindowSize / 2);
+        const newHorizontalOffset = (targetIndex - 3) * dayWidth;
+        
+        // Apply new position with slight delay to allow window update
+        setTimeout(() => {
+          setDayTranslateOffsetX(newHorizontalOffset);
+          
+          // Set vertical offset to show current time
+          const visibleHeight = weekviewRect?.height || 600;
+          const newVerticalOffset = Math.max(0, nowPosition - visibleHeight / 2);
+          setDayTranslateOffsetY(newVerticalOffset);
+        }, 50);
       }
     };
 
@@ -215,6 +238,7 @@ WeekViewProps) {
     setDayTranslateOffsetY,
     weekviewRect,
     nowPosition,
+    virtualWindowSize,
   ]);
 
   const maxScrollY = useMemo(
