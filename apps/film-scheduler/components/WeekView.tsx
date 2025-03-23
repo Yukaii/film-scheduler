@@ -95,6 +95,14 @@ WeekViewProps) {
     initialWeekStart.subtract(virtualWindowSize / 2, "day")
   );
 
+  // Initialize dayTranslateOffset based on today's date
+  const [dayTranslateOffsetX, setDayTranslateOffsetX, dayTranslateOffsetXRef] =
+    useStateRef<number>(0);
+
+  // Add a new state for vertical scrolling
+  const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] =
+    useStateRef<number>(0);
+
   // Generate days array based on virtual window
   const weekDays = useMemo(() => {
     return Array.from({ length: virtualWindowSize }, (_, i) =>
@@ -122,14 +130,6 @@ WeekViewProps) {
     [weekviewWidth]
   );
 
-  // Initialize dayTranslateOffset based on today's date
-  const [dayTranslateOffsetX, setDayTranslateOffsetX, dayTranslateOffsetXRef] =
-    useStateRef<number>(0);
-
-  // Add a new state for vertical scrolling
-  const [dayTranslateOffsetY, setDayTranslateOffsetY, dayTranslateOffsetYRef] =
-    useStateRef<number>(0);
-
   // Initialize virtual scroll hook
   const { scrollToSession, scrollToNow } = useVirtualScroll({
     weekDays,
@@ -141,6 +141,23 @@ WeekViewProps) {
     setDayTranslateOffsetY,
     setVirtualWindowStart,
   });
+
+  // Set initial scroll position to center on initialWeekStart
+  useEffect(() => {
+    if (dayWidth > 0 && weekDays.length > 0) {
+      // Find the index of initialWeekStart in weekDays
+      const initialDayIndex = weekDays.findIndex(day => 
+        day.isSame(initialWeekStart, 'day')
+      );
+      
+      if (initialDayIndex !== -1) {
+        // Set the initial scroll offset to center the initialWeekStart
+        // Account for the time column (that's why we add 1)
+        const initialOffset = (initialDayIndex - 3) * dayWidth;
+        setDayTranslateOffsetX(initialOffset);
+      }
+    }
+  }, [initialWeekStart, weekDays, dayWidth, setDayTranslateOffsetX]);
 
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
