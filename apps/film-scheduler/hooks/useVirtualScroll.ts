@@ -39,7 +39,7 @@ export function useVirtualScroll({
   /**
    * Scroll to a specific date and time
    */
-  const scrollToTime = useCallback((targetDate: dayjs.Dayjs) => {
+  const scrollToTime = useCallback((targetDate: dayjs.Dayjs, alignment: "center" | "left" | "right" = "center") => {
     // Find the day in the virtual window
     const targetDayIndex = weekDays.findIndex((day) =>
       day.isSame(targetDate, "day")
@@ -51,7 +51,20 @@ export function useVirtualScroll({
     if (targetDayIndex !== -1) {
       // Target day is in the current virtual window - scroll to it
       // Calculate horizontal offset to center the day
-      const newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
+      let newHorizontalOffset = 0;
+      switch (alignment) {
+        case "left":
+          newHorizontalOffset = targetDayIndex * dayWidth;
+          break;
+        case "right":
+          newHorizontalOffset = (targetDayIndex + 1) * dayWidth;
+          break;
+        case "center":
+        default:
+          newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center it with a few days before
+          break;
+      }
+      
       setDayTranslateOffsetX(newHorizontalOffset);
 
       // Calculate vertical offset to position the time in the middle

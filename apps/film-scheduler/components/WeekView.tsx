@@ -37,8 +37,9 @@ const hoursInDay = 14;
 const INITIAL_VIRTUAL_WINDOW_SIZE = 28; // Initial size of the virtual window in days
 
 const TIME_COLUMN_WIDTH = 80; // Width of the time column in pixels
+
 export interface WeekViewProps {
-  initialWeekStart: dayjs.Dayjs;
+  viewWeekStart: dayjs.Dayjs;
   selectedSessions: Session[];
   previewSessions: Session[];
   onWeekStartChange: (date: dayjs.Dayjs) => void;
@@ -71,11 +72,10 @@ function useNowIndicator() {
 }
 
 export function WeekView({
-  initialWeekStart,
+  viewWeekStart,
   selectedSessions,
   previewSessions,
-}: // onWeekStartChange,
-WeekViewProps) {
+}: WeekViewProps) {
   const {
     filmsMap,
     addSession,
@@ -93,7 +93,7 @@ WeekViewProps) {
     INITIAL_VIRTUAL_WINDOW_SIZE
   );
   const [virtualWindowStart, setVirtualWindowStart] = useState(
-    initialWeekStart.subtract(virtualWindowSize / 2, "day")
+    viewWeekStart.subtract(virtualWindowSize / 2, "day")
   );
 
   // Initialize dayTranslateOffset based on today's date
@@ -139,7 +139,7 @@ WeekViewProps) {
   );
 
   // Initialize virtual scroll hook
-  const { scrollToSession, scrollToNow } = useVirtualScroll({
+  const { scrollToSession, scrollToNow, scrollToTime } = useVirtualScroll({
     weekDays,
     dayWidth,
     virtualWindowSize,
@@ -151,24 +151,13 @@ WeekViewProps) {
     setVirtualWindowStart,
   });
 
-  // Set initial scroll position to center on initialWeekStart
-  // Only run this effect when the component mounts or when initialWeekStart changes
+  // Only run this effect when the component mounts or when viewWeekStart changes
   useEffect(() => {
     if (dayWidth > 0 && weekDays.length > 0) {
-      // Find the index of initialWeekStart in weekDays
-      const initialDayIndex = weekDays.findIndex(day => 
-        day.isSame(initialWeekStart, 'day')
-      );
-      
-      if (initialDayIndex !== -1) {
-        // Set the initial scroll offset to center the initialWeekStart
-        // Account for the time column (that's why we add 1)
-        const initialOffset = (initialDayIndex - 3) * dayWidth;
-        setDayTranslateOffsetX(initialOffset);
-      }
+      scrollToTime(viewWeekStart, "left");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialWeekStart, dayWidth, setDayTranslateOffsetX]);
+  }, [viewWeekStart, dayWidth]);
 
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
@@ -554,6 +543,12 @@ WeekViewProps) {
       "MM/DD"
     )}`;
   }, [visibleStartDay, visibleEndDay]);
+
+  // Visible day tracking ref for dayWidth changes
+  const visibleStartDayRef = useRef<dayjs.Dayjs | null>(null);
+  useEffect(() => {
+    visibleStartDayRef.current = visibleStartDay;
+  }, [visibleStartDay]);
 
   return (
     <div

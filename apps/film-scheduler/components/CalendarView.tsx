@@ -97,7 +97,7 @@ export function CalendarView(props: { className?: string }) {
       </div>
 
       <WeekView
-        initialWeekStart={currentWeekStart}
+        viewWeekStart={currentWeekStart}
         onWeekStartChange={(d: Dayjs) => {
           setCurrentDate(d.toDate());
         }}
