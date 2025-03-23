@@ -8,6 +8,7 @@ interface UseVirtualScrollParams {
   virtualWindowSize: number;
   weekviewRect: DOMRect | null;
   startHour: number;
+  maxScrollY?: number; // Add maxScrollY as an optional parameter
   setDayTranslateOffsetX: (value: number) => void;
   setDayTranslateOffsetY: (value: number) => void;
   setVirtualWindowStart: (value: dayjs.Dayjs) => void;
@@ -19,6 +20,7 @@ export function useVirtualScroll({
   virtualWindowSize,
   weekviewRect,
   startHour,
+  maxScrollY,
   setDayTranslateOffsetX,
   setDayTranslateOffsetY,
   setVirtualWindowStart,
@@ -53,10 +55,16 @@ export function useVirtualScroll({
       setDayTranslateOffsetX(newHorizontalOffset);
 
       // Calculate vertical offset to position the time in the middle
-      const newVerticalOffset = Math.max(
+      let newVerticalOffset = Math.max(
         0,
         timePosition - visibleHeight / 2 + 60
       );
+      
+      // Respect maxScrollY if provided
+      if (maxScrollY !== undefined) {
+        newVerticalOffset = Math.min(newVerticalOffset, maxScrollY);
+      }
+      
       setDayTranslateOffsetY(newVerticalOffset);
       
       return true;
@@ -75,10 +83,16 @@ export function useVirtualScroll({
         setDayTranslateOffsetX(newHorizontalOffset);
         
         // Set vertical offset to show the time
-        const newVerticalOffset = Math.max(
+        let newVerticalOffset = Math.max(
           0,
           timePosition - visibleHeight / 2 + 60
         );
+        
+        // Respect maxScrollY if provided
+        if (maxScrollY !== undefined) {
+          newVerticalOffset = Math.min(newVerticalOffset, maxScrollY);
+        }
+        
         setDayTranslateOffsetY(newVerticalOffset);
       }, 50);
       
@@ -90,6 +104,7 @@ export function useVirtualScroll({
     virtualWindowSize,
     weekviewRect,
     calculateTimePosition,
+    maxScrollY, // Add maxScrollY to dependencies
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
     setVirtualWindowStart,

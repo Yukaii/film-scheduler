@@ -130,6 +130,12 @@ WeekViewProps) {
     [weekviewWidth]
   );
 
+  // Add a new state for vertical scrolling
+  const maxScrollY = useMemo(
+    () => (hoursInDay + 1) * 60 - (weekviewRect?.height || 300),
+    [weekviewRect]
+  );
+
   // Initialize virtual scroll hook
   const { scrollToSession, scrollToNow } = useVirtualScroll({
     weekDays,
@@ -137,6 +143,7 @@ WeekViewProps) {
     virtualWindowSize,
     weekviewRect,
     startHour,
+    maxScrollY,
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
     setVirtualWindowStart,
@@ -203,12 +210,6 @@ WeekViewProps) {
       );
     };
   }, [sessions, scrollToSession, scrollToNow]);
-
-  // Add a new state for vertical scrolling
-  const maxScrollY = useMemo(
-    () => (hoursInDay + 1) * 60 - (weekviewRect?.height || 300),
-    [weekviewRect]
-  );
 
   // Handle scroll/wheel event with infinite scroll logic
   useEffect(() => {
