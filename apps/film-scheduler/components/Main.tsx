@@ -285,11 +285,13 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
       >
         <SidebarProvider>
           <AppSidebar />
-          <CalendarView
-            className={cn({
-              "md:pr-[16rem]": panelOpen && !!viewingFilmId,
-            })}
-          />
+          <main className="overflow-hidden">
+            <CalendarView
+              className={cn({
+                "md:pr-[16rem]": panelOpen && !!viewingFilmId,
+              })}
+            />
+          </main>
         </SidebarProvider>
 
         <FilmSidebar
