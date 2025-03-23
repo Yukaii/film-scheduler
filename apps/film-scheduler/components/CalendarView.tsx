@@ -553,27 +553,36 @@ function WeekView({
     handleMouseUp,
   ]);
 
-  // For debugging
   const visibleDaysRange = useMemo(() => {
     const startIndex = Math.floor(dayTranslateOffset / dayWidth);
     return `${startIndex} to ${startIndex + 7}`;
   }, [dayTranslateOffset, dayWidth]);
 
-  // Get the actual day range being displayed (for debugging)
-  const actualDaysRange = useMemo(() => {
-    if (weekDays.length === 0) return "";
+  const [visibleStartDay, visibleEndDay] = useMemo(() => {
+    if (weekDays.length === 0) return [null, null];
     const startIndex = Math.floor(dayTranslateOffset / dayWidth);
     const endIndex = Math.min(startIndex + 7, weekDays.length);
 
-    if (startIndex >= weekDays.length || endIndex <= 0) return "Out of range";
+    if (startIndex >= weekDays.length || endIndex <= 0) {
+      console.warn("Invalid day range");
+      return [null, null];
+    }
 
     const visibleStartDay = weekDays[Math.max(0, startIndex)];
     const visibleEndDay = weekDays[Math.min(endIndex - 1, weekDays.length - 1)];
+    
+    return [visibleStartDay, visibleEndDay] as const;
+  }, [dayTranslateOffset, dayWidth, weekDays]);
 
-    return `${visibleStartDay?.format("MM/DD")} to ${visibleEndDay?.format(
+  const actualDaysRange = useMemo(() => {
+    if (!visibleStartDay || !visibleEndDay) return "";
+    return `${visibleStartDay.format("MM/DD")} to ${visibleEndDay.format(
       "MM/DD"
     )}`;
-  }, [dayTranslateOffset, dayWidth, weekDays]);
+  }, [
+    visibleStartDay,
+    visibleEndDay,
+  ]);
 
   return (
     <div
