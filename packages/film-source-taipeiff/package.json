@@ -1,0 +1,36 @@
+{
+  "name": "@film-scheduler/film-source-taipeiff",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./data": "./dist/data/index.js",
+    "./types": "./dist/types.js",
+    "./config": "./dist/config.js"
+  },
+  "typesVersions": {
+    "*": {
+      "data": ["./dist/data/index.d.ts"],
+      "types": ["./dist/types.d.ts"],
+      "config": ["./dist/config.d.ts"]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "inquirer": "^8.2.6",
+    "jsdom": "^22.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/jsdom": "^21.1.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.0.0"
+  }
+}

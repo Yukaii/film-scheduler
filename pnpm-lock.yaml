@@ -170,6 +170,44 @@ importers:
         specifier: ^5.0.0
         version: 5.8.2
 
+  packages/film-source-taipeiff:
+    dependencies:
+      inquirer:
+        specifier: ^8.2.6
+        version: 8.2.6
+      jsdom:
+        specifier: ^22.0.0
+        version: 22.1.0
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
+    devDependencies:
+      '@types/inquirer':
+        specifier: ^9.0.7
+        version: 9.0.7
+      '@types/jsdom':
+        specifier: ^21.1.0
+        version: 21.1.7
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.17.24
+      esbuild:
+        specifier: ^0.20.0
+        version: 0.20.2
+      typescript:
+        specifier: ^5.0.0
+        version: 5.8.2
+
+  packages/film-source-taipeiff-test:
+    dependencies:
+      '@film-scheduler/film-source-taipeiff':
+        specifier: workspace:*
+        version: link:../film-source-taipeiff
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.8.2
+
   packages/film-source-test:
     dependencies:
       '@film-scheduler/film-source-golden-horse':
