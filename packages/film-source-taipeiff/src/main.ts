@@ -212,35 +212,60 @@ class ParserService {
 
 class SectionManager {
   private static sections: Section[] = [];
+  private static sectionsInitialized = false;
 
-  static async initialize(festival: FestivalConfig): Promise<void> {
-    const cachePaths = Config.getCachePaths(festival);
+  static async initializeSections(festivalYear: string, apiCategories: Category[]): Promise<void> {
+    if (this.sectionsInitialized) {
+      console.log("Sections already initialized.");
+      return;
+    }
+
+    // Use a representative FestivalConfig for cache path. Year is important.
+    // The category part of FestivalConfig for getCachePaths is less critical as the path is common for the year.
+    const representativeFestivalConfig: FestivalConfig = { year: festivalYear, category: 'TAIPEIFF_COMMON_SECTIONS' };
+    const cachePaths = Config.getCachePaths(representativeFestivalConfig); // Correctly points to data/[year]-TAIPEIFF/sections.json
+
     const cachedSections = await CacheManager.loadCache<Section[]>(cachePaths.sections);
     
-    if (cachedSections) {
+    // Use cached sections if they exist and the array is not empty
+    if (cachedSections && cachedSections.length > 0) {
       this.sections = cachedSections;
-      console.log(`Loaded ${this.sections.length} sections from cache`);
+      console.log(`Loaded ${this.sections.length} sections from cache: ${cachePaths.sections}`);
     } else {
-      await this.fetchSectionsFromApi(festival);
+      if (cachedSections && cachedSections.length === 0) {
+        console.log(`Cached sections file found at ${cachePaths.sections} but it was empty. Rebuilding sections.`);
+      } else {
+        console.log(`No cached sections found at ${cachePaths.sections}. Building from API categories.`);
+      }
+      
+      this.sections = apiCategories.map(apiCat => ({
+        id: apiCat.value, // API category ID, e.g., "90", "178"
+        name: `${festivalYear}台北電影節` // Generic name, e.g., "2025台北電影節"
+      }));
+
+      if (this.sections.length > 0) {
+        await CacheManager.saveCache(cachePaths.sections, this.sections);
+        console.log(`Built and cached ${this.sections.length} sections to ${cachePaths.sections}.`);
+      } else {
+        console.log("No API categories provided or found; sections list is empty.");
+        // Optionally save an empty array to cache if that's desired behavior
+        await CacheManager.saveCache(cachePaths.sections, []);
+      }
     }
-  }
-
-  private static async fetchSectionsFromApi(festival: FestivalConfig): Promise<void> {
-    const cachePaths = Config.getCachePaths(festival);
-    
-    // For now, create a default section since we don't have section API details
-    this.sections = [
-      { id: festival.category, name: '2025台北電影節' }
-    ];
-
-    await CacheManager.saveCache(cachePaths.sections, this.sections);
+    this.sectionsInitialized = true;
   }
 
   static getSections(): Section[] {
+    if (!this.sectionsInitialized) {
+      console.warn("SectionManager.getSections() called before sections were initialized. Returning empty array. This might indicate an issue.");
+    }
     return this.sections;
   }
 
   static getSection(id: string): Section | undefined {
+    if (!this.sectionsInitialized) {
+      console.warn("SectionManager.getSection() called before sections were initialized. Returning undefined. This might indicate an issue.");
+    }
     return this.sections.find(section => section.id === id);
   }
 }
@@ -371,38 +396,41 @@ interface MainOptions {
 async function main(options: MainOptions = {}) {
   console.log('=== Taipei Film Festival Data Crawler ===');
 
-  // Step 1: Fetch categories dynamically
-  const categories = await Config.fetchCategoriesFromHtml();
-  Config.CATEGORIES = categories;
+  // Step 1: Fetch API categories dynamically
+  const apiCategories = await Config.fetchCategoriesFromHtml();
+  Config.CATEGORIES = apiCategories; // Store globally if needed by other parts
 
-  if (!categories.length) {
-    console.error('No categories found on the Taipei IFF site. Exiting.');
+  if (!apiCategories.length) {
+    console.error('No API categories found on the Taipei IFF site. Exiting.');
     process.exit(1);
   }
 
-  // Step 2: Download all categories automatically
-  const year = '2025'; // Define year once, consistent with original loop's hardcoding
+  const year = '2025'; // Define year once
   const festivalIdentifier = 'TAIPEIFF'; // Festival identifier for directory
 
-  // Use a representative FestivalConfig for generating common cache paths.
-  // The actual category ID for API calls will come from the loop.
+  // Initialize SectionManager with all fetched API categories ONCE.
+  await SectionManager.initializeSections(year, apiCategories);
+
+  // Use a representative FestivalConfig for generating common cache paths for films, details etc.
+  // The specific category ID used here for 'category' field is less critical for path generation
+  // as Config.getCachePaths now uses a common festival identifier for the directory.
   const baseFestivalConfigForCachePath: FestivalConfig = {
     year: year,
-    // This category value is for Config.getCachePaths. If getCachePaths is properly modified
-    // to use a fixed festival name (e.g., "TAIPEIFF") for the directory, this specific value is less critical for path generation.
-    category: categories.length > 0 ? categories[0].value : festivalIdentifier 
+    category: apiCategories.length > 0 ? apiCategories[0].value : festivalIdentifier 
   };
-  const cachePaths = Config.getCachePaths(baseFestivalConfigForCachePath);
+  const cachePaths = Config.getCachePaths(baseFestivalConfigForCachePath); // For film_list.json, film_details.json etc.
 
-  // Ensure base directory exists
+  // Ensure base data directory exists
   await fs.mkdir(cachePaths.base, { recursive: true }).catch(err => {
     if (err.code !== 'EEXIST') throw err; // Ignore if directory already exists, re-throw other errors
   });
 
   console.log(`\nProcessing Taipei Film Festival ${year} (${festivalIdentifier})`);
-  console.log(`All data will be cached in: ${cachePaths.base}`);
+  console.log(`All data (except sections.json) will be cached in files within: ${cachePaths.base}`);
+  console.log(`Sections data is managed by SectionManager and cached at: ${path.join(cachePaths.base, 'sections.json')}`);
 
-  // Initialize accumulators for all categories, trying to load existing cache first.
+
+  // Initialize accumulators for film list, section map, and details, trying to load existing cache first.
   let allFilms: Record<string, FilmBasicInfo> = await CacheManager.loadCache(cachePaths.filmList) || {};
   let allFilmSectionsMap: FilmSectionsMap = await CacheManager.loadCache(cachePaths.sectionsMap) || {};
   let allFilmDetailsCache: Record<string, FilmDetails> = await CacheManager.loadCache(cachePaths.details) || {};
@@ -410,25 +438,21 @@ async function main(options: MainOptions = {}) {
   if (Object.keys(allFilms).length > 0 || Object.keys(allFilmDetailsCache).length > 0) {
     console.log(`Loaded ${Object.keys(allFilms).length} films and ${Object.keys(allFilmDetailsCache).length} details from existing cache.`);
   } else {
-    console.log("No existing cache found, starting fresh.");
+    console.log("No existing film/details cache found, starting fresh for these.");
   }
 
-  for (const cat of categories) {
-    // const internalFestivalId = `2025-TAIPEIFF-${cat.value}`; // This is no longer used for path construction here.
-    const selectedFestival: FestivalConfig = {
-      year: '2025',
+  // Loop through each fetched API category to download film lists
+  for (const cat of apiCategories) {
+    const selectedFestival: FestivalConfig = { // This config is for API calls for this specific category
+      year: year, // Use defined year
       category: cat.value
     };
 
-    console.log(`\nFetching data for API category: ${cat.label || cat.value} (ID: ${cat.value})`);
+    console.log(`\nFetching film data for API category: ${cat.label || cat.value} (ID: ${cat.value})`);
 
-    // Initialize sections. SectionManager internally uses Config.getCachePaths(selectedFestival),
-    // which now points to the common sections.json (e.g., data/2025-TAIPEIFF/sections.json).
-    // If sections.json is created, it will be based on the first category's 'selectedFestival' context.
-    // Subsequent calls for other categories will load this existing common sections file.
-    await SectionManager.initialize(selectedFestival);
+    // SectionManager.initialize() is no longer called inside the loop. Sections are already handled.
 
-    // Download film list for the current category, accumulating results.
+    // Download film list for the current API category, accumulating results into allFilms and allFilmSectionsMap.
     console.log('Downloading film list for this API category...');
     // The downloadFilmList service method should correctly update allFilms and allFilmSectionsMap by reference or by returning new versions.
     // The current implementation of downloadFilmList takes accumulators and returns them modified.
