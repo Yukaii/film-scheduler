@@ -53,7 +53,7 @@ function main() {
             .forEach(([filmId, sectionIds]) => {
             const film = festival.filmListCache[filmId];
             const sectionNames = sectionIds
-                .map(sid => festival.sectionsCache.find(section => section.id === sid)?.name)
+                .map(sid => festival.sectionsCache.find((section) => section.id === sid)?.name)
                 .filter(Boolean);
             console.log(`\n${film.name}`);
             console.log(`Sections: ${sectionNames.join(', ')}`);

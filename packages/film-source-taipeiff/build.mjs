@@ -8,6 +8,16 @@ import { fileURLToPath } from 'url';
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+async function cleanDist() {
+  const distDir = path.join(__dirname, 'dist');
+  try {
+    await fs.rm(distDir, { recursive: true, force: true });
+    console.log('Cleaned dist directory.');
+  } catch (error) {
+    console.error('Error cleaning dist directory:', error);
+  }
+}
+
 async function copyDataDirectory() {
   const srcDataDir = path.join(__dirname, 'src/data');
   const distDataDir = path.join(__dirname, 'dist/data');
@@ -28,7 +38,10 @@ async function copyDataDirectory() {
           await fs.mkdir(destPath, { recursive: true });
           await copyDir(srcPath, destPath);
         } else {
-          await fs.copyFile(srcPath, destPath);
+          // Only copy non-TypeScript files; .ts files are handled by compilation
+          if (!entry.name.endsWith('.ts')) {
+            await fs.copyFile(srcPath, destPath);
+          }
         }
       }
     }
@@ -38,6 +51,9 @@ async function copyDataDirectory() {
     console.error('Error copying data directory:', error);
   }
 }
+
+// Clean dist directory
+await cleanDist();
 
 // Compile TypeScript first to generate declarations
 console.log('Compiling TypeScript...');

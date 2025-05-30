@@ -1,9 +1,5 @@
 import { festivalData } from '@film-scheduler/film-source-taipeiff/data';
-import {
-  DataByFestival,
-  Section,
-  FilmSchedule,
-} from '@film-scheduler/film-source-taipeiff/types';
+import { DataByFestival, Section, FilmSchedule } from '@film-scheduler/film-source-taipeiff/types';
 
 function printFestivalSummary(festivalId: string, data: DataByFestival) {
   const festival = data[festivalId];
@@ -68,7 +64,7 @@ function main() {
       .forEach(([filmId, sectionIds]) => {
         const film = festival.filmListCache[filmId];
         const sectionNames = sectionIds
-          .map(sid => festival.sectionsCache.find(section => section.id === sid)?.name)
+          .map(sid => festival.sectionsCache.find((section: Section) => section.id === sid)?.name)
           .filter(Boolean);
         
         console.log(`\n${film.name}`);
