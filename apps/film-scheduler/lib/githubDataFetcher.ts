@@ -3,7 +3,7 @@ interface GithubConfig {
   repo: string;
   branch: string;
   fallbackCommit?: string;
-  basePath: string;
+  basePaths: Record<string, string>; // Festival ID prefix to base path mapping
 }
 
 interface FestivalData {
@@ -23,7 +23,10 @@ class GithubDataFetcher {
       repo: 'film-scheduler',
       branch: 'main',
       fallbackCommit: process.env.FALLBACK_COMMIT,
-      basePath: 'packages/film-source-golden-horse/src/data'
+      basePaths: {
+        'golden-horse': 'packages/film-source-golden-horse/src/data',
+        'taipeiff': 'packages/film-source-taipeiff/src/data'
+      }
     };
   }
 
@@ -78,7 +81,16 @@ class GithubDataFetcher {
       return this.data[festivalId];
     }
 
-    const basePath = `${this.config.basePath}/${festivalId}`;
+    // Determine which data source to use based on festival ID
+    let basePath: string;
+    if (festivalId.includes('-178')) {
+      // Taipei Film Festival
+      basePath = `${this.config.basePaths['taipeiff']}/${festivalId}`;
+    } else {
+      // Golden Horse Festival (default)
+      basePath = `${this.config.basePaths['golden-horse']}/${festivalId}`;
+    }
+
     try {
       const [filmDetails, sections, filmSectionsMap] = await Promise.all([
         this.fetchJsonWithFallback<Record<string, unknown>>(`${basePath}/film_details.json`),

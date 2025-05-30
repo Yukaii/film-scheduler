@@ -10,16 +10,29 @@ interface Category {
 // Known festival IDs
 const FESTIVALS = [
   '2025-FFF',
+  '2025-178',
   '2024-FF'
 ];
 
 export async function GET() {
   try {
-    // Ensure data is loaded for all known festivals
-    await Promise.all(FESTIVALS.map(id => githubDataFetcher.getFestivalData(id)));
+    // Try to ensure data is loaded for all known festivals
+    const festivalData = await Promise.allSettled(
+      FESTIVALS.map(id => githubDataFetcher.getFestivalData(id))
+    );
+
+    // Only include festivals that loaded successfully
+    const successfulFestivals = FESTIVALS.filter((id, index) => {
+      const result = festivalData[index];
+      if (result.status === 'rejected') {
+        console.warn(`Failed to load festival ${id}:`, result.reason);
+        return false;
+      }
+      return true;
+    });
 
     // Map festival IDs to more detailed information
-    const festivals = FESTIVALS.map(id => {
+    const festivals = successfulFestivals.map(id => {
       const [year, category] = id.split('-');
       const categoryInfo = CATEGORIES.find((c: Category) => c.value === category);
       
