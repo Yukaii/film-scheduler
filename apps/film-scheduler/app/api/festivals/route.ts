@@ -9,8 +9,8 @@ interface Category {
 
 // Known festival IDs
 const FESTIVALS = [
-  '2025-FFF',
   '2025-TAIPEIFF',
+  '2025-FFF',
   '2024-FF'
 ];
 
@@ -44,17 +44,10 @@ export async function GET() {
       };
     });
     
-    // Sort by year (descending), with TAIPEIFF prioritized for same year
+    // Sort by year (descending) and then by category
     festivals.sort((a, b) => {
       if (a.year !== b.year) {
         return parseInt(b.year) - parseInt(a.year);
-      }
-      // For same year, prioritize TAIPEIFF as it's the most upcoming event
-      if (a.category === 'TAIPEIFF' && b.category !== 'TAIPEIFF') {
-        return -1;
-      }
-      if (b.category === 'TAIPEIFF' && a.category !== 'TAIPEIFF') {
-        return 1;
       }
       return a.category.localeCompare(b.category);
     });
