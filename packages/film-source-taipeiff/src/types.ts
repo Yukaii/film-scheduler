@@ -138,3 +138,11 @@ export interface TaipeiffIdRegisterResponse {
   // For now, we'll assume it contains the token we need
   [key: string]: any;
 }
+
+// Place/Venue mapping interfaces
+export interface TaipeiffPlace {
+  id: string;
+  title: string;
+}
+
+export type PlaceMap = Record<string, string>; // placeId -> placeName

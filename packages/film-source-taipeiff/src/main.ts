@@ -22,7 +22,9 @@ import {
   TaipeiffScheduleApiResponse,
   TaipeiffScheduleApiRequest,
   TaipeiffScheduleSession,
-  TaipeiffIdRegisterResponse
+  TaipeiffIdRegisterResponse,
+  TaipeiffPlace,
+  PlaceMap
 } from './types';
 
 class Config {
@@ -215,6 +217,47 @@ class FilmApiService {
     return new Response('{}', { status: 200 });
   }
 
+  // Fetch place mapping from the schedule page
+  static async fetchPlaceMapping(): Promise<PlaceMap> {
+    try {
+      const headers = { ...Config.HEADERS } as Record<string, string>;
+      headers['Referer'] = Config.SCHEDULE_PAGE_URL;
+      
+      const res = await fetch(Config.SCHEDULE_PAGE_URL, { headers });
+      this.storeCookies(res);
+      
+      const html = await res.text();
+      const dom = new JSDOM(html);
+      const document = dom.window.document;
+      
+      // Look for the placeObjList in script tags
+      const scripts = document.querySelectorAll('script');
+      for (const script of scripts) {
+        const content = script.textContent || '';
+        const placeMatch = content.match(/const placeObjList = JSON\.parse\('([^']+)'\);/);
+        if (placeMatch) {
+          try {
+            const placeArray: TaipeiffPlace[] = JSON.parse(placeMatch[1]);
+            const placeMap: PlaceMap = {};
+            placeArray.forEach(place => {
+              placeMap[place.id] = place.title || `場地${place.id}`;
+            });
+            console.log(`Found ${Object.keys(placeMap).length} place mappings in schedule page`);
+            return placeMap;
+          } catch (parseError) {
+            console.warn('Failed to parse place mapping JSON:', parseError);
+          }
+        }
+      }
+      
+      console.warn('Place mapping not found in schedule page');
+      return {};
+    } catch (error) {
+      console.error('Error fetching place mapping:', error);
+      return {};
+    }
+  }
+
   // Fetch the encrypted token from the schedule page
   static async fetchScheduleToken(): Promise<string> {
     try {
@@ -313,8 +356,8 @@ class ParserService {
     };
   }
 
-  // Parse schedule sessions from API response
-  static parseScheduleFromApiResponse(data: TaipeiffScheduleApiResponse, date: string): Record<string, FilmSchedule[]> {
+  // Parse schedule sessions from API response with place mapping
+  static parseScheduleFromApiResponse(data: TaipeiffScheduleApiResponse, date: string, placeMap: PlaceMap = {}): Record<string, FilmSchedule[]> {
     const filmSchedules: Record<string, FilmSchedule[]> = {};
     
     if (data.status === 'success' && data.msg) {
@@ -326,11 +369,14 @@ class ParserService {
             filmSchedules[filmId] = [];
           }
           
+          // Map place ID to place name
+          const locationName = placeMap[session.placeId] || session.placeId || '未知場地';
+          
           // Convert time format and create schedule entry
           const schedule: FilmSchedule = {
             date: date,
             time: `${session.start}-${session.end}`,
-            location: session.placeId || '未知場地' // Use placeId for now, could be mapped to venue names
+            location: locationName
           };
           
           filmSchedules[filmId].push(schedule);
@@ -423,8 +469,11 @@ class ScheduleService {
     const allSchedules: Record<string, FilmSchedule[]> = {};
     
     try {
-      console.log('\nFetching schedule token...');
+      console.log('\nFetching schedule token and place mapping...');
       const token = await FilmApiService.fetchScheduleToken();
+      const placeMap = await FilmApiService.fetchPlaceMapping();
+      
+      console.log(`Place mapping loaded: ${JSON.stringify(placeMap, null, 2)}`);
       
       // Generate date range for the festival
       const dates = ParserService.generateDateRange(Config.FESTIVAL_START_DATE, Config.FESTIVAL_END_DATE);
@@ -443,7 +492,8 @@ class ScheduleService {
           const data: TaipeiffScheduleApiResponse = await response.json();
           console.log(`Schedule API response for ${date}:`, JSON.stringify(data, null, 2));
           
-          const dailySchedules = ParserService.parseScheduleFromApiResponse(data, date);
+          // Parse schedule data with place mapping
+          const dailySchedules = ParserService.parseScheduleFromApiResponse(data, date, placeMap);
           
           // Merge daily schedules into the overall schedule map
           Object.entries(dailySchedules).forEach(([filmId, schedules]) => {
