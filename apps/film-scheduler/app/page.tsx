@@ -21,18 +21,10 @@ function MainWrapper() {
       });
   }, []);
 
-  const defaultFestivalId = useMemo(() => {
-    if (festivals.length === 0) return '';
-    
-    // Prefer Taipei Film Festival as default
-    const taipeiFestival = festivals.find(f => f.category === 'TAIPEIFF');
-    if (taipeiFestival) {
-      return taipeiFestival.id;
-    }
-    
-    // Fallback to first festival if Taipei Film Festival not found
-    return festivals[0].id;
-  }, [festivals]);
+  const defaultFestivalId = useMemo(() => 
+    festivals.length > 0 ? festivals[0].id : '', 
+    [festivals]
+  );
 
   if (loading) {
     return <div>Loading festivals...</div>;
