@@ -1,0 +1,17 @@
+{
+  "name": "@film-scheduler/film-source-taipeiff-test",
+  "version": "1.0.0",
+  "description": "Test package for film-source-taipeiff",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/test.js",
+    "start": "npm run build && npm run test"
+  },
+  "dependencies": {
+    "@film-scheduler/film-source-taipeiff": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
