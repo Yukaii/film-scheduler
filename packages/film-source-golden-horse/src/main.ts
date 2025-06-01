@@ -117,7 +117,7 @@ class SectionManager {
       'action': 'get_class_list',
       'search_year': festival.year,
       'search_category': festival.category,
-      'parent_id': festival.parentId,
+      'parent_id': festival.parentId || '',
       'ghff_id': '0'
     });
 
@@ -244,7 +244,7 @@ class FilmService {
       'action': 'get_class_list',
       'search_year': festival.year,
       'search_category': festival.category,
-      'parent_id': festival.parentId,
+      'parent_id': festival.parentId || '',
       'ghff_id': ghffId
     });
 
@@ -315,7 +315,8 @@ class FilmService {
 
       const filmDetails = {
         ...ParserService.parseFilmDetailsFromHtml(document),
-        sectionIds: sectionMap[filmId] || []
+        sectionIds: sectionMap[filmId] || [],
+        detailUrl: `${Config.FILM_DETAILS_BASE_URL}/${filmId}`
       };
 
       detailsCache[filmId] = filmDetails;

@@ -10,26 +10,17 @@ export type FilmSidebarProps = {
 };
 
 export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
-  const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail, currentFestivalId } = useAppContext();
+  const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail } = useAppContext();
   const viewingFilm = useMemo(() => {
     return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
   }, [filmsMap, viewingFilmId]);
 
   const isOpen = open && viewingFilm;
 
-  // Generate the appropriate URL based on festival type
+  // Get the detail URL from the film data (unified across festivals)
   const getFilmUrl = useMemo(() => {
-    if (!viewingFilmId || !currentFestivalId) return null;
-    
-    if (currentFestivalId.includes('TAIPEIFF')) {
-      // For Taipei Film Festival, we don't have a specific URL pattern yet
-      // This could be updated when the official website structure is known
-      return null;
-    } else {
-      // Default to Golden Horse festival URL
-      return `https://www.goldenhorse.org.tw/film/programme/films/detail/${viewingFilmId}`;
-    }
-  }, [viewingFilmId, currentFestivalId]);
+    return viewingFilm?.detailUrl || null;
+  }, [viewingFilm]);
 
   return (
     <div

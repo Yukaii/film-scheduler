@@ -30,9 +30,8 @@ export async function GET(
           let parsedTime: number;
           
           if (festivalId.includes('TAIPEIFF')) {
-            // Taipei Film Festival format: date: "2025-06-20", time: "19:00-20:57"
-            const startTime = sch.time.split('-')[0]; // Extract start time from range
-            parsedTime = new Date(`${sch.date} ${startTime} +8`).valueOf();
+            // Taipei Film Festival format: date: "2025-06-20", time: "19:00"
+            parsedTime = new Date(`${sch.date} ${sch.time} +8`).valueOf();
           } else {
             // Golden Horse Festival format: date: "04.11", time: "21:30"  
             const year = festivalId.split('-')[0];

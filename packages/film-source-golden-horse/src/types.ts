@@ -19,6 +19,7 @@ export interface FilmDetails {
   schedule: FilmSchedule[];
   duration: string;
   sectionIds: string[];
+  detailUrl?: string;
 }
 
 export interface Category {
@@ -33,7 +34,7 @@ export interface Section {
 
 export interface FestivalConfig {
   year: string;
-  parentId: string;
+  parentId?: string;
   category: string;
 }
 

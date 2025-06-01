@@ -8,6 +8,7 @@ export interface Film {
   schedule: Session[];
   duration: number;
   sectionIds: string[];
+  detailUrl?: string;
 }
 
 export type FilmsMap = Map<string, Film>;
@@ -27,6 +28,7 @@ export interface RawFilm {
   synopsis: string;
   schedule: RawScheduleItem[];
   duration: string;
+  detailUrl?: string;
 }
 interface RawScheduleItem {
   date: string;
