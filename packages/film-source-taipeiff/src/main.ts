@@ -387,6 +387,35 @@ class ParserService {
     return filmSchedules;
   }
 
+  // Extract duration from schedule sessions
+  static extractDurationFromSchedule(scheduleData: Record<string, FilmSchedule[]>): Record<string, string> {
+    const filmDurations: Record<string, string> = {};
+    
+    // For now, calculate duration from schedule time ranges
+    // This is a fallback approach since the API might not always provide duration directly
+    Object.entries(scheduleData).forEach(([filmId, schedules]) => {
+      if (schedules.length > 0) {
+        const firstSchedule = schedules[0];
+        const timeMatch = firstSchedule.time.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
+        if (timeMatch) {
+          const [, startTime, endTime] = timeMatch;
+          const [startHour, startMin] = startTime.split(':').map(Number);
+          const [endHour, endMin] = endTime.split(':').map(Number);
+          
+          const startTotalMin = startHour * 60 + startMin;
+          const endTotalMin = endHour * 60 + endMin;
+          const durationMin = endTotalMin - startTotalMin;
+          
+          if (durationMin > 0) {
+            filmDurations[filmId] = `${durationMin} 分`;
+          }
+        }
+      }
+    });
+    
+    return filmDurations;
+  }
+
   // Helper function to generate dates between start and end
   static generateDateRange(startDate: string, endDate: string): string[] {
     const dates: string[] = [];
@@ -531,10 +560,19 @@ class ScheduleService {
     detailsCache: Record<string, FilmDetails>,
     scheduleData: Record<string, FilmSchedule[]>
   ): void {
+    // Extract duration information from schedule data
+    const filmDurations = ParserService.extractDurationFromSchedule(scheduleData);
+    
     Object.entries(scheduleData).forEach(([filmId, schedules]) => {
       if (detailsCache[filmId]) {
         detailsCache[filmId].schedule = schedules;
-        console.log(`Updated schedule for film ${filmId}: ${schedules.length} sessions`);
+        // Update duration if we extracted it from schedule
+        if (filmDurations[filmId]) {
+          detailsCache[filmId].duration = filmDurations[filmId];
+          console.log(`Updated schedule and duration for film ${filmId}: ${schedules.length} sessions, duration: ${filmDurations[filmId]}`);
+        } else {
+          console.log(`Updated schedule for film ${filmId}: ${schedules.length} sessions`);
+        }
       } else {
         console.warn(`Schedule found for unknown film ${filmId}, skipping merge`);
       }
