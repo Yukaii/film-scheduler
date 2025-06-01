@@ -94,3 +94,47 @@ export interface TaipeiffApiRequest {
   };
   NowPage: number;
 }
+
+// Schedule API types
+export interface TaipeiffScheduleSession {
+  id: string;
+  film: string; // film ID
+  title: string;
+  start: string; // time like "13:30"
+  end: string; // time like "15:06"
+  grade: string;
+  gradetext: string;
+  placeId: string;
+  detailurl: string;
+  addCalendar: string;
+  isFav: boolean;
+  isConflict: string;
+  platerJoin: string;
+  detailList: TaipeiffScheduleSessionDetail[];
+}
+
+export interface TaipeiffScheduleSessionDetail {
+  detailurl: string;
+  title: string;
+  duration: string;
+  grade: string;
+  gradetext: string;
+  platerJoin: string;
+}
+
+export interface TaipeiffScheduleApiResponse {
+  status: string;
+  msg: TaipeiffScheduleSession[];
+}
+
+export interface TaipeiffScheduleApiRequest {
+  date: string; // format: "2025-06-23"
+  jobType: string; // "getMyFilm_2"
+  [key: string]: string; // encrypted token
+}
+
+export interface TaipeiffIdRegisterResponse {
+  // The structure of this response needs to be determined from actual API calls
+  // For now, we'll assume it contains the token we need
+  [key: string]: any;
+}

@@ -18,13 +18,24 @@ import {
   FilmSectionsMap,
   TaipeiffApiResponse,
   TaipeiffApiRequest,
-  TaipeiffFilm
+  TaipeiffFilm,
+  TaipeiffScheduleApiResponse,
+  TaipeiffScheduleApiRequest,
+  TaipeiffScheduleSession,
+  TaipeiffIdRegisterResponse
 } from './types';
 
 class Config {
   static readonly API_URL = 'https://www.taipeiff.taipei/api/articles/movies';
   static readonly FILM_LIST_URL = 'https://www.taipeiff.taipei/tw/movies/list';
+  static readonly SCHEDULE_API_URL = 'https://www.taipeiff.taipei/movies/schedule';
+  static readonly ID_REGISTER_URL = 'https://www.taipeiff.taipei/api/idregister';
+  static readonly SCHEDULE_PAGE_URL = 'https://www.taipeiff.taipei/tw/movies/schedule';
   static readonly DATA_DIR = path.join(__dirname, 'data');
+  
+  // Festival dates
+  static readonly FESTIVAL_START_DATE = '2025-06-20';
+  static readonly FESTIVAL_END_DATE = '2025-07-01';
   static readonly HEADERS = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Language': 'zh-TW,zh;q=0.9',
@@ -52,8 +63,7 @@ class Config {
     { year: '2025', category: '178' },
   ];
 
-  // Mock encrypted token - in real implementation this would need to be dynamically generated
-  static readonly MOCK_TOKEN = 'ec751f14d7915a3372ae3dbb4a6a5dcaa7f431af3f5772a81abbbb4bd70345d76f1001454ec614d251d0fb6c3be8b90cafef6523ad73531b2fa2a6cbf5c3f77cd984697851fa490377524ff62ae06006';
+  // Token key for API requests - the token value will be fetched dynamically
   static readonly TOKEN_KEY = '5648e5284e20a699eec058285a8b43b0';
 
   static getCachePaths(festival: FestivalConfig) {
@@ -136,9 +146,44 @@ class FilmApiService {
       .join('; ');
   }
 
+  // Fetch token from film list page
+  static async fetchFilmListToken(): Promise<string> {
+    try {
+      const headers = { ...Config.HEADERS } as Record<string, string>;
+      
+      const res = await fetch(Config.FILM_LIST_URL, { headers });
+      this.storeCookies(res);
+      
+      const html = await res.text();
+      const dom = new JSDOM(html);
+      const document = dom.window.document;
+      
+      // Look for the token in script tags
+      const scripts = document.querySelectorAll('script');
+      for (const script of scripts) {
+        const content = script.textContent || '';
+        const tokenMatch = content.match(/"5648e5284e20a699eec058285a8b43b0":\s*"([^"]+)"/); 
+        if (tokenMatch) {
+          console.log('Found film list token in page source');
+          return tokenMatch[1];
+        }
+      }
+      
+      const error = new Error('Token not found in film list page - unable to proceed with API requests');
+      console.error(error.message);
+      throw error;
+    } catch (error) {
+      console.error('Error fetching film list token:', error);
+      throw error;
+    }
+  }
+
   static async fetchFilmList(category: string, page: number = 1): Promise<Response> {
+    // Get dynamic token for film list requests
+    const token = await this.fetchFilmListToken();
+    
     const payload: TaipeiffApiRequest = {
-      [Config.TOKEN_KEY]: Config.MOCK_TOKEN,
+      [Config.TOKEN_KEY]: token,
       Filter: {
         c: category,
         s: '',
@@ -168,6 +213,65 @@ class FilmApiService {
     // In a real implementation, this would fetch individual film details
     // For now, we'll return a mock response since we don't have the details endpoint
     return new Response('{}', { status: 200 });
+  }
+
+  // Fetch the encrypted token from the schedule page
+  static async fetchScheduleToken(): Promise<string> {
+    try {
+      const headers = { ...Config.HEADERS } as Record<string, string>;
+      headers['Referer'] = Config.SCHEDULE_PAGE_URL;
+      
+      const res = await fetch(Config.SCHEDULE_PAGE_URL, { headers });
+      this.storeCookies(res);
+      
+      const html = await res.text();
+      const dom = new JSDOM(html);
+      const document = dom.window.document;
+      
+      // Look for the token in script tags
+      const scripts = document.querySelectorAll('script');
+      for (const script of scripts) {
+        const content = script.textContent || '';
+        const tokenMatch = content.match(/"5648e5284e20a699eec058285a8b43b0":\s*"([^"]+)"/); 
+        if (tokenMatch) {
+          console.log('Found schedule token in page source');
+          return tokenMatch[1];
+        }
+      }
+      
+      const error = new Error('Token not found in schedule page - unable to proceed with schedule API requests');
+      console.error(error.message);
+      throw error;
+    } catch (error) {
+      console.error('Error fetching schedule token:', error);
+      throw error;
+    }
+  }
+
+  // Fetch schedule for a specific date
+  static async fetchScheduleForDate(date: string, token: string): Promise<Response> {
+    const payload: TaipeiffScheduleApiRequest = {
+      date: date, // format: "2025-06-23"
+      jobType: 'getMyFilm_2',
+      [Config.TOKEN_KEY]: token
+    };
+
+    // Attach cookies if present
+    const headers = { ...Config.HEADERS } as Record<string, string>;
+    headers['Referer'] = Config.SCHEDULE_PAGE_URL;
+    const cookieHeader = this.getCookieHeader();
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
+    const res = await fetch(Config.SCHEDULE_API_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    this.storeCookies(res);
+    return res;
   }
 }
 
@@ -207,6 +311,49 @@ class ParserService {
       schedule: [], // Taipei Film Festival API doesn't provide schedule in this endpoint
       duration: '' // Duration not available in this endpoint
     };
+  }
+
+  // Parse schedule sessions from API response
+  static parseScheduleFromApiResponse(data: TaipeiffScheduleApiResponse, date: string): Record<string, FilmSchedule[]> {
+    const filmSchedules: Record<string, FilmSchedule[]> = {};
+    
+    if (data.status === 'success' && data.msg) {
+      data.msg.forEach((session: TaipeiffScheduleSession) => {
+        if (session.film) {
+          const filmId = session.film;
+          
+          if (!filmSchedules[filmId]) {
+            filmSchedules[filmId] = [];
+          }
+          
+          // Convert time format and create schedule entry
+          const schedule: FilmSchedule = {
+            date: date,
+            time: `${session.start}-${session.end}`,
+            location: session.placeId || '未知場地' // Use placeId for now, could be mapped to venue names
+          };
+          
+          filmSchedules[filmId].push(schedule);
+        }
+      });
+    }
+    
+    return filmSchedules;
+  }
+
+  // Helper function to generate dates between start and end
+  static generateDateRange(startDate: string, endDate: string): string[] {
+    const dates: string[] = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const current = new Date(start);
+    while (current <= end) {
+      dates.push(current.toISOString().split('T')[0]); // YYYY-MM-DD format
+      current.setDate(current.getDate() + 1);
+    }
+    
+    return dates;
   }
 }
 
@@ -267,6 +414,81 @@ class SectionManager {
       console.warn("SectionManager.getSection() called before sections were initialized. Returning undefined. This might indicate an issue.");
     }
     return this.sections.find(section => section.id === id);
+  }
+}
+
+class ScheduleService {
+  // Fetch all schedules for the festival period
+  static async fetchAllSchedules(festival: FestivalConfig): Promise<Record<string, FilmSchedule[]>> {
+    const allSchedules: Record<string, FilmSchedule[]> = {};
+    
+    try {
+      console.log('\nFetching schedule token...');
+      const token = await FilmApiService.fetchScheduleToken();
+      
+      // Generate date range for the festival
+      const dates = ParserService.generateDateRange(Config.FESTIVAL_START_DATE, Config.FESTIVAL_END_DATE);
+      console.log(`Fetching schedules for ${dates.length} dates: ${Config.FESTIVAL_START_DATE} to ${Config.FESTIVAL_END_DATE}`);
+      
+      for (const date of dates) {
+        try {
+          console.log(`Fetching schedule for ${date}...`);
+          const response = await FilmApiService.fetchScheduleForDate(date, token);
+          
+          if (!response.ok) {
+            console.warn(`Failed to fetch schedule for ${date}: HTTP ${response.status}`);
+            continue;
+          }
+          
+          const data: TaipeiffScheduleApiResponse = await response.json();
+          console.log(`Schedule API response for ${date}:`, JSON.stringify(data, null, 2));
+          
+          const dailySchedules = ParserService.parseScheduleFromApiResponse(data, date);
+          
+          // Merge daily schedules into the overall schedule map
+          Object.entries(dailySchedules).forEach(([filmId, schedules]) => {
+            if (!allSchedules[filmId]) {
+              allSchedules[filmId] = [];
+            }
+            allSchedules[filmId].push(...schedules);
+          });
+          
+          const sessionCount = Object.values(dailySchedules).reduce((sum, schedules) => sum + schedules.length, 0);
+          console.log(`Found ${sessionCount} sessions on ${date}`);
+          
+          // Add a small delay to avoid overwhelming the server
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+        } catch (error) {
+          console.error(`Error fetching schedule for ${date}:`, error);
+          continue;
+        }
+      }
+      
+      const totalFilmsWithSchedules = Object.keys(allSchedules).length;
+      const totalSessions = Object.values(allSchedules).reduce((sum, schedules) => sum + schedules.length, 0);
+      console.log(`\nSchedule fetching complete: ${totalSessions} sessions for ${totalFilmsWithSchedules} films`);
+      
+    } catch (error) {
+      console.error('Error in schedule fetching process:', error);
+    }
+    
+    return allSchedules;
+  }
+
+  // Merge schedule data into film details
+  static mergeScheduleIntoDetails(
+    detailsCache: Record<string, FilmDetails>,
+    scheduleData: Record<string, FilmSchedule[]>
+  ): void {
+    Object.entries(scheduleData).forEach(([filmId, schedules]) => {
+      if (detailsCache[filmId]) {
+        detailsCache[filmId].schedule = schedules;
+        console.log(`Updated schedule for film ${filmId}: ${schedules.length} sessions`);
+      } else {
+        console.warn(`Schedule found for unknown film ${filmId}, skipping merge`);
+      }
+    });
   }
 }
 
@@ -500,14 +722,25 @@ async function main(options: MainOptions = {}) {
     console.log("No new film details were fetched; all were up-to-date or skipped.");
   }
 
-  // Save the accumulated film details cache.
-  console.log('\nSaving accumulated film details cache...');
+  // Fetch and integrate schedule data
+  console.log('\n=== Schedule Processing ===');
+  const representativeFestival: FestivalConfig = { year: year, category: apiCategories[0]?.value || '178' };
+  const scheduleData = await ScheduleService.fetchAllSchedules(representativeFestival);
+  
+  // Merge schedule data into film details
+  console.log('\nMerging schedule data into film details...');
+  ScheduleService.mergeScheduleIntoDetails(allFilmDetailsCache, scheduleData);
+  
+  // Save the updated film details cache with schedule data
+  console.log('\nSaving updated film details cache with schedule data...');
   await CacheManager.saveCache(cachePaths.details, allFilmDetailsCache);
-  console.log('Saved film details.');
+  console.log('Saved film details with schedules.');
 
   console.log('\n=== Final Summary ===');
   console.log(`Total unique films processed across all API categories: ${Object.keys(allFilms).length}`);
   console.log(`Total film details in cache: ${Object.keys(allFilmDetailsCache).length}`);
+  const filmsWithSchedules = Object.values(allFilmDetailsCache).filter(details => details.schedule.length > 0).length;
+  console.log(`Films with schedule data: ${filmsWithSchedules}`);
   console.log(`All data cached in: ${cachePaths.base}`);
 }
 
@@ -520,6 +753,7 @@ export {
   FilmApiService,
   ParserService,
   SectionManager,
+  ScheduleService,
   FilmService,
   CacheManager,
   main
