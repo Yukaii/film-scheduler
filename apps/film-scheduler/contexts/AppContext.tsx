@@ -5,6 +5,8 @@ import React, { Dispatch, SetStateAction } from "react";
 export type AppContextType = {
   festivals: Festival[];
   defaultFestivalId: string;
+  currentFestivalId: string;
+  setCurrentFestivalId: Dispatch<SetStateAction<string>>;
   films: Film[];
   filmsMap: FilmsMap;
   setFilms: Dispatch<SetStateAction<Film[]>>;
@@ -49,6 +51,8 @@ const noop = () => {};
 export const AppContext = React.createContext<AppContextType>({
   festivals: [],
   defaultFestivalId: "",
+  currentFestivalId: "",
+  setCurrentFestivalId: noop,
   films: [],
   filmsMap: new Map(),
   setFilms: noop,

@@ -10,12 +10,26 @@ export type FilmSidebarProps = {
 };
 
 export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
-  const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail } = useAppContext();
+  const { filmsMap, viewingFilmId, onClickSession, revealFilmDetail, currentFestivalId } = useAppContext();
   const viewingFilm = useMemo(() => {
     return viewingFilmId ? filmsMap.get(viewingFilmId) : null;
   }, [filmsMap, viewingFilmId]);
 
   const isOpen = open && viewingFilm;
+
+  // Generate the appropriate URL based on festival type
+  const getFilmUrl = useMemo(() => {
+    if (!viewingFilmId || !currentFestivalId) return null;
+    
+    if (currentFestivalId.includes('TAIPEIFF')) {
+      // For Taipei Film Festival, we don't have a specific URL pattern yet
+      // This could be updated when the official website structure is known
+      return null;
+    } else {
+      // Default to Golden Horse festival URL
+      return `https://www.goldenhorse.org.tw/film/programme/films/detail/${viewingFilmId}`;
+    }
+  }, [viewingFilmId, currentFestivalId]);
 
   return (
     <div
@@ -53,8 +67,11 @@ export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
         </h4>
 
         <a
-          href={`https://www.goldenhorse.org.tw/film/programme/films/detail/${viewingFilmId}`}
-          className="text-slate-500 dark:text-slate-300 underline cursor-pointer hover:opacity-70"
+          href={getFilmUrl || '#'}
+          className={cn(
+            "text-slate-500 dark:text-slate-300 underline cursor-pointer hover:opacity-70",
+            !getFilmUrl && "opacity-50 pointer-events-none"
+          )}
           target="_blank"
           rel="noreferrer noopener"
         >
