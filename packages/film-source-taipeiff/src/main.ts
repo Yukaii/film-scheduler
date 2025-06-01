@@ -356,7 +356,7 @@ class ParserService {
     };
   }
 
-  // Parse schedule sessions from API response with place mapping
+  // Parse schedule sessions from API response with place mapping  
   static parseScheduleFromApiResponse(data: TaipeiffScheduleApiResponse, date: string, placeMap: PlaceMap = {}): Record<string, FilmSchedule[]> {
     const filmSchedules: Record<string, FilmSchedule[]> = {};
     
@@ -372,10 +372,10 @@ class ParserService {
           // Map place ID to place name
           const locationName = placeMap[session.placeId] || session.placeId || '未知場地';
           
-          // Convert time format and create schedule entry
+          // Standardize time format to use only start time (consistent with Golden Horse format)
           const schedule: FilmSchedule = {
             date: date,
-            time: `${session.start}-${session.end}`,
+            time: session.start,
             location: locationName
           };
           
@@ -385,6 +385,22 @@ class ParserService {
     }
     
     return filmSchedules;
+  }
+
+  // Extract detail URLs from schedule sessions
+  static extractDetailUrlsFromScheduleData(data: TaipeiffScheduleApiResponse): Record<string, string> {
+    const detailUrls: Record<string, string> = {};
+    
+    if (data.status === 'success' && data.msg) {
+      data.msg.forEach((session: TaipeiffScheduleSession) => {
+        if (session.film && session.detailurl && !detailUrls[session.film]) {
+          // Store the first detail URL found for each film
+          detailUrls[session.film] = session.detailurl;
+        }
+      });
+    }
+    
+    return detailUrls;
   }
 
   // Extract duration from schedule sessions
@@ -494,8 +510,9 @@ class SectionManager {
 
 class ScheduleService {
   // Fetch all schedules for the festival period
-  static async fetchAllSchedules(festival: FestivalConfig): Promise<Record<string, FilmSchedule[]>> {
+  static async fetchAllSchedules(festival: FestivalConfig): Promise<[Record<string, FilmSchedule[]>, Record<string, string>]> {
     const allSchedules: Record<string, FilmSchedule[]> = {};
+    const allDetailUrls: Record<string, string> = {};
     
     try {
       console.log('\nFetching schedule token and place mapping...');
@@ -524,12 +541,22 @@ class ScheduleService {
           // Parse schedule data with place mapping
           const dailySchedules = ParserService.parseScheduleFromApiResponse(data, date, placeMap);
           
+          // Extract detail URLs from the schedule data
+          const dailyDetailUrls = ParserService.extractDetailUrlsFromScheduleData(data);
+          
           // Merge daily schedules into the overall schedule map
           Object.entries(dailySchedules).forEach(([filmId, schedules]) => {
             if (!allSchedules[filmId]) {
               allSchedules[filmId] = [];
             }
             allSchedules[filmId].push(...schedules);
+          });
+          
+          // Merge detail URLs (only add if not already present)
+          Object.entries(dailyDetailUrls).forEach(([filmId, detailUrl]) => {
+            if (!allDetailUrls[filmId]) {
+              allDetailUrls[filmId] = detailUrl;
+            }
           });
           
           const sessionCount = Object.values(dailySchedules).reduce((sum, schedules) => sum + schedules.length, 0);
@@ -546,19 +573,21 @@ class ScheduleService {
       
       const totalFilmsWithSchedules = Object.keys(allSchedules).length;
       const totalSessions = Object.values(allSchedules).reduce((sum, schedules) => sum + schedules.length, 0);
-      console.log(`\nSchedule fetching complete: ${totalSessions} sessions for ${totalFilmsWithSchedules} films`);
+      const totalDetailUrls = Object.keys(allDetailUrls).length;
+      console.log(`\nSchedule fetching complete: ${totalSessions} sessions for ${totalFilmsWithSchedules} films, ${totalDetailUrls} detail URLs extracted`);
       
     } catch (error) {
       console.error('Error in schedule fetching process:', error);
     }
     
-    return allSchedules;
+    return [allSchedules, allDetailUrls];
   }
 
-  // Merge schedule data into film details
+  // Merge schedule data and detail URLs into film details
   static mergeScheduleIntoDetails(
     detailsCache: Record<string, FilmDetails>,
-    scheduleData: Record<string, FilmSchedule[]>
+    scheduleData: Record<string, FilmSchedule[]>,
+    detailUrls: Record<string, string> = {}
   ): void {
     // Extract duration information from schedule data
     const filmDurations = ParserService.extractDurationFromSchedule(scheduleData);
@@ -572,6 +601,12 @@ class ScheduleService {
           console.log(`Updated schedule and duration for film ${filmId}: ${schedules.length} sessions, duration: ${filmDurations[filmId]}`);
         } else {
           console.log(`Updated schedule for film ${filmId}: ${schedules.length} sessions`);
+        }
+        
+        // Add detail URL if available
+        if (detailUrls[filmId]) {
+          detailsCache[filmId].detailUrl = detailUrls[filmId];
+          console.log(`Added detail URL for film ${filmId}: ${detailUrls[filmId]}`);
         }
       } else {
         console.warn(`Schedule found for unknown film ${filmId}, skipping merge`);
@@ -813,11 +848,11 @@ async function main(options: MainOptions = {}) {
   // Fetch and integrate schedule data
   console.log('\n=== Schedule Processing ===');
   const representativeFestival: FestivalConfig = { year: year, category: apiCategories[0]?.value || '178' };
-  const scheduleData = await ScheduleService.fetchAllSchedules(representativeFestival);
+  const [scheduleData, detailUrls] = await ScheduleService.fetchAllSchedules(representativeFestival);
   
-  // Merge schedule data into film details
-  console.log('\nMerging schedule data into film details...');
-  ScheduleService.mergeScheduleIntoDetails(allFilmDetailsCache, scheduleData);
+  // Merge schedule data and detail URLs into film details
+  console.log('\nMerging schedule data and detail URLs into film details...');
+  ScheduleService.mergeScheduleIntoDetails(allFilmDetailsCache, scheduleData, detailUrls);
   
   // Save the updated film details cache with schedule data
   console.log('\nSaving updated film details cache with schedule data...');

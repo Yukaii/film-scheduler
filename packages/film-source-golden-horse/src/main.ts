@@ -117,7 +117,7 @@ class SectionManager {
       'action': 'get_class_list',
       'search_year': festival.year,
       'search_category': festival.category,
-      'parent_id': festival.parentId,
+      'parent_id': festival.parentId || '',
       'ghff_id': '0'
     });
 
@@ -185,7 +185,7 @@ class ParserService {
     return results;
   }
 
-  static parseFilmDetailsFromHtml(document: Document): Omit<FilmDetails, 'sectionIds'> {
+  static parseFilmDetailsFromHtml(document: Document, festival?: FestivalConfig): Omit<FilmDetails, 'sectionIds'> {
     const titleElement = document.querySelector("div.h1.first");
     const directorElement = document.querySelector("div.h4");
     const synopsisElements = document.querySelectorAll("div.margin-top.zero p");
@@ -209,8 +209,16 @@ class ParserService {
         if (dateElement && locationElement) {
           const dateText = dateElement.textContent?.trim() || '';
           const [date, time] = dateText.split(/\s+〈.*〉\s+/);
+          
+          // Standardize date format from "04.11" to "YYYY-MM-DD"
+          let standardizedDate = date.trim();
+          if (festival?.year && date.match(/^\d{2}\.\d{2}$/)) {
+            // Golden Horse format: "04.11" -> "2024-04-11"
+            standardizedDate = `${festival.year}-${date.replace(".", "-")}`;
+          }
+          
           return {
-            date: date.trim(),
+            date: standardizedDate,
             time: time?.trim() || "",
             location: locationElement.textContent?.trim() || ""
           };
@@ -244,7 +252,7 @@ class FilmService {
       'action': 'get_class_list',
       'search_year': festival.year,
       'search_category': festival.category,
-      'parent_id': festival.parentId,
+      'parent_id': festival.parentId || '',
       'ghff_id': ghffId
     });
 
@@ -314,8 +322,9 @@ class FilmService {
       if (!document) throw new Error(`Failed to parse HTML for filmId: ${filmId}`);
 
       const filmDetails = {
-        ...ParserService.parseFilmDetailsFromHtml(document),
-        sectionIds: sectionMap[filmId] || []
+        ...ParserService.parseFilmDetailsFromHtml(document, festival),
+        sectionIds: sectionMap[filmId] || [],
+        detailUrl: `${Config.FILM_DETAILS_BASE_URL}/${filmId}`
       };
 
       detailsCache[filmId] = filmDetails;
