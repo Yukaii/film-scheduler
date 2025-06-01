@@ -27,18 +27,8 @@ export async function GET(
         ...rest,
         id,
         schedule: schedule.map((sch: { date: string; time: string; location: string }) => {
-          let parsedTime: number;
-          
-          if (festivalId.includes('TAIPEIFF')) {
-            // Taipei Film Festival format: date: "2025-06-20", time: "19:00"
-            parsedTime = new Date(`${sch.date} ${sch.time} +8`).valueOf();
-          } else {
-            // Golden Horse Festival format: date: "04.11", time: "21:30"  
-            const year = festivalId.split('-')[0];
-            parsedTime = new Date(
-              `${year}-${sch.date.replace(".", "-")} ${sch.time} +8`
-            ).valueOf();
-          }
+          // Both festivals now use standardized format: date: "YYYY-MM-DD", time: "HH:MM"
+          const parsedTime = new Date(`${sch.date} ${sch.time} +8`).valueOf();
           
           const partialSession = {
             filmId: id,
