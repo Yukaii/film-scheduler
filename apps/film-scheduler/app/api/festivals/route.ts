@@ -9,8 +9,8 @@ interface Category {
 
 // Known festival IDs
 const FESTIVALS = [
+  '2025-TAIPEIFF',
   '2025-FFF',
-  '2025-178',
   '2024-FF'
 ];
 

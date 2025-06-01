@@ -27,11 +27,23 @@ export async function GET(
         ...rest,
         id,
         schedule: schedule.map((sch: { date: string; time: string; location: string }) => {
+          let parsedTime: number;
+          
+          if (festivalId.includes('TAIPEIFF')) {
+            // Taipei Film Festival format: date: "2025-06-20", time: "19:00-20:57"
+            const startTime = sch.time.split('-')[0]; // Extract start time from range
+            parsedTime = new Date(`${sch.date} ${startTime} +8`).valueOf();
+          } else {
+            // Golden Horse Festival format: date: "04.11", time: "21:30"  
+            const year = festivalId.split('-')[0];
+            parsedTime = new Date(
+              `${year}-${sch.date.replace(".", "-")} ${sch.time} +8`
+            ).valueOf();
+          }
+          
           const partialSession = {
             filmId: id,
-            time: new Date(
-              `${festivalId.split('-')[0]}-${sch.date.replace(".", "-")} ${sch.time} +8`
-            ).valueOf(),
+            time: parsedTime,
             location: sch.location,
           };
 

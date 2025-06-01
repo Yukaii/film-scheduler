@@ -41,6 +41,7 @@ interface MainProps {
 export default function Main({ festivals, defaultFestivalId }: MainProps) {
   const [films, setFilms] = useState<Film[]>([]);
   const [filmsMap, setFilmsMap] = useState<FilmsMap>(new Map());
+  const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
 
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
@@ -243,6 +244,8 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           setFilmsMap,
           festivals,
           defaultFestivalId,
+          currentFestivalId,
+          setCurrentFestivalId,
           previewSessions,
           selectedSessions,
           currentDate,

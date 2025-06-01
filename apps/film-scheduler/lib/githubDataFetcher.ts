@@ -83,7 +83,7 @@ class GithubDataFetcher {
 
     // Determine which data source to use based on festival ID
     let basePath: string;
-    if (festivalId.includes('-178')) {
+    if (festivalId.includes('-TAIPEIFF')) {
       // Taipei Film Festival
       basePath = `${this.config.basePaths['taipeiff']}/${festivalId}`;
     } else {

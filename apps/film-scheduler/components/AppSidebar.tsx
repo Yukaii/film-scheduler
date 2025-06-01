@@ -231,7 +231,7 @@ export function AppSidebar() {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
+  const { currentFestivalId, setCurrentFestivalId } = useAppContext();
 
   useEffect(() => {
     // Get festival from URL or auto-select if only one available
@@ -246,7 +246,7 @@ export function AppSidebar() {
       setCurrentFestivalId(defaultFestivalId);
       router.push(`?festival=${defaultFestivalId}`);
     }
-  }, [festivals, defaultFestivalId, searchParams, router]);
+  }, [festivals, defaultFestivalId, searchParams, router, setCurrentFestivalId]);
 
   const handleFestivalChange = (festivalId: string) => {
     setCurrentFestivalId(festivalId);
