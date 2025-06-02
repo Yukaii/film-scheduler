@@ -26,6 +26,15 @@ import { Film, Session } from "./types";
 import {
   cn,
 } from "@/lib/utils";
+import {
+  parseSearchQuery,
+  matchesDateFilter,
+  matchesTimeFilter,
+  matchesTitleFilter,
+  matchesDirectorFilter,
+  matchesGeneralSearch,
+  matchesCategoryFilter,
+} from "@/lib/searchParser";
 import dayjs from "dayjs";
 import {
   ChevronDown,
@@ -215,13 +224,45 @@ export function AppSidebar() {
   };
 
   const filteredFilms = useMemo(() => {
+    if (!search.trim()) {
+      return films;
+    }
+
+    const searchFilters = parseSearchQuery(search);
+    
     return films.filter((f) => {
-      return (
-        f.filmTitle.includes(search) ||
-        f.filmOriginalTitle.includes(search) ||
-        f.directorName.includes(search) ||
-        f.directorOriginalName.includes(search)
-      );
+      // Apply date filter if present
+      if (searchFilters.dateFilter) {
+        const hasMatchingSession = f.schedule.some(session => 
+          matchesDateFilter(session.time, searchFilters.dateFilter!)
+        );
+        if (!hasMatchingSession) return false;
+      }
+
+      // Apply time filter if present
+      if (searchFilters.timeFilter) {
+        const hasMatchingSession = f.schedule.some(session => 
+          matchesTimeFilter(session.time, searchFilters.timeFilter!)
+        );
+        if (!hasMatchingSession) return false;
+      }
+
+      // Apply title filter if present
+      if (searchFilters.title) {
+        if (!matchesTitleFilter(f, searchFilters.title)) return false;
+      }
+
+      // Apply director filter if present
+      if (searchFilters.director) {
+        if (!matchesDirectorFilter(f, searchFilters.director)) return false;
+      }
+
+      // Apply general search if present (legacy search behavior)
+      if (searchFilters.generalSearch) {
+        if (!matchesGeneralSearch(f, searchFilters.generalSearch)) return false;
+      }
+
+      return true;
     });
   }, [search, films]);
 

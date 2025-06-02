@@ -22,6 +22,15 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, generateSessionId } from "@/lib/utils";
+import {
+  parseSearchQuery,
+  matchesDateFilter,
+  matchesTimeFilter,
+  matchesTitleFilter,
+  matchesDirectorFilter,
+  matchesGeneralSearch,
+  matchesCategoryFilter,
+} from "@/lib/searchParser";
 
 interface FillBlankModalProps {
   open: boolean;
@@ -128,14 +137,47 @@ export function FillBlankModal({
 
     // Apply search filter if provided
     if (searchTerm.trim()) {
-      const lowercaseTerm = searchTerm.toLowerCase();
-      filteredFilms = filteredFilms.filter(
-        (film) =>
-          film.filmTitle.toLowerCase().includes(lowercaseTerm) ||
-          film.filmOriginalTitle.toLowerCase().includes(lowercaseTerm) ||
-          film.directorName.toLowerCase().includes(lowercaseTerm) ||
-          film.directorOriginalName.toLowerCase().includes(lowercaseTerm)
-      );
+      const searchFilters = parseSearchQuery(searchTerm);
+      
+      filteredFilms = filteredFilms.filter((film) => {
+        // Apply date filter if present
+        if (searchFilters.dateFilter) {
+          const hasMatchingSession = film.schedule.some(session => 
+            matchesDateFilter(session.time, searchFilters.dateFilter!)
+          );
+          if (!hasMatchingSession) return false;
+        }
+
+        // Apply time filter if present
+        if (searchFilters.timeFilter) {
+          const hasMatchingSession = film.schedule.some(session => 
+            matchesTimeFilter(session.time, searchFilters.timeFilter!)
+          );
+          if (!hasMatchingSession) return false;
+        }
+
+        // Apply category filter from search syntax if present
+        if (searchFilters.category) {
+          if (!matchesCategoryFilter(film, searchFilters.category, sections)) return false;
+        }
+
+        // Apply title filter if present
+        if (searchFilters.title) {
+          if (!matchesTitleFilter(film, searchFilters.title)) return false;
+        }
+
+        // Apply director filter if present
+        if (searchFilters.director) {
+          if (!matchesDirectorFilter(film, searchFilters.director)) return false;
+        }
+
+        // Apply general search if present (legacy search behavior)
+        if (searchFilters.generalSearch) {
+          if (!matchesGeneralSearch(film, searchFilters.generalSearch)) return false;
+        }
+
+        return true;
+      });
     }
 
     // Apply category filter if provided
