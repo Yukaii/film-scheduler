@@ -288,7 +288,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
       >
         <SidebarProvider>
           <AppSidebar />
-          <main className="overflow-hidden">
+          <main className="overflow-hidden w-full">
             <CalendarView
               className={cn({
                 "md:pr-[16rem]": panelOpen && !!viewingFilmId,
