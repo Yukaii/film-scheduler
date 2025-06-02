@@ -84,9 +84,9 @@ export function DayView({
     <div className="w-full overflow-x-auto">
       {/* Time axis header */}
       <div className="sticky top-0 bg-background z-20 border-b">
-        <div className="flex min-w-[800px]">
+        <div className="flex min-w-[800px] w-full">
           {/* Location column header */}
-          <div className="w-48 p-4 border-r font-semibold bg-muted/20 flex-shrink-0 sticky left-0 z-10">
+          <div className="w-48 p-4 border-r font-semibold bg-muted/20 flex-shrink-0">
             Location
           </div>
           {/* Time columns */}
@@ -107,13 +107,13 @@ export function DayView({
 
       {/* Location rows */}
       <div className="relative">
-        <div className="min-w-[800px]">
+        <div className="min-w-[800px] w-full">
         {/* Current time indicator */}
         {isSameDay && nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
           <div
             className="absolute top-0 h-full w-[1px] bg-red-500 z-10"
             style={{
-              left: `calc(192px + ${((nowHourOffset + now.minute() / 60) / hoursInDay) * 100}% - ${192 * ((nowHourOffset + now.minute() / 60) / hoursInDay)}px)`,
+              left: `calc(192px + ${((nowHourOffset + now.minute() / 60) / hoursInDay) * 100}%)`,
             }}
           >
             <span className="absolute bg-red-500 text-white text-xs px-1 rounded-r -top-1">
@@ -129,7 +129,7 @@ export function DayView({
               style={{ minHeight: '100px', maxHeight: '120px' }}
             >
               {/* Location name */}
-              <div className="w-48 p-4 border-r bg-muted/20 flex items-center flex-shrink-0 sticky left-0 z-10">
+              <div className="w-48 p-4 border-r bg-muted/20 flex items-center flex-shrink-0 sticky left-0">
                 <span className="font-medium text-sm">{location}</span>
               </div>
               
