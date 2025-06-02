@@ -14,12 +14,13 @@ import {
 } from "@/components/ui/popover";
 import { WeekView } from "./WeekView";
 import { DayView } from "./DayView";
+import { FilmBottomPanel } from "./FilmBottomPanel";
 import { Dayjs } from "dayjs";
 
 type ViewMode = "week" | "day";
 
 export function CalendarView(props: { className?: string }) {
-  const { currentDate, previewSessions, selectedSessions, setCurrentDate } =
+  const { currentDate, previewSessions, selectedSessions, setCurrentDate, revealFilmDetail, filmsMap } =
     useAppContext();
 
   // Add state to track the current view week from infinite scroll
@@ -28,6 +29,16 @@ export function CalendarView(props: { className?: string }) {
   );
   const [highlightDate, setHighlightDate] = useState(currentDate);
   const [viewMode, setViewMode] = useState<ViewMode>("week");
+  const [dayViewFilmPanelOpen, setDayViewFilmPanelOpen] = useState(false);
+
+  // Handle film detail viewing in day view
+  const handleDayViewFilmDetail = (filmId: string) => {
+    const film = filmsMap.get(filmId);
+    if (film) {
+      revealFilmDetail(film);
+      setDayViewFilmPanelOpen(true);
+    }
+  };
 
   // Update navigate to handle both week and day navigation
   const navigate = (direction: "previous" | "next") => {
@@ -150,21 +161,32 @@ export function CalendarView(props: { className?: string }) {
       </div>
 
       {/* Conditional rendering based on view mode */}
-      {viewMode === "week" ? (
-        <WeekView
-          viewWeekStart={viewWeekStart}
-          highlightDate={highlightDate}
-          onWeekStartChange={(d: Dayjs) => {
-            setViewWeekStart(d);
-          }}
-          selectedSessions={selectedSessions}
-          previewSessions={previewSessions}
-        />
-      ) : (
-        <DayView
-          currentDate={dayjs(currentDate)}
-          selectedSessions={selectedSessions}
-          previewSessions={previewSessions}
+      <div className={cn({ "pb-[280px]": viewMode === "day" && dayViewFilmPanelOpen })}>
+        {viewMode === "week" ? (
+          <WeekView
+            viewWeekStart={viewWeekStart}
+            highlightDate={highlightDate}
+            onWeekStartChange={(d: Dayjs) => {
+              setViewWeekStart(d);
+            }}
+            selectedSessions={selectedSessions}
+            previewSessions={previewSessions}
+          />
+        ) : (
+          <DayView
+            currentDate={dayjs(currentDate)}
+            selectedSessions={selectedSessions}
+            previewSessions={previewSessions}
+            onFilmDetailView={handleDayViewFilmDetail}
+          />
+        )}
+      </div>
+
+      {/* Film bottom panel for day view */}
+      {viewMode === "day" && (
+        <FilmBottomPanel
+          open={dayViewFilmPanelOpen}
+          setOpen={setDayViewFilmPanelOpen}
         />
       )}
     </div>

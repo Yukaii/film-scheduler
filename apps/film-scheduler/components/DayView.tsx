@@ -10,6 +10,7 @@ export interface DayViewProps {
   currentDate: dayjs.Dayjs;
   selectedSessions: Session[];
   previewSessions: Session[];
+  onFilmDetailView?: (filmId: string) => void;
 }
 
 function useNowIndicator() {
@@ -38,6 +39,7 @@ export function DayView({
   currentDate,
   selectedSessions,
   previewSessions,
+  onFilmDetailView,
 }: DayViewProps) {
   const {
     films,
@@ -81,8 +83,8 @@ export function DayView({
   return (
     <div className="w-full overflow-x-auto">
       {/* Time axis header */}
-      <div className="sticky top-0 bg-background z-20 border-b min-w-[800px]">
-        <div className="flex">
+      <div className="sticky top-0 bg-background z-20 border-b">
+        <div className="flex min-w-[800px]">
           {/* Location column header */}
           <div className="w-48 p-4 border-r font-semibold bg-muted/20 flex-shrink-0">
             Location
@@ -104,13 +106,14 @@ export function DayView({
       </div>
 
       {/* Location rows */}
-      <div className="relative min-w-[800px]">
+      <div className="relative">
+        <div className="min-w-[800px]">
         {/* Current time indicator */}
         {isSameDay && nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
           <div
             className="absolute top-0 h-full w-[1px] bg-red-500 z-10"
             style={{
-              left: `${192 + ((nowHourOffset + now.minute() / 60) / hoursInDay) * 100}%`,
+              left: `calc(192px + ${((nowHourOffset + now.minute() / 60) / hoursInDay) * 100}%)`,
             }}
           >
             <span className="absolute bg-red-500 text-white text-xs px-1 rounded-r -top-1">
@@ -119,28 +122,28 @@ export function DayView({
           </div>
         )}
 
-        {locations.map((location) => (
-          <div
-            key={location}
-            className="flex border-b hover:bg-muted/30 transition-colors"
-            style={{ minHeight: '100px', maxHeight: '120px' }}
-          >
-            {/* Location name */}
-            <div className="w-48 p-4 border-r bg-muted/20 flex items-center flex-shrink-0 sticky left-0">
-              <span className="font-medium text-sm">{location}</span>
-            </div>
-            
-            {/* Time slots for this location */}
-            <div className="flex-1 relative">
-              {/* Time grid background */}
-              <div className="absolute inset-0 flex">
-                {Array.from({ length: hoursInDay }, (_, hour) => (
-                  <div
-                    key={hour}
-                    className="flex-1 border-r border-border/30 min-w-[60px]"
-                  />
-                ))}
+          {locations.map((location) => (
+            <div
+              key={location}
+              className="flex border-b hover:bg-muted/30 transition-colors"
+              style={{ minHeight: '100px', maxHeight: '120px' }}
+            >
+              {/* Location name */}
+              <div className="w-48 p-4 border-r bg-muted/20 flex items-center flex-shrink-0 sticky left-0">
+                <span className="font-medium text-sm">{location}</span>
               </div>
+              
+              {/* Time slots for this location */}
+              <div className="flex-1 relative">
+                {/* Time grid background */}
+                <div className="absolute inset-0 flex">
+                  {Array.from({ length: hoursInDay }, (_, hour) => (
+                    <div
+                      key={hour}
+                      className="flex-1 border-r border-border/30 min-w-[60px]"
+                    />
+                  ))}
+                </div>
               
               {/* Sessions for this location */}
               {sessionsByLocation[location]?.map((session, sessionIndex) => {
@@ -187,13 +190,38 @@ export function DayView({
                       height: `${height}px`,
                     }}
                     onClick={() => {
+                      // Right-click or Ctrl+click for selection
+                      // Regular click for film details
+                      if (onFilmDetailView) {
+                        onFilmDetailView(session.filmId);
+                      } else {
+                        if (isSelected) {
+                          removeSession(session);
+                        } else {
+                          addSession(session);
+                        }
+                      }
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
                       if (isSelected) {
                         removeSession(session);
                       } else {
                         addSession(session);
                       }
                     }}
-                    title={`${film.filmTitle} • ${startTime.format("HH:mm")} - ${startTime.add(film.duration, "minute").format("HH:mm")}`}
+                    onMouseDown={(e) => {
+                      if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        if (isSelected) {
+                          removeSession(session);
+                        } else {
+                          addSession(session);
+                        }
+                      }
+                    }}
+                    title={`${film.filmTitle} • ${startTime.format("HH:mm")} - ${startTime.add(film.duration, "minute").format("HH:mm")}
+Click to view details • Right-click or Ctrl+click to select/deselect`}
                   >
                     <div className="p-1 h-full overflow-hidden">
                       <div className="font-semibold text-xs truncate">{film.filmTitle}</div>
@@ -212,6 +240,7 @@ export function DayView({
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Empty state */}
