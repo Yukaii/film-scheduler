@@ -338,7 +338,7 @@ export function FillBlankModal({
               id="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="片名/導演"
+              placeholder="片名/導演 (支援 date:, time:, category:, title:, director: 語法)"
               className="col-span-3"
             />
           </div>

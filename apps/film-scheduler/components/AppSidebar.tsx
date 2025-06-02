@@ -335,7 +335,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4 border-b">
         <div className="relative">
           <Input
-            placeholder="篩選影片"
+            placeholder="篩選影片 (支援 date:, time:, title:, director: 等語法)"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pr-8 shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
