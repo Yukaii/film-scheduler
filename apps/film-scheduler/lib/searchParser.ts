@@ -40,6 +40,15 @@ export function parseSearchQuery(query: string): ParsedSearchFilters {
   const filters: ParsedSearchFilters = {};
   let remainingQuery = query.trim();
 
+  // Reset all regex lastIndex to prevent issues with global regexes
+  DATE_REGEX.lastIndex = 0;
+  TIME_REGEX.lastIndex = 0;
+  CATEGORY_REGEX.lastIndex = 0;
+  TITLE_QUOTED_REGEX.lastIndex = 0;
+  TITLE_UNQUOTED_REGEX.lastIndex = 0;
+  DIRECTOR_QUOTED_REGEX.lastIndex = 0;
+  DIRECTOR_UNQUOTED_REGEX.lastIndex = 0;
+
   // Parse date filters
   let match;
   while ((match = DATE_REGEX.exec(query)) !== null) {
@@ -53,8 +62,7 @@ export function parseSearchQuery(query: string): ParsedSearchFilters {
     }
   }
 
-  // Parse time filters  
-  TIME_REGEX.lastIndex = 0; // Reset regex
+  // Parse time filters
   while ((match = TIME_REGEX.exec(query)) !== null) {
     const operator = match[1] === ':' ? 'eq' : match[1] === '>' ? 'gt' : 'lt';
     const time = match[2];
@@ -67,19 +75,16 @@ export function parseSearchQuery(query: string): ParsedSearchFilters {
   }
 
   // Parse category filter
-  CATEGORY_REGEX.lastIndex = 0;
   if ((match = CATEGORY_REGEX.exec(query)) !== null) {
     filters.category = match[1];
     remainingQuery = remainingQuery.replace(match[0], '').trim();
   }
 
   // Parse title filter (quoted first, then unquoted)
-  TITLE_QUOTED_REGEX.lastIndex = 0;
   if ((match = TITLE_QUOTED_REGEX.exec(query)) !== null) {
     filters.title = match[1];
     remainingQuery = remainingQuery.replace(match[0], '').trim();
   } else {
-    TITLE_UNQUOTED_REGEX.lastIndex = 0;
     if ((match = TITLE_UNQUOTED_REGEX.exec(query)) !== null) {
       filters.title = match[1];
       remainingQuery = remainingQuery.replace(match[0], '').trim();
@@ -87,12 +92,10 @@ export function parseSearchQuery(query: string): ParsedSearchFilters {
   }
 
   // Parse director filter (quoted first, then unquoted)
-  DIRECTOR_QUOTED_REGEX.lastIndex = 0;
   if ((match = DIRECTOR_QUOTED_REGEX.exec(query)) !== null) {
     filters.director = match[1];
     remainingQuery = remainingQuery.replace(match[0], '').trim();
   } else {
-    DIRECTOR_UNQUOTED_REGEX.lastIndex = 0;
     if ((match = DIRECTOR_UNQUOTED_REGEX.exec(query)) !== null) {
       filters.director = match[1];
       remainingQuery = remainingQuery.replace(match[0], '').trim();
