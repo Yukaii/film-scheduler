@@ -2,7 +2,6 @@ import React, { useMemo, useState, useEffect } from "react";
 import dayjs from "@/lib/dayjs";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
-import { joinSessions } from "@/lib/utils";
 
 const startHour = 10;
 const hoursInDay = 14;
@@ -41,21 +40,27 @@ export function DayView({
   previewSessions,
 }: DayViewProps) {
   const {
+    films,
     filmsMap,
     addSession,
     removeSession,
   } = useAppContext();
   const { now, nowHourOffset } = useNowIndicator();
 
-  // Join selected and preview sessions like WeekView does
-  const sessions = joinSessions(selectedSessions, previewSessions);
-
-  // Get sessions for the current day
+  // Get ALL sessions for the current day from all films
   const daysSessions = useMemo(() => {
-    return sessions.filter((session) => 
-      dayjs(session.time).isSame(currentDate, "day")
-    );
-  }, [sessions, currentDate]);
+    const allSessions: Session[] = [];
+    films.forEach(film => {
+      if (film.schedule) {
+        film.schedule.forEach(session => {
+          if (dayjs(session.time).isSame(currentDate, "day")) {
+            allSessions.push(session);
+          }
+        });
+      }
+    });
+    return allSessions;
+  }, [films, currentDate]);
 
   // Get unique locations for the day
   const locations = useMemo(() => {
