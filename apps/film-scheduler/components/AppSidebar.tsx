@@ -33,7 +33,6 @@ import {
   matchesTitleFilter,
   matchesDirectorFilter,
   matchesGeneralSearch,
-  matchesCategoryFilter,
 } from "@/lib/searchParser";
 import dayjs from "dayjs";
 import {

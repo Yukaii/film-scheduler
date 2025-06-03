@@ -193,7 +193,7 @@ export function FillBlankModal({
       const bDiff = Math.abs(selectedDuration - b.duration);
       return aDiff - bDiff;
     });
-  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory]);
+  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory, sections]);
 
   // Create a session from a film
   const createSession = (film: Film) => {
