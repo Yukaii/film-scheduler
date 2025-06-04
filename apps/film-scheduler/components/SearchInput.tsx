@@ -38,6 +38,7 @@ export function SearchInput({
   sections = []
 }: SearchInputProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isManuallyOpened, setIsManuallyOpened] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -221,14 +222,25 @@ export function SearchInput({
     }
     
     onChange(newValue);
-    setIsOpen(false);
+    
+    // Check if the suggestion is a prefix that expects more input
+    const isPrefixSuggestion = suggestion.type === 'syntax' || 
+                             (typeof suggestion.value === 'string' && suggestion.value.endsWith(':'));
+
+    if (isPrefixSuggestion) {
+      setIsOpen(true);
+      setIsManuallyOpened(true); // Ensure typing continues to show suggestions
+    } else {
+      setIsOpen(false);
+      setIsManuallyOpened(false);
+    }
     setSelectedIndex(0);
     
     // Focus back to input
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  }, [value, onChange]);
+  }, [value, onChange, setIsManuallyOpened]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -266,19 +278,32 @@ export function SearchInput({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onChange(newValue);
-    setIsOpen(newValue.trim().length > 0);
+    setSelectedIndex(0);
+    // Keep dropdown open when typing if it was manually opened
+    if (isManuallyOpened) {
+      setIsOpen(true);
+    }
+    // Close dropdown if input is cleared and it wasn't manually opened
+    if (newValue.trim().length === 0 && !isManuallyOpened) {
+      setIsOpen(false);
+    }
+  };
+
+  const handleInputClick = () => {
+    const newOpenState = !isOpen;
+    setIsOpen(newOpenState);
+    setIsManuallyOpened(newOpenState);
     setSelectedIndex(0);
   };
 
   const handleInputFocus = () => {
-    if (suggestions.length > 0) {
-      setIsOpen(true);
-    }
+    // Don't auto-open on focus, let click handle it
   };
 
   const clearSearch = () => {
     onChange("");
     setIsOpen(false);
+    setIsManuallyOpened(false);
     inputRef.current?.focus();
   };
 
@@ -291,6 +316,7 @@ export function SearchInput({
             value={value}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
+            onClick={handleInputClick}
             placeholder={placeholder}
             className={cn("pr-8", className)}
           />
