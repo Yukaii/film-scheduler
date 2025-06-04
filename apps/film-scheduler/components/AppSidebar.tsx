@@ -18,14 +18,17 @@ import {
   Tooltip,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
+import { SearchInput } from "./SearchInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
 import {
   cn,
 } from "@/lib/utils";
+import {
+  filterFilmsAdvanced,
+} from "@/lib/searchParser";
 import dayjs from "dayjs";
 import {
   ChevronDown,
@@ -175,6 +178,7 @@ export function AppSidebar() {
     defaultFestivalId,
     setFilms,
     setFilmsMap,
+    sections,
     setPreviewFilmId,
     previewFilmId,
     onClickSession,
@@ -215,15 +219,12 @@ export function AppSidebar() {
   };
 
   const filteredFilms = useMemo(() => {
-    return films.filter((f) => {
-      return (
-        f.filmTitle.includes(search) ||
-        f.filmOriginalTitle.includes(search) ||
-        f.directorName.includes(search) ||
-        f.directorOriginalName.includes(search)
-      );
-    });
-  }, [search, films]);
+    if (!search.trim()) {
+      return films;
+    }
+
+    return filterFilmsAdvanced(films, search, sections);
+  }, [search, films, sections]);
 
   const starredFilms = useMemo(() => {
     return films.filter((f) => starredFilmIds.includes(f.id));
@@ -292,22 +293,14 @@ export function AppSidebar() {
         </div>
 
       <SidebarHeader className="p-4 border-b">
-        <div className="relative">
-          <Input
-            placeholder="篩選影片"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-8 shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
-          />
-          {search.length > 0 && (
-            <div
-              onClick={() => setSearch("")}
-              className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            >
-              <X size={14} className="text-muted-foreground" />
-            </div>
-          )}
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="篩選影片 (支援 date:, time:, title:, director:, AND, OR, NOT 等語法)"
+          className="shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
+          films={films}
+          sections={sections}
+        />
       </SidebarHeader>
 
       <SidebarContent>

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Film, Session } from "./types";
 import dayjs from "dayjs";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "./SearchInput";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, generateSessionId } from "@/lib/utils";
+import {
+  filterFilmsAdvanced,
+} from "@/lib/searchParser";
 
 interface FillBlankModalProps {
   open: boolean;
@@ -128,14 +131,7 @@ export function FillBlankModal({
 
     // Apply search filter if provided
     if (searchTerm.trim()) {
-      const lowercaseTerm = searchTerm.toLowerCase();
-      filteredFilms = filteredFilms.filter(
-        (film) =>
-          film.filmTitle.toLowerCase().includes(lowercaseTerm) ||
-          film.filmOriginalTitle.toLowerCase().includes(lowercaseTerm) ||
-          film.directorName.toLowerCase().includes(lowercaseTerm) ||
-          film.directorOriginalName.toLowerCase().includes(lowercaseTerm)
-      );
+      filteredFilms = filterFilmsAdvanced(filteredFilms, searchTerm, sections);
     }
 
     // Apply category filter if provided
@@ -151,7 +147,7 @@ export function FillBlankModal({
       const bDiff = Math.abs(selectedDuration - b.duration);
       return aDiff - bDiff;
     });
-  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory]);
+  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory, sections]);
 
   // Create a session from a film
   const createSession = (film: Film) => {
@@ -292,12 +288,13 @@ export function FillBlankModal({
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="search" className="col-span-1">搜尋</Label>
-            <Input
-              id="search"
+            <SearchInput
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="片名/導演"
+              onChange={setSearchTerm}
+              placeholder="片名/導演 (支援 date:, time:, category:, title:, director: 語法)"
               className="col-span-3"
+              films={films}
+              sections={sections}
             />
           </div>
         </div>

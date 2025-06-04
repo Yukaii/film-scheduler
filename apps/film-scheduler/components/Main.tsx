@@ -26,7 +26,7 @@ import {
   useSessionImport,
   useOnboardingStatus,
 } from "@/lib/hooks";
-import { Festival, fetchFilms } from "@/lib/filmData";
+import { Festival, Section, fetchFilms } from "@/lib/filmData";
 import useSWR from "swr";
 
 const ShareModal = dynamic(() =>
@@ -41,6 +41,7 @@ interface MainProps {
 export default function Main({ festivals, defaultFestivalId }: MainProps) {
   const [films, setFilms] = useState<Film[]>([]);
   const [filmsMap, setFilmsMap] = useState<FilmsMap>(new Map());
+  const [sections, setSections] = useState<Section[]>([]);
   const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
 
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
@@ -231,7 +232,10 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
       setFilms(data.films);
       setFilmsMap(data.filmsMap);
     }
-  }, [data?.films, data?.filmsMap, setFilms, setFilmsMap]);
+    if (data?.sections) {
+      setSections(data.sections);
+    }
+  }, [data?.films, data?.filmsMap, data?.sections, setFilms, setFilmsMap]);
 
   return (
     <div className="flex flex-col w-full">
@@ -240,8 +244,10 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
         value={{
           films,
           filmsMap,
+          sections,
           setFilms,
           setFilmsMap,
+          setSections,
           festivals,
           defaultFestivalId,
           currentFestivalId,

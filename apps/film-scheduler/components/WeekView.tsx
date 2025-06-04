@@ -391,7 +391,7 @@ export function WeekView({
         .minute(minuteOffset)
         .toDate();
     },
-    [dayTranslateOffsetY]
+    []
   );
 
   // Handle mouse down to start selection
