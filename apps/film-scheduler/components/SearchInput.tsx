@@ -14,7 +14,7 @@ interface Section {
 }
 
 interface SearchSuggestion {
-  type: 'syntax' | 'date' | 'time' | 'category' | 'title' | 'director';
+  type: 'syntax' | 'date' | 'time' | 'category' | 'title' | 'director' | 'logical';
   value: string;
   label: string;
   description?: string;
@@ -52,6 +52,9 @@ export function SearchInput({
         { type: 'syntax' as const, value: 'category:', label: 'category:', description: '依類別篩選' },
         { type: 'syntax' as const, value: 'title:', label: 'title:', description: '依片名篩選' },
         { type: 'syntax' as const, value: 'director:', label: 'director:', description: '依導演篩選' },
+        { type: 'logical' as const, value: 'AND', label: 'AND', description: '邏輯 AND 運算' },
+        { type: 'logical' as const, value: 'OR', label: 'OR', description: '邏輯 OR 運算' },
+        { type: 'logical' as const, value: 'NOT', label: 'NOT', description: '邏輯 NOT 運算' },
       ];
     }
 
@@ -146,7 +149,7 @@ export function SearchInput({
           break;
       }
     } else {
-      // Suggest syntax completions
+      // Suggest syntax completions and logical operators
       const syntaxSuggestions = [
         { prefix: 'date:', description: '依日期篩選' },
         { prefix: 'time:', description: '依時間篩選' },
@@ -155,10 +158,28 @@ export function SearchInput({
         { prefix: 'director:', description: '依導演篩選' },
       ];
       
+      const logicalSuggestions = [
+        { prefix: 'AND', description: '邏輯 AND 運算' },
+        { prefix: 'OR', description: '邏輯 OR 運算' },
+        { prefix: 'NOT', description: '邏輯 NOT 運算' },
+      ];
+      
       syntaxSuggestions.forEach(({ prefix, description }) => {
         if (prefix.toLowerCase().includes(lastWord.toLowerCase())) {
           suggestions.push({
             type: 'syntax' as const,
+            value: prefix,
+            label: prefix,
+            description
+          });
+        }
+      });
+      
+      // Add logical operator suggestions if lastWord matches
+      logicalSuggestions.forEach(({ prefix, description }) => {
+        if (prefix.toLowerCase().includes(lastWord.toLowerCase())) {
+          suggestions.push({
+            type: 'logical' as const,
             value: prefix,
             label: prefix,
             description
@@ -180,6 +201,16 @@ export function SearchInput({
       // Replace the last word with the syntax
       words[words.length - 1] = suggestion.value;
       newValue = words.join(' ');
+    } else if (suggestion.type === 'logical') {
+      // For logical operators, replace the last word or append
+      if (lastWord.toLowerCase() === 'a' || lastWord.toLowerCase() === 'an' || 
+          lastWord.toLowerCase() === 'o' || lastWord.toLowerCase() === 'or' ||
+          lastWord.toLowerCase() === 'n' || lastWord.toLowerCase() === 'no' || lastWord.toLowerCase() === 'not') {
+        words[words.length - 1] = suggestion.value;
+        newValue = words.join(' ');
+      } else {
+        newValue = value.trim() + (value.trim() ? ' ' : '') + suggestion.value;
+      }
     } else if (lastWord.includes(':')) {
       // Replace the current filter
       words[words.length - 1] = suggestion.value;
@@ -294,9 +325,14 @@ export function SearchInput({
               )}
             >
               <div className="flex items-center gap-2 flex-1">
-                <Command size={14} className="text-muted-foreground flex-shrink-0" />
+                <Command size={14} className={cn("flex-shrink-0", {
+                  "text-muted-foreground": suggestion.type !== 'logical',
+                  "text-blue-500": suggestion.type === 'logical'
+                })} />
                 <div className="flex-1 min-w-0">
-                  <div className="font-mono text-sm truncate">{suggestion.label}</div>
+                  <div className={cn("font-mono text-sm truncate", {
+                    "text-blue-600 font-semibold": suggestion.type === 'logical'
+                  })}>{suggestion.label}</div>
                   {suggestion.description && (
                     <div className="text-xs text-muted-foreground truncate">{suggestion.description}</div>
                   )}

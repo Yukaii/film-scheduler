@@ -27,12 +27,7 @@ import {
   cn,
 } from "@/lib/utils";
 import {
-  parseSearchQuery,
-  matchesDateFilter,
-  matchesTimeFilter,
-  matchesTitleFilter,
-  matchesDirectorFilter,
-  matchesGeneralSearch,
+  filterFilmsAdvanced,
 } from "@/lib/searchParser";
 import dayjs from "dayjs";
 import {
@@ -228,43 +223,8 @@ export function AppSidebar() {
       return films;
     }
 
-    const searchFilters = parseSearchQuery(search);
-    
-    return films.filter((f) => {
-      // Apply date filter if present
-      if (searchFilters.dateFilter) {
-        const hasMatchingSession = f.schedule.some(session => 
-          matchesDateFilter(session.time, searchFilters.dateFilter!)
-        );
-        if (!hasMatchingSession) return false;
-      }
-
-      // Apply time filter if present
-      if (searchFilters.timeFilter) {
-        const hasMatchingSession = f.schedule.some(session => 
-          matchesTimeFilter(session.time, searchFilters.timeFilter!)
-        );
-        if (!hasMatchingSession) return false;
-      }
-
-      // Apply title filter if present
-      if (searchFilters.title) {
-        if (!matchesTitleFilter(f, searchFilters.title)) return false;
-      }
-
-      // Apply director filter if present
-      if (searchFilters.director) {
-        if (!matchesDirectorFilter(f, searchFilters.director)) return false;
-      }
-
-      // Apply general search if present (legacy search behavior)
-      if (searchFilters.generalSearch) {
-        if (!matchesGeneralSearch(f, searchFilters.generalSearch)) return false;
-      }
-
-      return true;
-    });
-  }, [search, films]);
+    return filterFilmsAdvanced(films, search, sections);
+  }, [search, films, sections]);
 
   const starredFilms = useMemo(() => {
     return films.filter((f) => starredFilmIds.includes(f.id));
@@ -336,7 +296,7 @@ export function AppSidebar() {
         <SearchInput
           value={search}
           onChange={setSearch}
-          placeholder="篩選影片 (支援 date:, time:, title:, director: 等語法)"
+          placeholder="篩選影片 (支援 date:, time:, title:, director:, AND, OR, NOT 等語法)"
           className="shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
           films={films}
           sections={sections}
