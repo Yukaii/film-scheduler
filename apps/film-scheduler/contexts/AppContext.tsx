@@ -1,5 +1,5 @@
 import { Film, FilmsMap, Session } from "@/components/types";
-import { Festival } from "@/lib/filmData";
+import { Festival, Section } from "@/lib/filmData";
 import React, { Dispatch, SetStateAction } from "react";
 
 export type AppContextType = {
@@ -9,8 +9,10 @@ export type AppContextType = {
   setCurrentFestivalId: Dispatch<SetStateAction<string>>;
   films: Film[];
   filmsMap: FilmsMap;
+  sections: Section[];
   setFilms: Dispatch<SetStateAction<Film[]>>;
   setFilmsMap: Dispatch<SetStateAction<FilmsMap>>;
+  setSections: Dispatch<SetStateAction<Section[]>>;
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
@@ -55,8 +57,10 @@ export const AppContext = React.createContext<AppContextType>({
   setCurrentFestivalId: noop,
   films: [],
   filmsMap: new Map(),
+  sections: [],
   setFilms: noop,
   setFilmsMap: noop,
+  setSections: noop,
   selectedSessions: [],
   previewSessions: [],
   previewFilmId: undefined,

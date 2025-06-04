@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Film, Session } from "./types";
 import dayjs from "dayjs";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "./SearchInput";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -334,12 +334,13 @@ export function FillBlankModal({
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="search" className="col-span-1">搜尋</Label>
-            <Input
-              id="search"
+            <SearchInput
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={setSearchTerm}
               placeholder="片名/導演 (支援 date:, time:, category:, title:, director: 語法)"
               className="col-span-3"
+              films={films}
+              sections={sections}
             />
           </div>
         </div>

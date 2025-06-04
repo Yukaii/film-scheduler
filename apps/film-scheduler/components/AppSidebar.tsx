@@ -18,8 +18,8 @@ import {
   Tooltip,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./ModeToggle";
+import { SearchInput } from "./SearchInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
@@ -183,6 +183,7 @@ export function AppSidebar() {
     defaultFestivalId,
     setFilms,
     setFilmsMap,
+    sections,
     setPreviewFilmId,
     previewFilmId,
     onClickSession,
@@ -332,22 +333,14 @@ export function AppSidebar() {
         </div>
 
       <SidebarHeader className="p-4 border-b">
-        <div className="relative">
-          <Input
-            placeholder="篩選影片 (支援 date:, time:, title:, director: 等語法)"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-8 shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
-          />
-          {search.length > 0 && (
-            <div
-              onClick={() => setSearch("")}
-              className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            >
-              <X size={14} className="text-muted-foreground" />
-            </div>
-          )}
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="篩選影片 (支援 date:, time:, title:, director: 等語法)"
+          className="shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
+          films={films}
+          sections={sections}
+        />
       </SidebarHeader>
 
       <SidebarContent>
