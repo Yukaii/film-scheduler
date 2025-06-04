@@ -279,14 +279,16 @@ export function SearchInput({
     const newValue = e.target.value;
     onChange(newValue);
     setSelectedIndex(0);
-    // Keep dropdown open when typing if it was manually opened
-    if (isManuallyOpened) {
+
+    if (newValue.trim().length === 0) {
+      // If input becomes empty (manual delete or from clearSearch), show syntax suggestions.
+      setIsOpen(true);
+      setIsManuallyOpened(true); // Treat as manually opened to show syntax list.
+    } else if (isManuallyOpened) {
+      // If it was manually opened and user is typing, keep it open.
       setIsOpen(true);
     }
-    // Close dropdown if input is cleared and it wasn't manually opened
-    if (newValue.trim().length === 0 && !isManuallyOpened) {
-      setIsOpen(false);
-    }
+    // If not manually opened and there's text, it remains closed (state set by suggestion selection or click outside).
   };
 
   const handleInputClick = () => {
@@ -302,8 +304,9 @@ export function SearchInput({
 
   const clearSearch = () => {
     onChange("");
-    setIsOpen(false);
-    setIsManuallyOpened(false);
+    setIsOpen(true); // Open to show syntax suggestions
+    setIsManuallyOpened(true); // Treat as manually opened
+    setSelectedIndex(0);
     inputRef.current?.focus();
   };
 
