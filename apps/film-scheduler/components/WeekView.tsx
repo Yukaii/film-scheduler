@@ -384,8 +384,11 @@ export function WeekView({
   // Helper function to convert screen position to time
   const positionToTime = useCallback(
     (day: dayjs.Dayjs, posY: number): Date => {
-      const hourOffset = Math.floor(posY / 60);
-      const minuteOffset = Math.round((posY % 60) / 5) * 5; // Round to nearest 5 min
+      // Adjust the position for the current vertical scroll and the fixed
+      // 30px offset at the top of the calendar grid.
+      const adjustedPosY = Math.max(0, posY + dayTranslateOffsetY - 30);
+      const hourOffset = Math.floor(adjustedPosY / 60);
+      const minuteOffset = Math.round((adjustedPosY % 60) / 5) * 5; // Round to nearest 5 min
       return day
         .hour(startHour + hourOffset)
         .minute(minuteOffset)
