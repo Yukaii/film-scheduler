@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from "react";
+import { Check, ChevronDown, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Film, Session } from "./types";
-import dayjs from "dayjs";
+import dayjs from "@/lib/dayjs";
 import { SearchInput } from "./SearchInput";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -20,11 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, generateSessionId } from "@/lib/utils";
-import {
-  filterFilmsAdvanced,
-} from "@/lib/searchParser";
+import { filterFilmsAdvanced } from "@/lib/searchParser";
 
 interface FillBlankModalProps {
   open: boolean;
@@ -38,6 +34,18 @@ interface FillBlankModalProps {
   sections: Array<{ id: string; name: string }>;
   selectedSessions: Session[];
 }
+
+interface Candidate {
+  film: Film;
+  /** The film's sessions on the selected day, by start time. */
+  sessions: Session[];
+  /** Ids of the sessions that fit inside the window (with flexibility). */
+  fitting: Set<string>;
+  /** Start of the first fitting session, or of the first session if none fit. */
+  sortKey: number;
+}
+
+const sessionKey = (s: Session) => s.id || generateSessionId(s);
 
 export function FillBlankModal({
   open,
@@ -53,227 +61,164 @@ export function FillBlankModal({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [flexibilityMinutes, setFlexibilityMinutes] = useState(10);
+  const [showOthers, setShowOthers] = useState(false);
 
-  // Close the modal
-  const onClose = () => setOpen(false);
+  const selectedDuration =
+    startTime && endTime ? dayjs(endTime).diff(dayjs(startTime), "minute") : 0;
 
-  // Calculate the duration between start and end time in minutes
-  const selectedDuration = useMemo(() => {
-    if (!startTime || !endTime) return 0;
-    return dayjs(endTime).diff(dayjs(startTime), "minute");
-  }, [startTime, endTime]);
+  // Films with at least one session on the selected day
+  const filmsOnDay = useMemo(() => {
+    if (!startTime) return [];
+    const day = dayjs(startTime);
+    return films.filter(
+      (film) => film.duration > 0 && film.schedule?.some((s) => dayjs(s.time).isSame(day, "day")),
+    );
+  }, [films, startTime]);
 
-  // Get unique categories with names
   const categories = useMemo(() => {
-    if (!sections || !Array.isArray(sections)) return [];
-    
-    const allCategory = { id: "all", name: "全部類別" };
-    
-    // If there's no valid time window, return all categories
-    if (!startTime || !endTime || selectedDuration <= 0) {
-      const sortedSections = [...sections].sort((a, b) => a.name.localeCompare(b.name));
-      return [allCategory, ...sortedSections];
-    }
-
-    // Get all sections that have films within the time window
-    const validSectionIds = new Set();
-    films.forEach((film) => {
-      if (film.duration > 0 && film.schedule && film.schedule.length > 0) {
-        const selectedStartTime = dayjs(startTime);
-        
-        // Check if film has sessions on the selected day
-        const hasValidSession = film.schedule.some(session => {
-          const sessionStart = dayjs(session.time);
-          return sessionStart.isSame(selectedStartTime, 'day');
-        });
-
-        if (hasValidSession && film.sectionIds) {
-          film.sectionIds.forEach(id => validSectionIds.add(id));
-        }
-      }
-    });
-
-    // Filter and sort sections
-    const validSections = sections
-      .filter(section => validSectionIds.has(section.id))
+    const ids = new Set(filmsOnDay.flatMap((film) => film.sectionIds ?? []));
+    const valid = sections
+      .filter((section) => ids.size === 0 || ids.has(section.id))
       .sort((a, b) => a.name.localeCompare(b.name));
-    
-    return [allCategory, ...validSections];
-  }, [sections, films, startTime, endTime, selectedDuration]);
+    return [{ id: "all", name: "全部類別" }, ...valid];
+  }, [sections, filmsOnDay]);
 
-  // Filter films based on duration, search term, and selected category
-  const suggestedFilms = useMemo(() => {
-    if (!startTime || !endTime || selectedDuration <= 0) return [];
+  // Split films into ones with a session that fits the gap and the rest of the day
+  const { fits, others } = useMemo(() => {
+    if (!startTime || !endTime || selectedDuration <= 0) return { fits: [], others: [] };
 
-    // Get the selected day and time
-    const selectedStartTime = dayjs(startTime);
-    
-    // Filter films based on duration
-    let filteredFilms = films.filter((film) => film.duration > 0);
-    
-    // Filter to only include films that have appropriate sessions on the selected day
-    filteredFilms = filteredFilms.filter(film => {
-      if (!film.schedule || film.schedule.length === 0) return false;
-      
-      // Check if any of the film's sessions are on the selected day AND
-      // could potentially be watched during the selected time window
-      return film.schedule.some(session => {
-        const sessionStart = dayjs(session.time);
-        
-        // Must be on the same day
-        if (!sessionStart.isSame(selectedStartTime, 'day')) return false;
-
-        // Include any session that starts on the selected day
-        // This will show all available sessions for that day
-        return true;
-      });
-    });
-
-    // Apply search filter if provided
-    if (searchTerm.trim()) {
-      filteredFilms = filterFilmsAdvanced(filteredFilms, searchTerm, sections);
-    }
-
-    // Apply category filter if provided
+    let pool = filmsOnDay;
+    if (searchTerm.trim()) pool = filterFilmsAdvanced(pool, searchTerm, sections);
     if (selectedCategory !== "all") {
-      filteredFilms = filteredFilms.filter(
-        (film) => film.sectionIds?.includes(selectedCategory)
-      );
+      pool = pool.filter((film) => film.sectionIds?.includes(selectedCategory));
     }
 
-    // Sort by how close the duration is to the selected time slot
-    return filteredFilms.sort((a, b) => {
-      const aDiff = Math.abs(selectedDuration - a.duration);
-      const bDiff = Math.abs(selectedDuration - b.duration);
-      return aDiff - bDiff;
-    });
-  }, [films, startTime, endTime, selectedDuration, searchTerm, selectedCategory, sections]);
+    const day = dayjs(startTime);
+    const windowStart = dayjs(startTime).subtract(flexibilityMinutes, "minute");
+    const windowEnd = dayjs(endTime).add(flexibilityMinutes, "minute");
 
-  // Create a session from a film
-  const createSession = (film: Film) => {
-    if (!startTime) return null;
-    
-    // Get the selected day
-    const selectedDate = dayjs(startTime).startOf('day');
-    const filmSessions = film.schedule || [];
-    
-    // Find sessions on the same day as the selected time
-    const sessionsOnSameDay = filmSessions.filter(session => 
-      dayjs(session.time).isSame(selectedDate, 'day')
-    );
-    
-    // If there are sessions on the same day, find the closest one to the selected time
-    if (sessionsOnSameDay.length > 0) {
-      let bestSession = sessionsOnSameDay[0];
-      let bestTimeDiff = Infinity;
-      
-      // Find the session closest to our selected time
-      for (const session of sessionsOnSameDay) {
-        const sessionTime = dayjs(session.time);
-        const selectedStartTime = dayjs(startTime);
-        const timeDiff = Math.abs(sessionTime.diff(selectedStartTime, 'minute'));
-        
-        if (timeDiff < bestTimeDiff) {
-          bestTimeDiff = timeDiff;
-          bestSession = session;
-        }
-      }
-      
-      // Use the exact session as is, without modifying its time
+    const candidates: Candidate[] = pool.map((film) => {
+      const sessions = film.schedule
+        .filter((s) => dayjs(s.time).isSame(day, "day"))
+        .sort((a, b) => a.time - b.time);
+      const fittingSessions = sessions.filter((s) => {
+        const start = dayjs(s.time);
+        const end = start.add(film.duration, "minute");
+        return !start.isBefore(windowStart) && !end.isAfter(windowEnd);
+      });
       return {
-        ...bestSession,
-        id: bestSession.id || generateSessionId(bestSession)
+        film,
+        sessions,
+        fitting: new Set(fittingSessions.map(sessionKey)),
+        sortKey: (fittingSessions[0] ?? sessions[0]).time,
       };
-    }
-    
-    // Only if no sessions exist on the selected day, create a custom one
-    const newSession: Omit<Session, "id"> = {
-      filmId: film.id,
-      time: startTime.getTime(),
-      location: "場次未定",
-    };
-    
+    });
+
+    const byTime = (a: Candidate, b: Candidate) => a.sortKey - b.sortKey;
     return {
-      ...newSession,
-      id: generateSessionId(newSession),
+      fits: candidates.filter((c) => c.fitting.size > 0).sort(byTime),
+      others: candidates.filter((c) => c.fitting.size === 0).sort(byTime),
     };
+  }, [
+    filmsOnDay,
+    startTime,
+    endTime,
+    selectedDuration,
+    searchTerm,
+    selectedCategory,
+    flexibilityMinutes,
+    sections,
+  ]);
+
+  const findSelected = (film: Film, session: Session) =>
+    selectedSessions.find((s) => s.filmId === film.id && s.time === session.time);
+
+  const toggleSession = (film: Film, session: Session) => {
+    const selected = findSelected(film, session);
+    if (selected) onRemoveSession(selected);
+    else onAddSession({ ...session, id: sessionKey(session) });
   };
 
-  // Handle adding a session
-  const isSessionSelected = (film: Film) => {
-    const possibleSession = createSession(film);
-    if (!possibleSession) return false;
-    
-    return selectedSessions.some((selectedSession: Session) => 
-      selectedSession.filmId === film.id &&
-      dayjs(selectedSession.time).isSame(dayjs(possibleSession.time))
-    );
-  };
+  const sectionNames = (film: Film) =>
+    film.sectionIds
+      .map((id) => sections.find((s) => s.id === id)?.name)
+      .filter(Boolean)
+      .join("、");
 
-  const handleAddSession = (film: Film) => {
-    const session = createSession(film);
-    if (session) {
-      onAddSession(session);
-    }
-  };
-
-  const handleRemoveSession = (film: Film) => {
-    const session = createSession(film);
-    if (session) {
-      onRemoveSession(session);
-    }
-  };
-
-  const handleSessionAction = (film: Film) => {
-    if (isSessionSelected(film)) {
-      handleRemoveSession(film);
-    } else {
-      handleAddSession(film);
-    }
-  };
+  const renderFilm = ({ film, sessions, fitting }: Candidate) => (
+    <li key={film.id} className="rounded-lg px-3 py-2.5 transition-colors hover:bg-muted/60">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="truncate font-medium">{film.filmTitle}</p>
+        <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+          {film.duration} 分
+        </span>
+      </div>
+      <p className="truncate text-xs text-muted-foreground">
+        {[film.directorName, sectionNames(film)].filter(Boolean).join(" · ")}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {sessions.map((session) => {
+          const start = dayjs(session.time);
+          const selected = Boolean(findSelected(film, session));
+          const fits = fitting.has(sessionKey(session));
+          return (
+            <button
+              key={sessionKey(session)}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => toggleSession(film, session)}
+              title={selected ? "點擊移除此場次" : fits ? "放得進這個空檔" : "在空檔之外"}
+              className={cn(
+                "inline-flex max-w-full items-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors",
+                selected
+                  ? "border-transparent bg-brand text-brand-foreground"
+                  : fits
+                    ? "border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                    : "border-dashed text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {selected ? (
+                <Check className="size-3 shrink-0" strokeWidth={2.5} />
+              ) : (
+                <Plus className="size-3 shrink-0" />
+              )}
+              <span className="font-medium tabular-nums">
+                {start.format("HH:mm")}–{start.add(film.duration, "minute").format("HH:mm")}
+              </span>
+              <span className="truncate opacity-80">{session.location}</span>
+            </button>
+          );
+        })}
+      </div>
+    </li>
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-[500px] max-h-[85vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[85vh] max-w-[540px] flex-col gap-0 p-0">
+        <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle>填滿時段</DialogTitle>
           <DialogDescription>
-            {startTime && endTime ? (
-              <>
-                  針對 {dayjs(startTime).format("MM/DD HH:mm")} - {dayjs(endTime).format("HH:mm")} 
-                的 {selectedDuration} 分鐘時段，建議可觀看的影片
-              </>
-            ) : (
-              "請選擇時段"
-            )}
+            {startTime && endTime
+              ? `${dayjs(startTime).format("MM/DD HH:mm")} – ${dayjs(endTime).format("HH:mm")} · ${selectedDuration} 分鐘空檔`
+              : "請選擇時段"}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="flexibility" className="col-span-1">
-              彈性時間
-            </Label>
-            <div className="flex items-center gap-4 col-span-3">
-              <Slider
-                id="flexibility"
-                defaultValue={[flexibilityMinutes]}
-                max={60}
-                step={5}
-                className="flex-1"
-                onValueChange={([value]) => setFlexibilityMinutes(value)}
-              />
-              <span className="w-12 text-right">+{flexibilityMinutes}分</span>
-            </div>
+        <div className="space-y-3 px-6 pb-4">
+          <div className="w-full">
+            <SearchInput
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="搜尋片名、導演或 category: 語法"
+              className="w-full"
+              films={films}
+              sections={sections}
+            />
           </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="category" className="col-span-1">類別</Label>
-            <Select 
-              value={selectedCategory} 
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger id="category" className="col-span-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-center">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger aria-label="類別">
                 <SelectValue placeholder="全部類別" />
               </SelectTrigger>
               <SelectContent>
@@ -284,91 +229,54 @@ export function FillBlankModal({
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="search" className="col-span-1">搜尋</Label>
-            <SearchInput
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="片名/導演 (支援 date:, time:, category:, title:, director: 語法)"
-              className="col-span-3"
-              films={films}
-              sections={sections}
-            />
+            <div className="flex items-center gap-3">
+              <Label htmlFor="flexibility" className="shrink-0 text-xs text-muted-foreground">
+                前後彈性
+              </Label>
+              <Slider
+                id="flexibility"
+                value={[flexibilityMinutes]}
+                max={60}
+                step={5}
+                className="flex-1"
+                onValueChange={([value]) => setFlexibilityMinutes(value)}
+              />
+              <span className="w-10 shrink-0 text-right text-xs tabular-nums">
+                ±{flexibilityMinutes}分
+              </span>
+            </div>
           </div>
         </div>
 
-        <ScrollArea className="flex-1 h-[340px] border rounded-md p-2 overflow-y-auto">
-          {suggestedFilms.length > 0 ? (
-            <div className="space-y-2">
-              {suggestedFilms.map((film) => {
-                // Get all sessions for this film on the selected day
-                const sessionsOnDay = film.schedule?.filter(s => 
-                  dayjs(s.time).isSame(dayjs(startTime), 'day')
-                ).sort((a, b) => dayjs(a.time).diff(dayjs(b.time))) || [];
-                
-                return (
-                  <div
-                    key={film.id}
-                    className="p-3 hover:bg-muted rounded-md flex justify-between"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{film.filmTitle}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {film.directorName} | {film.duration} 分鐘 | {film.sectionIds.map(id => sections.find(s => s.id === id)?.name).filter(Boolean).join(', ')}
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {sessionsOnDay.map((session) => {
-                          const sessionStart = dayjs(session.time);
-                          const sessionEnd = sessionStart.add(film.duration, 'minute');
-
-                          const isOverlapping = (
-                            sessionStart.isBefore(dayjs(endTime)) && 
-                            sessionEnd.isAfter(dayjs(startTime))
-                          );
-                          
-                          return (
-                            <div 
-                              key={session.id} 
-                              className={cn(
-                                "text-xs px-2 py-1 rounded-full",
-                                "border border-border",
-                                isOverlapping ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                              )}
-                              title={isOverlapping ? "此場次與選取時段重疊" : "此場次在選取時段外"}
-                            >
-                              {dayjs(session.time).format("HH:mm")} @ {session.location}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="ml-4 flex items-start">
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleSessionAction(film)}
-                        variant={isSessionSelected(film) ? "destructive" : "default"}
-                      >
-                        {isSessionSelected(film) ? "移除" : "加入"}
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <div className="min-h-0 flex-1 overflow-y-auto border-t px-3 pb-4">
+          <h3 className="sticky top-0 z-10 bg-background px-3 pt-4 pb-2 text-xs font-medium text-muted-foreground">
+            放得進這個空檔 <span className="tabular-nums">{fits.length}</span>
+          </h3>
+          {fits.length > 0 ? (
+            <ul className="space-y-0.5">{fits.map(renderFilm)}</ul>
           ) : (
-            <div className="py-8 text-center text-muted-foreground">
-              沒有找到符合條件的影片
-            </div>
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              沒有場次放得進這個空檔，試試加大前後彈性
+            </p>
           )}
-        </ScrollArea>
 
-        <DialogFooter className="pt-4">
-          <Button variant="outline" onClick={onClose}>
-            完成
-          </Button>
-        </DialogFooter>
+          {others.length > 0 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowOthers((v) => !v)}
+                aria-expanded={showOthers}
+                className="mt-3 flex w-full items-center gap-1 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <ChevronDown
+                  className={cn("size-3.5 transition-transform", !showOthers && "-rotate-90")}
+                />
+                當天其他場次 <span className="tabular-nums">{others.length}</span>
+              </button>
+              {showOthers && <ul className="space-y-0.5 opacity-90">{others.map(renderFilm)}</ul>}
+            </>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
