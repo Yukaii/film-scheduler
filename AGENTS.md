@@ -58,7 +58,7 @@ pnpm install
 pnpm dev          # Next dev server on http://localhost:4000
 pnpm build        # builds the web app only (what Vercel runs)
 pnpm build:all    # also builds the scraper packages
-pnpm lint         # ESLint
+pnpm lint         # oxlint (warnings fail)
 pnpm typecheck    # tsc --noEmit for the app
 ```
 
@@ -70,9 +70,9 @@ and for UI changes run `pnpm dev` and check in a browser (both light and dark th
 `pnpm typecheck` runs `next typegen` first, which generates the global `RouteContext<'/route'>`
 and `PageProps` types used in route handlers.
 
-Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat config
-(`eslint.config.mjs`), Tailwind CSS 4 with shadcn/ui, react-day-picker 10. Next 15+ rules apply: route `params` and
-`searchParams` are Promises and must be `await`ed. `next build` no longer runs ESLint.
+Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, oxlint
+(`apps/film-scheduler/.oxlintrc.json`), Tailwind CSS 4 with shadcn/ui, react-day-picker 10. Next 15+ rules apply: route `params` and
+`searchParams` are Promises and must be `await`ed. `next build` does not lint.
 
 ## Code conventions (app)
 
@@ -87,7 +87,7 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat
   `tw-animate-css`. Use v4 class names (`shadow-xs`, `rounded-sm`, `outline-hidden`) and v4
   variant order, which applies left to right (`hover:group-data-[x]/name:`). Merge classes with
   `cn()` from `@/lib/utils`.
-- React Compiler lint rules (`react-hooks/set-state-in-effect`, `purity`, `immutability`) are
+- React Compiler lint rules (oxlint `react/set-state-in-effect`, `purity`, `immutability`, `refs`) are
   errors. Derive values during render. Read browser APIs (matchMedia, localStorage, navigator)
   with `useSyncExternalStore`. Use the "adjust state during render" pattern instead of syncing
   state in effects.
@@ -112,8 +112,10 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat
 - `.env.local` (`FALLBACK_COMMIT`) is local-only and must never be committed.
 - CI (`.github/workflows/build.yml`) runs install → lint → app build (includes type check) →
   scraper package builds on Node 22, caching both the pnpm store and `.next/cache`.
-- ESLint stays on v9 until `eslint-plugin-react` and `eslint-plugin-import`, both pulled in by
-  `eslint-config-next`, support ESLint 10.
+- Linting is oxlint only; there is no ESLint. `.oxlintrc.json` is JSONC and was migrated from
+  `eslint-config-next` (core-web-vitals + typescript), with oxlint's `correctness` category on.
+  Several jsx-a11y rules are switched off there as an accessibility backlog. Re-enable them as you
+  fix components. Suppress a rule with `// oxlint-disable-next-line <rule>`.
 - `components/ui/calendar.tsx` styles day state through `data-*` attributes on the `<td>`
   (`group/day`). react-day-picker puts modifier attributes on the cell, not on the button.
 - pnpm 11 only runs dependency install scripts listed under `allowBuilds` in

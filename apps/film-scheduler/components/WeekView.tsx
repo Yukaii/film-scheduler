@@ -226,7 +226,7 @@ export function WeekView({
       // The scrollToTime function now handles cases where the day is outside the virtual window
       scrollToTime(viewWeekStart, false, "left");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [viewWeekStart, dayWidth]);
 
   // Event listener for virtual scrolling to a specific session

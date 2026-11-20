@@ -132,7 +132,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
   };
 
   // Handle week view navigation
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => new Date());
   const onClickSession = (session: Session) => {
     const sessionDate = dayjs(session.time);
 
