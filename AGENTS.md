@@ -128,6 +128,11 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, oxlint
   header (`CalendarView`) and the film detail panel header (`FilmSidebar`). Their bottom borders
   form one line, and `WeekView` sizes itself as `calc(100dvh - 4rem)`. Change all four together.
   Brand identity lives in `components/BrandMark.tsx`.
+- Desktop panel widths are user-resizable (`components/ResizeHandle.tsx`) and persisted in
+  localStorage. Sizes live in `lib/panelSizes.ts`. `Main` exposes them as `--sidebar-width` and
+  `--film-panel-width`, so style panels with those variables, not fixed `w-*` classes. Below `md`
+  the film panel is a draggable bottom sheet. Below `sm` the week view shows 3 days
+  (`hooks/useVisibleDays.ts`) and handles touch pans itself.
 - `components/ui/calendar.tsx` styles day state through `data-*` attributes on the `<td>`
   (`group/day`). react-day-picker puts modifier attributes on the cell, not on the button.
 - pnpm 11 only runs dependency install scripts listed under `allowBuilds` in

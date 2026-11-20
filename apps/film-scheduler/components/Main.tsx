@@ -28,6 +28,8 @@ import {
   useOnboardingStatus,
 } from "@/lib/hooks";
 import { Festival, Section, fetchFilms } from "@/lib/filmData";
+import { usePanelWidth } from "@/hooks/usePanelWidth";
+import { FILM_PANEL_SIZE, SIDEBAR_SIZE, panelWidthCss } from "@/lib/panelSizes";
 import useSWR from "swr";
 
 const ShareModal = dynamic(() =>
@@ -236,8 +238,16 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
     }
   };
 
+  // Desktop panel widths; the drag handles in AppSidebar/FilmSidebar write the same store
+  const [sidebarWidth] = usePanelWidth(SIDEBAR_SIZE.storageKey, SIDEBAR_SIZE.defaultWidth);
+  const [filmPanelWidth] = usePanelWidth(FILM_PANEL_SIZE.storageKey, FILM_PANEL_SIZE.defaultWidth);
+  const filmPanelOpen = panelOpen && !!viewingFilmId;
+
   return (
-    <div className="flex flex-col w-full">
+    <div
+      className="flex flex-col w-full"
+      style={{ "--film-panel-width": panelWidthCss(filmPanelWidth) } as React.CSSProperties}
+    >
 
       <AppContext.Provider
         value={{
@@ -289,19 +299,18 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           setTimeSelection,
         }}
       >
-        <SidebarProvider>
+        <SidebarProvider
+          style={{ "--sidebar-width": panelWidthCss(sidebarWidth) } as React.CSSProperties}
+        >
           <AppSidebar />
           <main className="overflow-hidden w-full">
-            <CalendarView
-              className={cn({
-                "md:pr-64": panelOpen && !!viewingFilmId,
-              })}
-            />
+            {/* Desktop reserves room for the film panel; on mobile it is a bottom sheet over the calendar */}
+            <CalendarView className={cn({ "md:pr-(--film-panel-width)": filmPanelOpen })} />
           </main>
         </SidebarProvider>
 
         <FilmSidebar
-          open={panelOpen && !!viewingFilmId}
+          open={filmPanelOpen}
           setOpen={(open: boolean) => setPanelOpen(open)}
         />
 

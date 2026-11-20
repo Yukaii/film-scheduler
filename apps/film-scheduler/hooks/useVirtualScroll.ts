@@ -9,6 +9,7 @@ interface UseVirtualScrollParams {
   weekviewRect: DOMRect | null;
   startHour: number;
   maxScrollY?: number; // Add maxScrollY as an optional parameter
+  visibleDays: number; // Day columns on screen; "center" alignment centers within them
   setDayTranslateOffsetX: (value: number) => void;
   setDayTranslateOffsetY: (value: number) => void;
   setVirtualWindowStart: (value: dayjs.Dayjs) => void;
@@ -21,6 +22,7 @@ export function useVirtualScroll({
   weekviewRect,
   startHour,
   maxScrollY,
+  visibleDays,
   setDayTranslateOffsetX,
   setDayTranslateOffsetY,
   setVirtualWindowStart,
@@ -106,7 +108,7 @@ export function useVirtualScroll({
         break;
       case "center":
       default:
-        newHorizontalOffset = (targetDayIndex - 3) * dayWidth; // Center with days before
+        newHorizontalOffset = (targetDayIndex - Math.floor(visibleDays / 2)) * dayWidth; // Center with days before
         break;
     }
     
@@ -135,6 +137,7 @@ export function useVirtualScroll({
     ensureDateIsVisible,
     dayWidth,
     maxScrollY,
+    visibleDays,
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
   ]);

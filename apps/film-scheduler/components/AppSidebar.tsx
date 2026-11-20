@@ -32,6 +32,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "./ui/button";
+import { ResizeHandle } from "./ResizeHandle";
+import { usePanelWidth } from "@/hooks/usePanelWidth";
+import { SIDEBAR_SIZE } from "@/lib/panelSizes";
 
 function FilmListItem({
   film,
@@ -233,7 +236,11 @@ function IconAction({
 }
 
 export function AppSidebar() {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const [sidebarWidth, setSidebarWidth] = usePanelWidth(
+    SIDEBAR_SIZE.storageKey,
+    SIDEBAR_SIZE.defaultWidth,
+  );
   const {
     films,
     festivals,
@@ -265,9 +272,12 @@ export function AppSidebar() {
       revealFilmDetail(undefined);
     } else {
       setPreviewFilmId(film.id);
+      revealFilmDetail(film);
 
-      if (!isMobile) {
-        revealFilmDetail(film);
+      // On mobile the sidebar is a sheet covering the calendar. Close it so the
+      // previewed sessions and the film's bottom sheet are visible.
+      if (isMobile) {
+        setOpenMobile(false);
       }
     }
   };
@@ -334,6 +344,17 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
+      {!isMobile && (
+        <ResizeHandle
+          edge="right"
+          label="調整側欄寬度"
+          width={sidebarWidth}
+          minWidth={SIDEBAR_SIZE.minWidth}
+          maxWidth={SIDEBAR_SIZE.maxWidth}
+          onResize={setSidebarWidth}
+          onReset={() => setSidebarWidth(null)}
+        />
+      )}
       <SidebarHeader className="gap-0 p-0">
         {/* Brand row: same height as the calendar header so the borders line up */}
         <div className="flex h-16 shrink-0 items-center border-b px-4">

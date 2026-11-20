@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/popover";
 import { WeekView } from "./WeekView";
 import { DayView } from "./DayView";
-import { FilmBottomPanel } from "./FilmBottomPanel";
 import { Dayjs } from "dayjs";
+import { useVisibleDays, WIDE_VISIBLE_DAYS } from "@/hooks/useVisibleDays";
 
 type ViewMode = "week" | "day";
 
@@ -24,29 +24,45 @@ export function CalendarView(props: { className?: string }) {
   const { currentDate, previewSessions, selectedSessions, setCurrentDate, revealFilmDetail, filmsMap, isLoadingFilms } =
     useAppContext();
 
-  // Add state to track the current view week from infinite scroll
+  // 7 columns on wide screens, 3 on phones. With 7 the view starts on the week's
+  // first day; with 3 it starts on the chosen day itself so that day is in view.
+  const visibleDays = useVisibleDays();
+  const anchorDay = (date: Date | Dayjs) =>
+    visibleDays === WIDE_VISIBLE_DAYS ? dayjs(date).startOf("week") : dayjs(date).startOf("day");
+
+  // First visible day of the multi-day view (named for the 7-day case)
   const [viewWeekStart, setViewWeekStart] = useState(() =>
     dayjs(currentDate).startOf("week")
   );
   const [highlightDate, setHighlightDate] = useState(currentDate);
   const [viewMode, setViewMode] = useState<ViewMode>("week");
-  const [dayViewFilmPanelOpen, setDayViewFilmPanelOpen] = useState(false);
 
-  // Handle film detail viewing in day view
+  // The column count is only known after hydration (and changes on rotate/resize).
+  // Re-anchor then: the current date if it is in the shown range, else the first shown day.
+  const [prevVisibleDays, setPrevVisibleDays] = useState(visibleDays);
+  if (visibleDays !== prevVisibleDays) {
+    setPrevVisibleDays(visibleDays);
+    const current = dayjs(currentDate);
+    const inView =
+      !current.isBefore(viewWeekStart, "day") &&
+      current.isBefore(viewWeekStart.add(prevVisibleDays, "day"), "day");
+    setViewWeekStart(anchorDay(inView ? current : viewWeekStart));
+  }
+
+  // Day view opens the same film panel as the week view
   const handleDayViewFilmDetail = (filmId: string) => {
     const film = filmsMap.get(filmId);
     if (film) {
       revealFilmDetail(film);
-      setDayViewFilmPanelOpen(true);
     }
   };
 
-  // Update navigate to handle both week and day navigation
+  // Week mode pages by the number of visible columns; day mode by one day
   const navigate = (direction: "previous" | "next") => {
     if (viewMode === "week") {
       const newWeekStart = direction === "next"
-        ? viewWeekStart.add(1, "week")
-        : viewWeekStart.subtract(1, "week");
+        ? viewWeekStart.add(visibleDays, "day")
+        : viewWeekStart.subtract(visibleDays, "day");
 
       setViewWeekStart(newWeekStart);
       setCurrentDate(newWeekStart.toDate());
@@ -57,7 +73,7 @@ export function CalendarView(props: { className?: string }) {
         : dayjs(currentDate).subtract(1, "day");
 
       setCurrentDate(newDate.toDate());
-      setViewWeekStart(newDate.startOf("week"));
+      setViewWeekStart(anchorDay(newDate));
     }
   };
 
@@ -65,10 +81,9 @@ export function CalendarView(props: { className?: string }) {
 
   const goToToday = () => {
     const today = new Date();
-    const todayWeekStart = dayjs(today).startOf("week");
 
     setCurrentDate(today);
-    setViewWeekStart(todayWeekStart);
+    setViewWeekStart(anchorDay(today));
     scrollNowIndicatorIntoView();
   };
 
@@ -117,8 +132,7 @@ export function CalendarView(props: { className?: string }) {
                   selected={currentDate}
                   onSelect={(date) => {
                     if (date) {
-                      const newWeekStart = dayjs(date).startOf("week");
-                      setViewWeekStart(newWeekStart);
+                      setViewWeekStart(anchorDay(date));
                       setCurrentDate(date);
                       setHighlightDate(date);
                     }
@@ -141,7 +155,7 @@ export function CalendarView(props: { className?: string }) {
 
           <div role="radiogroup" aria-label="檢視模式" className="inline-flex rounded-lg bg-muted p-0.5">
             {([
-              ["week", "週"],
+              ["week", visibleDays === WIDE_VISIBLE_DAYS ? "週" : `${visibleDays} 日`],
               ["day", "日"],
             ] as const).map(([mode, label]) => (
               <button
@@ -151,7 +165,7 @@ export function CalendarView(props: { className?: string }) {
                 aria-checked={viewMode === mode}
                 onClick={() => setViewMode(mode)}
                 className={cn(
-                  "h-7 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+                  "h-7 rounded-md px-2.5 text-sm whitespace-nowrap sm:px-3 font-medium text-muted-foreground transition-colors hover:text-foreground",
                   viewMode === mode && "bg-background text-foreground shadow-xs",
                 )}
               >
@@ -169,9 +183,10 @@ export function CalendarView(props: { className?: string }) {
       </header>
 
       {/* Conditional rendering based on view mode */}
-      <div className={cn({ "pb-[280px]": viewMode === "day" && dayViewFilmPanelOpen })}>
+      <div>
         {viewMode === "week" ? (
           <WeekView
+            visibleDays={visibleDays}
             viewWeekStart={viewWeekStart}
             highlightDate={highlightDate}
             onWeekStartChange={(d: Dayjs) => {
@@ -189,14 +204,6 @@ export function CalendarView(props: { className?: string }) {
           />
         )}
       </div>
-
-      {/* Film bottom panel for day view */}
-      {viewMode === "day" && (
-        <FilmBottomPanel
-          open={dayViewFilmPanelOpen}
-          setOpen={setDayViewFilmPanelOpen}
-        />
-      )}
     </div>
   );
 }

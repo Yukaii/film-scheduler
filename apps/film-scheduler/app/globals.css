@@ -143,6 +143,16 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Set by ResizeHandle while a panel is dragged: panels follow the pointer
+     without easing, and the drag doesn't select text */
+  :root[data-resizing] {
+    cursor: col-resize;
+    user-select: none;
+  }
+  :root[data-resizing] * {
+    transition: none !important;
+    cursor: col-resize !important;
+  }
 }
 
 .session-highlight-effect {

@@ -2,6 +2,7 @@ import React, {
   useMemo,
   useState,
   useEffect,
+  useEffectEvent,
   useRef,
   useCallback,
 } from "react";
@@ -41,7 +42,15 @@ const DAY_HEADER_HEIGHT = 40;
 
 const TIME_COLUMN_WIDTH = 80; // Width of the time column in pixels
 
+// Touch: movement before a pan locks to one axis, flick projection, vertical momentum
+const TOUCH_AXIS_LOCK_DISTANCE = 6;
+const FLICK_PROJECTION_MS = 200;
+const MOMENTUM_FRICTION = 0.95; // velocity kept per 16ms frame
+const MOMENTUM_MIN_VELOCITY = 0.02; // px/ms
+
 export interface WeekViewProps {
+  /** Number of day columns that fit on screen (7, or 3 on phones) */
+  visibleDays: number;
   viewWeekStart: dayjs.Dayjs;
   selectedSessions: Session[];
   previewSessions: Session[];
@@ -76,6 +85,7 @@ function useNowIndicator() {
 }
 
 export function WeekView({
+  visibleDays,
   viewWeekStart,
   selectedSessions,
   previewSessions,
@@ -126,11 +136,11 @@ export function WeekView({
   const sessions = joinSessions(selectedSessions, previewSessions);
 
   // Initial virtual window settings
-  const [virtualWindowSize, setVirtualWindowSize] = useState(
+  const [virtualWindowSize, setVirtualWindowSize, virtualWindowSizeRef] = useStateRef(
     INITIAL_VIRTUAL_WINDOW_SIZE
   );
-  const [virtualWindowStart, setVirtualWindowStart] = useState(
-    viewWeekStart.subtract(virtualWindowSize / 2, "day")
+  const [virtualWindowStart, setVirtualWindowStart, virtualWindowStartRef] = useStateRef(
+    viewWeekStart.subtract(INITIAL_VIRTUAL_WINDOW_SIZE / 2, "day")
   );
 
   // Initialize dayTranslateOffset based on today's date
@@ -164,9 +174,9 @@ export function WeekView({
   const weekviewRect = useBoundingClientRect(weekViewRef);
   const weekviewWidth = useMemo(() => weekviewRect?.width || 0, [weekviewRect]);
   const dayWidth = useMemo(
-    // days * days width + time column
-    () => (weekviewWidth - timeColumnWidth) / 7,
-    [weekviewWidth, timeColumnWidth]
+    // visible days share the width left of the time column
+    () => (weekviewWidth - timeColumnWidth) / visibleDays,
+    [weekviewWidth, timeColumnWidth, visibleDays]
   );
 
   // Add a new state for vertical scrolling
@@ -183,6 +193,7 @@ export function WeekView({
     weekviewRect,
     startHour,
     maxScrollY,
+    visibleDays,
     setDayTranslateOffsetX,
     setDayTranslateOffsetY,
     setVirtualWindowStart,
@@ -190,13 +201,13 @@ export function WeekView({
 
   const visibleDaysRange = useMemo(() => {
     const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
-    return `${startIndex} to ${startIndex + 7}`;
-  }, [dayTranslateOffsetX, dayWidth]);
+    return `${startIndex} to ${startIndex + visibleDays}`;
+  }, [dayTranslateOffsetX, dayWidth, visibleDays]);
 
   const [visibleStartDay, visibleEndDay] = useMemo(() => {
     if (weekDays.length === 0) return [null, null];
     const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
-    const endIndex = Math.min(startIndex + 7, weekDays.length);
+    const endIndex = Math.min(startIndex + visibleDays, weekDays.length);
 
     if (startIndex >= weekDays.length || endIndex <= 0) {
       console.warn("Invalid day range");
@@ -207,7 +218,7 @@ export function WeekView({
     const visibleEndDay = weekDays[Math.min(endIndex - 1, weekDays.length - 1)];
 
     return [visibleStartDay, visibleEndDay] as const;
-  }, [dayTranslateOffsetX, dayWidth, weekDays]);
+  }, [dayTranslateOffsetX, dayWidth, weekDays, visibleDays]);
 
   const actualDaysRange = useMemo(() => {
     if (!visibleStartDay || !visibleEndDay) return "";
@@ -216,20 +227,27 @@ export function WeekView({
     )}`;
   }, [visibleStartDay, visibleEndDay]);
 
-  // Visible day tracking ref for dayWidth changes
-  const visibleStartDayRef = useRef<dayjs.Dayjs | null>(null);
+  // Scroll to viewWeekStart once the grid has a width, and whenever it changes
+  const hasLayout = dayWidth > 0;
   useEffect(() => {
-    visibleStartDayRef.current = visibleStartDay;
-  }, [visibleStartDay]);
-
-  // Only run this effect when the component mounts or when viewWeekStart changes
-  useEffect(() => {
-    if (dayWidth > 0 && weekDays.length > 0) {
+    if (hasLayout && weekDays.length > 0) {
       // The scrollToTime function now handles cases where the day is outside the virtual window
       scrollToTime(viewWeekStart, false, "left");
     }
   // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewWeekStart, dayWidth]);
+  }, [viewWeekStart, hasLayout]);
+
+  // When columns change width (window resize, a panel opening or being dragged),
+  // keep the same first visible day rather than jumping back to viewWeekStart,
+  // which would undo a jump to a session.
+  const prevDayWidthRef = useRef(dayWidth);
+  useEffect(() => {
+    const prevDayWidth = prevDayWidthRef.current;
+    prevDayWidthRef.current = dayWidth;
+    if (prevDayWidth > 0 && dayWidth > 0 && prevDayWidth !== dayWidth) {
+      setDayTranslateOffsetX(Math.round(dayTranslateOffsetXRef.current / prevDayWidth) * dayWidth);
+    }
+  }, [dayWidth, setDayTranslateOffsetX, dayTranslateOffsetXRef]);
 
   // Event listener for virtual scrolling to a specific session
   useEffect(() => {
@@ -245,8 +263,9 @@ export function WeekView({
         return;
       }
       
-      // scrollToSession now handles cases where the session's day is outside the virtual window
-      scrollToSession(targetSession);
+      // scrollToSession now handles cases where the session's day is outside the virtual window.
+      // Afterwards, tell CalendarView which days are showing so its header follows.
+      scrollToSession(targetSession).then(() => reportFirstVisibleDay());
     };
 
     // Event listener for scrolling to the current time indicator
@@ -277,152 +296,237 @@ export function WeekView({
     };
   }, [sessions, scrollToSession, scrollToNow]);
 
-  // Handle scroll/wheel event with infinite scroll logic
-  useEffect(() => {
-    const weekViewElement = weekViewRef.current;
+  // Move the view by a scroll delta (wheel or touch), growing the virtual window
+  // of days when an edge comes near and trimming it so it stays small.
+  // Reads the *Ref values so several deltas within one frame accumulate.
+  const scrollByDelta = useEffectEvent((deltaX: number, deltaY: number) => {
+    if (deltaX !== 0 && dayWidth > 0) {
+      const windowStart = virtualWindowStartRef.current;
+      const windowSize = virtualWindowSizeRef.current;
+      const newOffset = dayTranslateOffsetXRef.current + deltaX;
+      setDayTranslateOffsetX(newOffset);
 
-    const handleScroll = (e: WheelEvent) => {
-      // Clear any existing timeout to identify when scrolling stops
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
+      // Calculate visible range in the virtual window
+      const daysFromStart = Math.floor(newOffset / dayWidth);
+      const daysFromEnd = windowSize - (daysFromStart + visibleDays);
 
-      // Set scrolling state to true
-      if (!isScrolling) {
-        setIsScrolling(true);
-        setUseTransition(false);
-      }
+      let newStart = windowStart;
+      let offsetAdjustment = 0;
+      let sizeAdjustment = 0;
+      const daysToAdd = 7; // Extend a week at a time
 
-      // Handle horizontal scroll
-      if (e.deltaX !== 0) {
-        const scrollOffset = e.deltaX;
+      if (daysFromStart < extendThreshold) {
+        // Approaching the start: prepend days
+        newStart = windowStart.subtract(daysToAdd, "day");
+        offsetAdjustment = daysToAdd * dayWidth;
+        sizeAdjustment = daysToAdd;
 
-        // Calculate new offset
-        const newOffset = dayTranslateOffsetXRef.current + scrollOffset;
-        setDayTranslateOffsetX(newOffset);
-
-        // Calculate visible range in the virtual window
-        const daysScrolledFromStart = Math.floor(newOffset / dayWidth);
-        const visibleDaysEndIndex = daysScrolledFromStart + 7; // 7 visible days
-
-        // Check if we're approaching start or end of virtual window
-        const daysFromStart = daysScrolledFromStart;
-        const daysFromEnd = virtualWindowSize - visibleDaysEndIndex;
-
-        // Extend in either direction if needed
-        let newStart = virtualWindowStart;
-        let offsetAdjustment = 0;
-        let sizeAdjustment = 0;
-
-        // If approaching start, prepend days
-        if (daysFromStart < extendThreshold) {
-          const daysToAdd = 7; // Add a week at a time
-          newStart = virtualWindowStart.subtract(daysToAdd, "day");
-          offsetAdjustment = daysToAdd * dayWidth;
-          sizeAdjustment = daysToAdd;
-
-          // Trim from end if window gets too large
-          if (virtualWindowSize + daysToAdd > 30) {
-            const daysToTrim = Math.min(
-              daysToAdd,
-              virtualWindowSize - (7 + trimThreshold)
-            );
-            sizeAdjustment = daysToAdd - daysToTrim;
-          }
+        // Trim from the end if the window gets too large
+        if (windowSize + daysToAdd > 30) {
+          const daysToTrim = Math.min(daysToAdd, windowSize - (visibleDays + trimThreshold));
+          sizeAdjustment = daysToAdd - daysToTrim;
         }
-        // If approaching end, append days
-        else if (daysFromEnd < extendThreshold) {
-          const daysToAdd = 7; // Add a week at a time
-          sizeAdjustment = daysToAdd;
+      } else if (daysFromEnd < extendThreshold) {
+        // Approaching the end: append days
+        sizeAdjustment = daysToAdd;
 
-          // Trim from start if window gets too large
-          if (virtualWindowSize + daysToAdd > 30) {
-            const daysToTrim = Math.min(
-              daysToAdd,
-              virtualWindowSize - (7 + trimThreshold)
-            );
-            newStart = virtualWindowStart.add(daysToTrim, "day");
-            // When trimming from start AND scrolling toward the end, we need to adjust the offset
-            // to maintain the visual position of what the user is currently viewing
-            offsetAdjustment = -daysToTrim * dayWidth;
-            sizeAdjustment = daysToAdd - daysToTrim;
-          }
-        }
-
-        // Apply changes if needed
-        if (offsetAdjustment !== 0 || sizeAdjustment !== 0) {
-          // Update in a single batch to prevent visual jank
-          const updatedVirtualWindowSize = virtualWindowSize + sizeAdjustment;
-          const updatedOffset =
-            dayTranslateOffsetXRef.current + offsetAdjustment;
-
-          setVirtualWindowStart(newStart);
-          setVirtualWindowSize(updatedVirtualWindowSize);
-          setDayTranslateOffsetX(updatedOffset);
+        // Trim from the start if the window gets too large, shifting the offset
+        // so what the user is looking at stays put
+        if (windowSize + daysToAdd > 30) {
+          const daysToTrim = Math.min(daysToAdd, windowSize - (visibleDays + trimThreshold));
+          newStart = windowStart.add(daysToTrim, "day");
+          offsetAdjustment = -daysToTrim * dayWidth;
+          sizeAdjustment = daysToAdd - daysToTrim;
         }
       }
 
-      // Handle vertical scroll
-      if (e.deltaY !== 0) {
-        // Update vertical offset
-        const newOffsetY = dayTranslateOffsetYRef.current + e.deltaY;
-
-        // Limit the vertical scroll to stay within reasonable bounds
-        // Height of the full calendar content is hoursInDay * 60 pixels
-        const limitedOffsetY = Math.max(0, Math.min(newOffsetY, maxScrollY));
-
-        setDayTranslateOffsetY(limitedOffsetY);
+      if (offsetAdjustment !== 0 || sizeAdjustment !== 0) {
+        setVirtualWindowStart(newStart);
+        setVirtualWindowSize(windowSize + sizeAdjustment);
+        setDayTranslateOffsetX(dayTranslateOffsetXRef.current + offsetAdjustment);
       }
-
-      // Start a timeout to detect when scrolling stops
-      scrollTimeoutRef.current = setTimeout(() => {
-        // Scrolling has stopped, apply magnetic snapping
-        if (isScrolling) {
-          // Calculate nearest day snap point
-          const currentDayOffset = dayTranslateOffsetXRef.current / dayWidth;
-          const nearestDay = Math.round(currentDayOffset);
-
-          // Apply the transition effect when snapping
-          setUseTransition(true);
-
-          // Set the new offset with magnetic snapping
-          setDayTranslateOffsetX(nearestDay * dayWidth);
-
-          // Reset scrolling state
-          setIsScrolling(false);
-          
-          // Calculate which week is now visible and notify parent component
-          onWeekStartChange(visibleStartDayRef.current!);
-        }
-      }, 50); // 50ms delay to detect end of scroll
-
-      e.preventDefault();
-    };
-
-    if (weekViewElement) {
-      weekViewElement.addEventListener("wheel", handleScroll);
     }
+
+    if (deltaY !== 0) {
+      // Keep the vertical offset within the hours of the day
+      const newOffsetY = dayTranslateOffsetYRef.current + deltaY;
+      setDayTranslateOffsetY(Math.max(0, Math.min(newOffsetY, maxScrollY)));
+    }
+  });
+
+  // Tell the parent which day is now the first column
+  const reportFirstVisibleDay = useEffectEvent(() => {
+    if (dayWidth <= 0) return;
+    const index = Math.round(dayTranslateOffsetXRef.current / dayWidth);
+    onWeekStartChange(virtualWindowStartRef.current.add(index, "day"));
+  });
+
+  // Snap to the nearest day column and report the new first visible day. A flick
+  // (velocityX in px/ms) carries the snap further, up to one screen of days.
+  const snapToDay = useEffectEvent((velocityX: number = 0) => {
+    if (dayWidth <= 0) return;
+    const offset = dayTranslateOffsetXRef.current;
+    const current = Math.round(offset / dayWidth);
+    const projected = Math.round((offset + velocityX * FLICK_PROJECTION_MS) / dayWidth);
+    const target = Math.max(
+      0,
+      current - visibleDays,
+      Math.min(projected, current + visibleDays, virtualWindowSizeRef.current - visibleDays),
+    );
+
+    setUseTransition(true);
+    setDayTranslateOffsetX(target * dayWidth);
+    setIsScrolling(false);
+    reportFirstVisibleDay();
+  });
+
+  const momentumFrameRef = useRef<number | null>(null);
+  const cancelMomentum = () => {
+    if (momentumFrameRef.current !== null) {
+      cancelAnimationFrame(momentumFrameRef.current);
+      momentumFrameRef.current = null;
+    }
+  };
+
+  // Keep a vertical touch pan gliding after the finger lifts
+  const startVerticalMomentum = useEffectEvent((initialVelocity: number) => {
+    let velocity = initialVelocity;
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = now - last;
+      last = now;
+      scrollByDelta(0, velocity * dt);
+      velocity *= Math.pow(MOMENTUM_FRICTION, dt / 16);
+      momentumFrameRef.current =
+        Math.abs(velocity) < MOMENTUM_MIN_VELOCITY ? null : requestAnimationFrame(step);
+    };
+    momentumFrameRef.current = requestAnimationFrame(step);
+  });
+
+  const handleWheel = useEffectEvent((e: WheelEvent) => {
+    e.preventDefault();
+    cancelMomentum();
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    if (!isScrolling) {
+      setIsScrolling(true);
+      setUseTransition(false);
+    }
+
+    scrollByDelta(e.deltaX, e.deltaY);
+
+    // Snap once the wheel has been quiet for 50ms
+    scrollTimeoutRef.current = setTimeout(() => snapToDay(), 50);
+  });
+
+  // One-finger pan, locked to whichever axis it starts moving along.
+  // Taps never reach touchmove's preventDefault, so they still click sessions.
+  const touchRef = useRef<{
+    startX: number;
+    startY: number;
+    lastX: number;
+    lastY: number;
+    lastTime: number;
+    axis: "x" | "y" | null;
+    velocityX: number;
+    velocityY: number;
+  } | null>(null);
+
+  const handleTouchStart = useEffectEvent((e: TouchEvent) => {
+    cancelMomentum();
+    if (e.touches.length !== 1) {
+      touchRef.current = null;
+      return;
+    }
+    const { clientX, clientY } = e.touches[0];
+    touchRef.current = {
+      startX: clientX,
+      startY: clientY,
+      lastX: clientX,
+      lastY: clientY,
+      lastTime: e.timeStamp,
+      axis: null,
+      velocityX: 0,
+      velocityY: 0,
+    };
+    setUseTransition(false);
+  });
+
+  const handleTouchMove = useEffectEvent((e: TouchEvent) => {
+    const touch = touchRef.current;
+    if (!touch || e.touches.length !== 1) return;
+    const { clientX, clientY } = e.touches[0];
+
+    if (!touch.axis) {
+      const dx = clientX - touch.startX;
+      const dy = clientY - touch.startY;
+      if (Math.hypot(dx, dy) < TOUCH_AXIS_LOCK_DISTANCE) return;
+      touch.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    }
+    if (e.cancelable) e.preventDefault();
+
+    // Finger moving left scrolls forward, like a positive wheel delta
+    const dt = Math.max(1, e.timeStamp - touch.lastTime);
+    const deltaX = touch.lastX - clientX;
+    const deltaY = touch.lastY - clientY;
+    if (touch.axis === "x") {
+      scrollByDelta(deltaX, 0);
+      touch.velocityX = 0.8 * (deltaX / dt) + 0.2 * touch.velocityX;
+    } else {
+      scrollByDelta(0, deltaY);
+      touch.velocityY = 0.8 * (deltaY / dt) + 0.2 * touch.velocityY;
+    }
+    touch.lastX = clientX;
+    touch.lastY = clientY;
+    touch.lastTime = e.timeStamp;
+  });
+
+  const handleTouchEnd = useEffectEvent((e: TouchEvent) => {
+    const touch = touchRef.current;
+    touchRef.current = null;
+    if (!touch?.axis) return;
+
+    // A finger that paused before lifting has no flick
+    const paused = e.timeStamp - touch.lastTime > 100;
+    if (touch.axis === "x") {
+      snapToDay(paused ? 0 : touch.velocityX);
+    } else if (!paused && Math.abs(touch.velocityY) > MOMENTUM_MIN_VELOCITY) {
+      startVerticalMomentum(touch.velocityY);
+    }
+  });
+
+  // Listeners are attached natively (not via React props) so they can be
+  // non-passive and call preventDefault. The handlers above always see fresh state.
+  useEffect(() => {
+    const element = weekViewRef.current;
+    if (!element) return;
+
+    const onWheel = (e: WheelEvent) => handleWheel(e);
+    const onTouchStart = (e: TouchEvent) => handleTouchStart(e);
+    const onTouchMove = (e: TouchEvent) => handleTouchMove(e);
+    const onTouchEnd = (e: TouchEvent) => handleTouchEnd(e);
+    const options = { passive: false };
+
+    element.addEventListener("wheel", onWheel, options);
+    element.addEventListener("touchstart", onTouchStart, options);
+    element.addEventListener("touchmove", onTouchMove, options);
+    element.addEventListener("touchend", onTouchEnd);
+    element.addEventListener("touchcancel", onTouchEnd);
     return () => {
-      if (weekViewElement) {
-        weekViewElement.removeEventListener("wheel", handleScroll);
-      }
-      // Clear any remaining timeout on unmount
+      element.removeEventListener("wheel", onWheel);
+      element.removeEventListener("touchstart", onTouchStart);
+      element.removeEventListener("touchmove", onTouchMove);
+      element.removeEventListener("touchend", onTouchEnd);
+      element.removeEventListener("touchcancel", onTouchEnd);
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
+      if (momentumFrameRef.current !== null) {
+        cancelAnimationFrame(momentumFrameRef.current);
+      }
     };
-  }, [
-    virtualWindowStart,
-    virtualWindowSize,
-    dayWidth,
-    dayTranslateOffsetXRef,
-    dayTranslateOffsetYRef,
-    isScrolling,
-    setDayTranslateOffsetX,
-    setDayTranslateOffsetY,
-    maxScrollY,
-    onWeekStartChange,
-  ]);
+  }, []);
 
   // Helper function to convert screen position to time
   const positionToTime = useCallback(
@@ -589,7 +693,8 @@ export function WeekView({
 
   return (
     <div
-      className="relative overflow-hidden max-h-full"
+      // touch-none: WeekView handles one-finger pans itself (see handleTouchMove)
+      className="relative overflow-hidden max-h-full touch-none overscroll-none"
       style={
         {
           "--day-width": `${dayWidth}px`,
