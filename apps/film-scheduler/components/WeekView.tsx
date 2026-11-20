@@ -682,7 +682,7 @@ export function WeekView({
               <span className="md:text-xs text-[10px] absolute p-1 -top-3 bg-background">
                 {dayjs()
                   .hour(startHour + hour)
-                  .format("h A")}
+                  .format("HH:00")}
               </span>
             </div>
           ))}
@@ -704,7 +704,7 @@ export function WeekView({
           }}
         >
           <span className="absolute bg-brand text-brand-foreground text-xs px-1 rounded-b left-2">
-            Now {now.format("HH:mm")}
+            現在 {now.format("HH:mm")}
           </span>
         </div>
       )}

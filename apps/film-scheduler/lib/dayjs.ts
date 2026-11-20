@@ -18,4 +18,10 @@
     return short ? day : `週${day}`;
   }
 
+  /** Short Chinese date-time for tooltips and lists: "11/20（五）21:40". */
+  export function formatDateTimeZh(date: dayjs.ConfigType) {
+    const d = dayjs(date);
+    return `${d.format("M/D")}（${weekdayZh(d, { short: true })}）${d.format("HH:mm")}`;
+  }
+
   export default dayjs;

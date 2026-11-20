@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SessionsMiniPreview } from "@/components/SessionsMiniPreview";
 import { Session, FilmsMap } from "@/components/types";
+import { formatDateTimeZh } from "@/lib/dayjs";
 
 interface ImportModalProps {
   sessions: Session[];
@@ -107,7 +108,7 @@ export function ImportModal({
                 />
                 <label htmlFor={`checkbox-${sessionId}`}>
                   {film.filmTitle} {session.location} -{" "}
-                  {new Date(session.time).toLocaleString()}
+                  {formatDateTimeZh(session.time)}
                 </label>
               </div>
             );

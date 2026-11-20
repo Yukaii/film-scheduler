@@ -165,7 +165,7 @@ type LayoutProps = {
   nowLabel: string;
 };
 
-const hourLabel = (hour: number) => dayjs().hour(startHour + hour).format("h A");
+const hourLabel = (hour: number) => dayjs().hour(startHour + hour).format("HH:00");
 
 /**
  * Phones: time runs down a sticky left column and every venue is a column

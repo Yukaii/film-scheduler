@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import dayjs from "dayjs";
+import dayjs, { formatDateTimeZh } from "@/lib/dayjs";
 import {
   TooltipTrigger,
   TooltipProvider,
@@ -77,7 +77,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
   return (
     <div className="rounded-lg border p-3">
       <div className="mb-1 grid grid-cols-7 gap-1">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+        {["日", "一", "二", "三", "四", "五", "六"].map((day) => (
           <div key={day} className="text-center text-[0.7rem] font-medium text-muted-foreground">
             {day}
           </div>
@@ -94,7 +94,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
               <div className="mb-1 flex items-baseline gap-1 text-xs leading-none">
                 <span className="font-medium tabular-nums">{day.format("D")}</span>
                 {showMonth && (
-                  <span className="truncate text-[0.65rem] text-muted-foreground">{day.format("MMM")}</span>
+                  <span className="truncate text-[0.65rem] text-muted-foreground">{day.format("M月")}</span>
                 )}
               </div>
               {sessions.map((session) => {
@@ -114,7 +114,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
                       </TooltipTrigger>
                       <TooltipContent side="bottom">
                         {session.film.filmTitle} {session.location} -{" "}
-                        {new Date(session.time).toLocaleString()}
+                        {formatDateTimeZh(session.time)}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
