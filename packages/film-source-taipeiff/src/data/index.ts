@@ -11,7 +11,7 @@ function loadFestivalData(): DataByFestival {
   const festivals = fs.readdirSync(dataDir)
     .filter(name => {
       const fullPath = path.join(dataDir, name);
-      return fs.statSync(fullPath).isDirectory() && /^\d{4}-\d+$/.test(name);
+      return fs.statSync(fullPath).isDirectory() && /^\d{4}-[A-Z]+$/.test(name);
     })
     .map(name => {
       const [year, category] = name.split('-');

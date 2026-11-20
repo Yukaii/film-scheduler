@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server';
 import { githubDataFetcher } from '@/lib/githubDataFetcher';
-import { CATEGORIES } from '@/lib/config';
+import { CATEGORIES, FESTIVALS, type Category } from '@/lib/config';
 
 // Next 15+ made GET handlers dynamic by default; keep the Next 14 behavior of
 // prerendering the festival list at build time.
 export const dynamic = 'force-static';
-
-interface Category {
-  value: string;
-  label: string;
-}
-
-// Known festival IDs
-const FESTIVALS = [
-  '2025-TAIPEIFF',
-  '2025-FFF',
-  '2024-FF'
-];
 
 export async function GET() {
   try {

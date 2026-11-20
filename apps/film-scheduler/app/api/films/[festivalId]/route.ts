@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { githubDataFetcher } from '@/lib/githubDataFetcher';
 import { RawFilm } from '@/components/types';
 import { generateSessionId } from '@/lib/utils';
+import { isKnownFestival } from '@/lib/config';
 
 export async function GET(
   _request: NextRequest,
@@ -9,16 +10,17 @@ export async function GET(
 ) {
   try {
     const { festivalId } = await params;
-    
-    // Get festival data from GitHub
-    const festivalData = await githubDataFetcher.getFestivalData(festivalId);
-    if (!festivalData) {
+
+    if (!isKnownFestival(festivalId)) {
       return NextResponse.json(
         { error: `Festival ${festivalId} not found` },
         { status: 404 }
       );
     }
     
+    // Get festival data from GitHub
+    const festivalData = await githubDataFetcher.getFestivalData(festivalId);
+
     // Transform raw film data to the format expected by the frontend
     const films = Object.entries(festivalData.filmDetailsCache as Record<string, RawFilm>).map(([id, rawFilm]) => {
       const { schedule = [], duration = "0", ...rest } = rawFilm;
