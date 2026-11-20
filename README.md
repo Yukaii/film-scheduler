@@ -2,6 +2,13 @@
 
 金馬影展快要到了，想和去年一樣來場電影馬拉松看到飽的我，做了這個工具來幫忙選片
 
+## 其他選擇
+
+這是個人的小工具。如果你想要功能更完整的影展排片工具，也可以看看：
+
+* [@shihchin.0608 分享的影展排片工具](https://www.threads.com/@shihchin.0608/post/DdNuuehE4hi)：功能更完整的產品
+* [影展排片單小工具](https://film-festival-planning.vercel.app/)：免費的線上排片工具，可以選片、排場次、一鍵分享行程
+
 ## Screenshots
 
 ![dark](./docs/images/dark.png)

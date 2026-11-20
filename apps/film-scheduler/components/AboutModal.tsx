@@ -16,6 +16,19 @@ interface AboutModalProps {
 
 const REPO = "https://github.com/Yukaii/film-scheduler";
 const CONTRIBUTORS = ["Yukaii", "Pastleo"];
+// Other film-festival planners, also listed in the README
+const ALTERNATIVES = [
+  {
+    href: "https://www.threads.com/@shihchin.0608/post/DdNuuehE4hi",
+    name: "@shihchin.0608 的排片工具",
+    note: "功能更完整的產品",
+  },
+  {
+    href: "https://film-festival-planning.vercel.app/",
+    name: "影展排片單小工具",
+    note: "選片、排場次、一鍵分享行程",
+  },
+];
 
 /** Quiet underlined link that strengthens on hover; external links open a new tab. */
 function TextLink({ href, children }: { href: string; children: React.ReactNode }) {
@@ -77,6 +90,20 @@ export function AboutModal({ open, onClose }: AboutModalProps) {
               {CONTRIBUTORS.map((name) => (
                 <li key={name}>
                   <TextLink href={`https://github.com/${name}`}>{name}</TextLink>
+                </li>
+              ))}
+            </ul>
+          </Row>
+          <Row label="其他選擇">
+            <p className="mb-1.5 text-muted-foreground">想要功能更完整的排片工具？也可以試試：</p>
+            <ul className="space-y-1.5">
+              {ALTERNATIVES.map(({ href, name, note }) => (
+                <li key={href}>
+                  <TextLink href={href}>
+                    {name}
+                    <ArrowUpRight className="size-3.5 text-muted-foreground" />
+                  </TextLink>
+                  <span className="block text-xs text-muted-foreground">{note}</span>
                 </li>
               ))}
             </ul>
