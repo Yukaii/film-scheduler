@@ -200,18 +200,14 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
   };
 
   const { hasViewedOnboarding, markOnboardingAsViewed } = useOnboardingStatus();
-  const { open: isTutorialModalOpen, setOpen: setTutorialModalOpen } =
-    useToggle(!hasViewedOnboarding);
-  useEffect(() => {
-    if (!hasViewedOnboarding) {
-      setTutorialModalOpen(true);
-    }
-  }, [hasViewedOnboarding, setTutorialModalOpen]);
-  const openOnboardingModal = () => setTutorialModalOpen(true);
+  // First-time visitors see the tutorial automatically; anyone can reopen it
+  const { open: isTutorialRequested, setOpen: setTutorialRequested } = useToggle(false);
+  const isTutorialModalOpen = isTutorialRequested || !hasViewedOnboarding;
+  const openOnboardingModal = () => setTutorialRequested(true);
 
   const handleTutorialClose = () => {
     markOnboardingAsViewed();
-    setTutorialModalOpen(false);
+    setTutorialRequested(false);
   };
 
   const { open: isAboutModalOpen, setOpen: setAboutModalOpen } =

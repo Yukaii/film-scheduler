@@ -1,4 +1,4 @@
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useCallback, useSyncExternalStore, type SetStateAction } from "react";
 import { loadSessionIdsFromUrl } from "@/lib/utils";
 import { Session } from "@/components/types";
 
@@ -39,26 +39,82 @@ function rehydrate<T>(value: string): T {
   });
 }
 
-// A custom hook to manage state with localStorage persistence
-export function useLocalStorageState<T>(key: string, defaultValue: T) {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const storedValue = localStorage.getItem(key);
-      return storedValue ? rehydrate<T>(storedValue) : defaultValue;
-    } catch (error) {
-      console.error("Error loading from localStorage:", error);
-      return defaultValue;
-    }
-  });
+// localStorage-backed state, read through useSyncExternalStore so the server
+// render and the first client render agree (both use the default value) and
+// the stored value takes over right after hydration. Parsed values are cached
+// by their raw string so every read of an unchanged key returns the same
+// object, which useSyncExternalStore requires.
+const storageListeners = new Map<string, Set<() => void>>();
+const storageCache = new Map<string, { raw: string | null; value: unknown }>();
 
-  useEffect(() => {
+function readStored<T>(key: string, fallback: T): T {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(key);
+  } catch (error) {
+    console.error("Error loading from localStorage:", error);
+  }
+  const cached = storageCache.get(key);
+  if (cached && cached.raw === raw) return cached.value as T;
+
+  let value = fallback;
+  if (raw) {
     try {
-      const serializedState = dehydrate(state);
-      localStorage.setItem(key, serializedState);
+      value = rehydrate<T>(raw);
     } catch (error) {
-      console.error("Error saving to localStorage:", error);
+      console.error(`Error parsing localStorage key "${key}":`, error);
     }
-  }, [key, state]);
+  }
+  storageCache.set(key, { raw, value });
+  return value;
+}
+
+export function useLocalStorageState<T>(key: string, defaultValue: T) {
+  // Pin the first default so callers can pass a fresh literal (e.g. []) each render
+  const [fallback] = useState(defaultValue);
+
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      const listeners = storageListeners.get(key) ?? new Set<() => void>();
+      listeners.add(listener);
+      storageListeners.set(key, listeners);
+      // Also pick up changes made in other tabs
+      const onStorage = (e: StorageEvent) => {
+        if (e.key === key) listener();
+      };
+      window.addEventListener("storage", onStorage);
+      return () => {
+        listeners.delete(listener);
+        window.removeEventListener("storage", onStorage);
+      };
+    },
+    [key],
+  );
+
+  const state = useSyncExternalStore(
+    subscribe,
+    () => readStored(key, fallback),
+    () => fallback,
+  );
+
+  const setState = useCallback(
+    (action: SetStateAction<T>) => {
+      const prev = readStored(key, fallback);
+      const next =
+        typeof action === "function" ? (action as (prev: T) => T)(prev) : action;
+      try {
+        const raw = dehydrate(next);
+        localStorage.setItem(key, raw);
+        storageCache.set(key, { raw, value: next });
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+        // Keep the change in memory for this visit even though it couldn't persist
+        storageCache.set(key, { raw: storageCache.get(key)?.raw ?? null, value: next });
+      }
+      storageListeners.get(key)?.forEach((listener) => listener());
+    },
+    [key, fallback],
+  );
 
   return [state, setState] as const;
 }
@@ -125,7 +181,9 @@ export function useOnboardingStatus() {
   const hasViewedOnboarding = useSyncExternalStore(
     subscribeOnboarding,
     getOnboardingStatus,
-    () => false,
+    // Assume "viewed" while server rendering and hydrating, so returning visitors
+    // don't get the tutorial; first-time visitors see it right after hydration.
+    () => true,
   );
 
   const markOnboardingAsViewed = () => {
