@@ -137,6 +137,14 @@ export function FilmSidebar({ open, setOpen }: FilmSidebarProps) {
           </p>
         )}
 
+        {/* Some festival data has no runtime (0); hide the line rather than show "0 分鐘" */}
+        {viewingFilm.duration > 0 && (
+          <p className="text-sm">
+            <span className="text-muted-foreground">片長　</span>
+            <span className="tabular-nums">{viewingFilm.duration} 分鐘</span>
+          </p>
+        )}
+
         {viewingFilm.detailUrl && (
           <a
             href={viewingFilm.detailUrl}
