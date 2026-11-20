@@ -287,7 +287,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           <main className="overflow-hidden w-full">
             <CalendarView
               className={cn({
-                "md:pr-[16rem]": panelOpen && !!viewingFilmId,
+                "md:pr-64": panelOpen && !!viewingFilmId,
               })}
             />
           </main>

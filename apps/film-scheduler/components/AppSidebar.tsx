@@ -259,7 +259,7 @@ export function AppSidebar() {
               value={currentFestivalId}
               onValueChange={handleFestivalChange}
             >
-              <SelectTrigger className="w-full bg-background shadow-sm border-muted-foreground/20">
+              <SelectTrigger className="w-full bg-background shadow-xs border-muted-foreground/20">
                 <SelectValue placeholder="Select a festival" />
               </SelectTrigger>
               <SelectContent>
@@ -278,7 +278,7 @@ export function AppSidebar() {
           value={search}
           onChange={setSearch}
           placeholder="篩選影片 (支援 date:, time:, title:, director:, AND, OR, NOT 等語法)"
-          className="shadow-sm border-muted-foreground/20 focus-visible:ring-offset-1"
+          className="shadow-xs border-muted-foreground/20 focus-visible:ring-offset-1"
           films={films}
           sections={sections}
         />
@@ -402,7 +402,7 @@ export function AppSidebar() {
                   onClick={openOnboardingModal}
                   variant="outline"
                   size="icon"
-                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
+                  className="shadow-xs border-muted-foreground/20 hover:bg-muted/50"
                 >
                   <Compass className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
@@ -420,7 +420,7 @@ export function AppSidebar() {
                   onClick={openAboutModal} 
                   variant="outline" 
                   size="icon"
-                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
+                  className="shadow-xs border-muted-foreground/20 hover:bg-muted/50"
                 >
                   <Info className="h-[1.2rem] w-[1.2rem]" />
                 </Button>
@@ -438,7 +438,7 @@ export function AppSidebar() {
                   onClick={openShareModal} 
                   variant="outline" 
                   size="icon"
-                  className="shadow-sm border-muted-foreground/20 hover:bg-muted/50"
+                  className="shadow-xs border-muted-foreground/20 hover:bg-muted/50"
                 >
                   <ExternalLink className="h-[1.2rem] w-[1.2rem]" />
                 </Button>

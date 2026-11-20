@@ -51,7 +51,7 @@ function Calendar({
           // today styling yields to selected styling
           "group-[[data-today=true]:not([data-selected])]/day:bg-accent group-[[data-today=true]:not([data-selected])]/day:text-accent-foreground",
           "group-data-[selected=true]/day:bg-primary group-data-[selected=true]/day:text-primary-foreground",
-          "group-data-[selected=true]/day:hover:bg-primary group-data-[selected=true]/day:hover:text-primary-foreground",
+          "hover:group-data-[selected=true]/day:bg-primary hover:group-data-[selected=true]/day:text-primary-foreground",
           "group-data-[outside=true]/day:text-muted-foreground group-data-[outside=true]/day:opacity-50",
           "group-data-[disabled=true]/day:text-muted-foreground group-data-[disabled=true]/day:opacity-50"
         ),

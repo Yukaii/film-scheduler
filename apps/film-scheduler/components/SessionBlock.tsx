@@ -89,7 +89,7 @@ export function SessionBlock({
       id={sessionId}
       key={sessionId}
       className={cn(
-        "absolute max-w-[calc(100%-10px)] text-white rounded shadow transition-opacity duration-200 hover:opacity-100",
+        "absolute max-w-[calc(100%-10px)] text-white rounded shadow-sm transition-opacity duration-200 hover:opacity-100",
         "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
         "select-none session-block",
         {

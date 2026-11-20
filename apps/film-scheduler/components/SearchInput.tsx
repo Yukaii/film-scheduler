@@ -354,7 +354,7 @@ export function SearchInput({
               )}
             >
               <div className="flex items-center gap-2 flex-1">
-                <Command size={14} className={cn("flex-shrink-0", {
+                <Command size={14} className={cn("shrink-0", {
                   "text-muted-foreground": suggestion.type !== 'logical',
                   "text-blue-500": suggestion.type === 'logical'
                 })} />

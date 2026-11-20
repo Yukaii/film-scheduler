@@ -190,7 +190,7 @@ export function ShareModal({
 
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Input value={shareUrl} readOnly className="flex-grow" />
+            <Input value={shareUrl} readOnly className="grow" />
             <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
               <ClipboardCopy className="mr-1" />
               複製到剪貼簿
