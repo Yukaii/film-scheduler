@@ -2,20 +2,15 @@
   "name": "film-scheduler-monorepo",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@11.3.0",
   "scripts": {
-    "build": "pnpm -r build",
     "dev": "pnpm --filter film-scheduler dev",
-    "lint": "pnpm -r lint"
+    "build": "pnpm --filter film-scheduler build",
+    "build:all": "pnpm -r build",
+    "lint": "pnpm --filter film-scheduler lint",
+    "typecheck": "pnpm --filter film-scheduler typecheck"
   },
   "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "next": "14.2.15",
-    "tsx": "^4.19.4"
+    "node": ">=20.9"
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function useBoundingClientRect(ref: React.RefObject<HTMLElement>) {
+export default function useBoundingClientRect(ref: React.RefObject<HTMLElement | null>) {
   const [rect, setRect] = useState<DOMRect | null>(null);
 
   const observer = useRef<ResizeObserver | null>(null);

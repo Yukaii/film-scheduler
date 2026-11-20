@@ -27,7 +27,8 @@ async function copyDataDirectory() {
         if (entry.isDirectory()) {
           await fs.mkdir(destPath, { recursive: true });
           await copyDir(srcPath, destPath);
-        } else {
+        } else if (!entry.name.endsWith('.ts')) {
+          // .ts files are compiled by tsc/esbuild; only copy data files
           await fs.copyFile(srcPath, destPath);
         }
       }
@@ -51,7 +52,7 @@ await esbuild.build({
   bundle: true,
   platform: 'node',
   format: 'esm',
-  target: 'node18',
+  target: 'node20',
   sourcemap: true,
   loader: {
     '.json': 'json'

@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { githubDataFetcher } from '@/lib/githubDataFetcher';
 import { CATEGORIES } from '@/lib/config';
 
+// Next 15+ made GET handlers dynamic by default; keep the Next 14 behavior of
+// prerendering the festival list at build time.
+export const dynamic = 'force-static';
+
 interface Category {
   value: string;
   label: string;
@@ -35,7 +39,7 @@ export async function GET() {
     const festivals = successfulFestivals.map(id => {
       const [year, category] = id.split('-');
       const categoryInfo = CATEGORIES.find((c: Category) => c.value === category);
-      
+
       return {
         id,
         year,
@@ -43,7 +47,7 @@ export async function GET() {
         label: categoryInfo?.label || category
       };
     });
-    
+
     // Sort by year (descending) and then by category
     festivals.sort((a, b) => {
       if (a.year !== b.year) {
@@ -51,7 +55,7 @@ export async function GET() {
       }
       return a.category.localeCompare(b.category);
     });
-    
+
     return NextResponse.json({ festivals });
   } catch (error) {
     console.error('Error fetching festivals:', error);

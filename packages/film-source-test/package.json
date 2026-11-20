@@ -12,6 +12,7 @@
     "@film-scheduler/film-source-golden-horse": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@types/node": "^22.20.5",
+    "typescript": "^6.0.3"
   }
 }

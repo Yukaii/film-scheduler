@@ -47,7 +47,7 @@ class GithubDataFetcher {
     try {
       // Try main branch first
       const mainUrl = this.getGithubRawUrl(path, true);
-      const mainResponse = await fetch(mainUrl);
+      const mainResponse = await fetch(mainUrl, { cache: "force-cache" });
       if (mainResponse.ok) {
         return await mainResponse.json();
       }
@@ -55,7 +55,7 @@ class GithubDataFetcher {
       // Fallback to specific commit if available
       if (this.config.fallbackCommit) {
         const fallbackUrl = this.getGithubRawUrl(path, false);
-        const fallbackResponse = await fetch(fallbackUrl);
+        const fallbackResponse = await fetch(fallbackUrl, { cache: "force-cache" });
         if (fallbackResponse.ok) {
           return await fallbackResponse.json();
         }

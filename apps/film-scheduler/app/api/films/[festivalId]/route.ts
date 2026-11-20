@@ -4,11 +4,11 @@ import { RawFilm } from '@/components/types';
 import { generateSessionId } from '@/lib/utils';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { festivalId: string } }
+  _request: NextRequest,
+  { params }: RouteContext<'/api/films/[festivalId]'>
 ) {
   try {
-    const { festivalId } = params;
+    const { festivalId } = await params;
     
     // Get festival data from GitHub
     const festivalData = await githubDataFetcher.getFestivalData(festivalId);

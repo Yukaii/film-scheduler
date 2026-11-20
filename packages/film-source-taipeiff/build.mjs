@@ -67,7 +67,7 @@ await esbuild.build({
   bundle: true,
   platform: 'node',
   format: 'esm',
-  target: 'node18',
+  target: 'node20',
   sourcemap: true,
   loader: {
     '.json': 'json'
