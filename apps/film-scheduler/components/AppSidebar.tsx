@@ -137,32 +137,37 @@ function SessionListItem({
   const end = film ? start.add(film.duration, "minute") : undefined;
 
   return (
-    <li
-      className={cn(
-        "flex items-center rounded-md border-l-2 hover:bg-sidebar-accent",
-        conflict ? "border-destructive" : "border-brand",
-      )}
-    >
-      <button type="button" onClick={onClick} className="min-w-0 flex-1 px-2.5 py-1.5 text-left">
-        <p className="flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground">
-          <span className="font-medium text-foreground">
+    <li className="flex items-start border-b border-sidebar-border last:border-b-0 hover:bg-sidebar-accent/60">
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex min-w-0 flex-1 items-start gap-3 py-2.5 pl-2.5 text-left"
+      >
+        <span className="w-10 shrink-0 text-xs leading-5 tabular-nums">
+          <span className={cn("block font-medium", conflict && "text-red-600 dark:text-red-400")}>
             {start.format("HH:mm")}
-            {end && `–${end.format("HH:mm")}`}
+          </span>
+          {end && <span className="block text-muted-foreground">{end.format("HH:mm")}</span>}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium leading-5">
+            {film?.filmTitle ?? "未知影片"}
+          </span>
+          <span className="block truncate text-xs leading-5 text-muted-foreground">
+            {session.location}
           </span>
           {conflict && (
-            <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400">
+            <span className="flex items-center gap-1 text-xs leading-5 text-red-600 dark:text-red-400">
               <TriangleAlert className="size-3" />
-              時間重疊
+              與其他場次時間重疊
             </span>
           )}
-        </p>
-        <p className="truncate text-sm font-medium">{film?.filmTitle ?? "未知影片"}</p>
-        <p className="truncate text-xs text-muted-foreground">{session.location}</p>
+        </span>
       </button>
       <button
         type="button"
         onClick={onRemove}
-        className="mr-1 shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-red-500"
+        className="m-1.5 shrink-0 rounded-sm p-1 text-muted-foreground transition-colors hover:bg-background hover:text-red-500"
         aria-label={`移除 ${film?.filmTitle ?? ""} 場次`}
       >
         <X size={14} />
@@ -552,18 +557,18 @@ export function AppSidebar() {
             {days.length > 0 ? (
               <div className="space-y-3">
                 {conflicts.size > 0 && (
-                  <p className="mx-1 flex items-center gap-1.5 rounded-md bg-red-500/10 px-2.5 py-2 text-xs text-red-700 dark:text-red-300">
+                  <p className="flex items-center gap-1.5 bg-red-500/10 px-2.5 py-2 text-xs text-red-700 dark:text-red-300">
                     <TriangleAlert className="size-3.5 shrink-0" />
                     有 {conflicts.size} 個場次時間重疊
                   </p>
                 )}
                 {days.map((day) => (
                   <section key={day.key} aria-label={day.label}>
-                    <h3 className="sticky top-0 z-10 flex items-baseline justify-between bg-sidebar px-2.5 py-1 text-xs font-medium">
+                    <h3 className="sticky top-0 z-10 flex items-baseline justify-between border-b border-sidebar-border bg-sidebar px-2.5 pt-2 pb-1.5 text-xs font-medium">
                       {day.label}
                       <Count>{day.sessions.length} 場</Count>
                     </h3>
-                    <ul className="space-y-1">
+                    <ul>
                       {day.sessions.map((session) => (
                         <SessionListItem
                           key={session.id}
