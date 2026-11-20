@@ -118,7 +118,7 @@ export function CalendarView(props: { className?: string }) {
                     setHighlightDate(date);
                   }
                 }}
-                initialFocus
+                autoFocus
               />
             </PopoverContent>
           </Popover>
