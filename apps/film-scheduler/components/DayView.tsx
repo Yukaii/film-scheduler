@@ -15,6 +15,8 @@ const HOUR_HEIGHT = 60;
 const VENUE_HEADER_HEIGHT = 48;
 // Some festival data has no runtime; draw those sessions as one hour
 const FALLBACK_DURATION = 60;
+// Narrowest a session block may get: a two-line title plus the 24px button
+const MIN_BLOCK_WIDTH = 88;
 
 export interface DayViewProps {
   currentDate: dayjs.Dayjs;
@@ -149,7 +151,7 @@ export function DayView({
   return (
     // Own scroll container under the h-16 calendar header, so the venue row
     // sticks to the top and the time column to the left
-    <div className="h-[calc(100dvh-4rem)] w-full overflow-auto overscroll-contain [--time-w:3rem] sm:[--time-w:4rem]">
+    <div className="h-[calc(100dvh-4rem)] w-full overflow-auto overscroll-contain [--time-w:3rem] [--venue-min:7rem] sm:[--time-w:4rem] sm:[--venue-min:9rem]">
       <div className="flex min-w-fit">
         {/* Time column */}
         <div className="sticky left-0 z-20 w-(--time-w) shrink-0 border-r bg-background">
@@ -180,8 +182,18 @@ export function DayView({
             </div>
           )}
 
-          {venues.map(([venue, sessions]) => (
-            <div key={venue} className="min-w-28 flex-1 border-r last:border-r-0 sm:min-w-36">
+          {venues.map(([venue, sessions]) => {
+            const placed = placeSessions(sessions, durationOf);
+            const maxLanes = Math.max(1, ...placed.map((p) => p.lanes));
+
+            return (
+            <div
+              key={venue}
+              className="flex-1 border-r last:border-r-0"
+              // Widen venues with side-by-side screenings so every block keeps
+              // room for its title next to the +/✓ button
+              style={{ minWidth: `max(var(--venue-min), ${maxLanes * MIN_BLOCK_WIDTH}px)` }}
+            >
               <div
                 className="sticky top-0 z-10 flex items-center justify-center border-b bg-background px-1.5 text-center"
                 style={{ height: VENUE_HEADER_HEIGHT }}
@@ -199,7 +211,7 @@ export function DayView({
                   />
                 ))}
 
-                {placeSessions(sessions, durationOf).map(({ session, lane, lanes }) => {
+                {placed.map(({ session, lane, lanes }) => {
                   const film = filmsMap.get(session.filmId);
                   if (!film) return null;
 
@@ -275,7 +287,8 @@ export function DayView({
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
