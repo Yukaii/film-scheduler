@@ -5,8 +5,9 @@ import dayjs from "@/lib/dayjs";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn, scrollNowIndicatorIntoView } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
-import { CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { BrandMark } from "./BrandMark";
+import { SidebarToggle } from "./SidebarToggle";
 import { ViewModeIcon } from "./ViewModeIcon";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -78,7 +79,7 @@ export function CalendarView(props: { className?: string }) {
     }
   };
 
-  const { open, isMobile, openMobile, toggleSidebar } = useSidebar();
+  const { open, isMobile } = useSidebar();
 
   const goToToday = () => {
     const today = new Date();
@@ -96,21 +97,15 @@ export function CalendarView(props: { className?: string }) {
     }
   };
 
-  const sidebarVisible = isMobile ? openMobile : open;
 
   return (
     <div className={cn("w-full", props.className)}>
       {/* Height must match the sidebar brand row (h-16) and the WeekView height calc */}
       <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b bg-background px-2 md:px-4">
         <div className="flex min-w-0 items-center gap-0.5 sm:gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            aria-label={sidebarVisible ? "收合側欄" : "展開側欄"}
-          >
-            {sidebarVisible ? <PanelLeftClose /> : <PanelLeftOpen />}
-          </Button>
+          {/* On desktop the open sidebar carries the toggle in its brand row, at
+              this same spot; on mobile the sidebar is a sheet, so it lives here */}
+          {(isMobile || !open) && <SidebarToggle className="md:-ml-2" />}
 
           {/* Mobile shows the brand inside the sidebar sheet; desktop shows it here when the sidebar is collapsed */}
           {!isMobile && !open && <BrandMark compact className="mr-1" />}

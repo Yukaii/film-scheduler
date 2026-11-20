@@ -17,6 +17,7 @@ import {
 import { ModeToggle } from "./ModeToggle";
 import { SearchInput } from "./SearchInput";
 import { BrandMark } from "./BrandMark";
+import { SidebarToggle } from "./SidebarToggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
@@ -437,7 +438,8 @@ export function AppSidebar() {
       )}
       <SidebarHeader className="gap-0 p-0">
         {/* Brand row: same height as the calendar header so the borders line up */}
-        <div className="flex h-16 shrink-0 items-center border-b px-4">
+        <div className="flex h-16 shrink-0 items-center gap-1.5 border-b px-4">
+          <SidebarToggle className="-ml-2" />
           <BrandMark />
         </div>
 
