@@ -203,6 +203,7 @@ async function main() {
       sessionStorage.setItem("capture-init", "1");
       localStorage.clear();
       localStorage.setItem("hasViewedOnboarding", "true");
+      localStorage.setItem("viewMode", JSON.stringify("week")); // step 2 shows the week grid
     });
 
     const page = await context.newPage();

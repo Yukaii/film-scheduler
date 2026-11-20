@@ -19,6 +19,7 @@ import { WeekView } from "./WeekView";
 import { DayView } from "./DayView";
 import { Dayjs } from "dayjs";
 import { useVisibleDays, WIDE_VISIBLE_DAYS } from "@/hooks/useVisibleDays";
+import { useLocalStorageState } from "@/lib/hooks";
 
 type ViewMode = "week" | "day";
 
@@ -37,7 +38,9 @@ export function CalendarView(props: { className?: string }) {
     dayjs(currentDate).startOf("week")
   );
   const [highlightDate, setHighlightDate] = useState(currentDate);
-  const [viewMode, setViewMode] = useState<ViewMode>("week");
+  // Day view by default; the last choice is remembered across visits
+  const [storedViewMode, setViewMode] = useLocalStorageState<ViewMode>("viewMode", "day");
+  const viewMode: ViewMode = storedViewMode === "week" ? "week" : "day";
 
   // The column count is only known after hydration (and changes on rotate/resize).
   // Re-anchor then: the current date if it is in the shown range, else the first shown day.
@@ -166,8 +169,8 @@ export function CalendarView(props: { className?: string }) {
 
           <div role="radiogroup" aria-label="檢視模式" className="inline-flex rounded-lg bg-muted p-0.5">
             {([
-              ["week", visibleDays === WIDE_VISIBLE_DAYS ? "週" : `${visibleDays} 日`],
               ["day", "日"],
+              ["week", visibleDays === WIDE_VISIBLE_DAYS ? "週" : `${visibleDays} 日`],
             ] as const).map(([mode, label]) => (
               <button
                 key={mode}
