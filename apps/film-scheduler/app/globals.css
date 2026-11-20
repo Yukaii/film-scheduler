@@ -25,6 +25,9 @@
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
 
+  --color-brand: hsl(var(--brand));
+  --color-brand-foreground: hsl(var(--brand-foreground));
+
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
 
@@ -60,8 +63,10 @@
 
 @layer base {
   :root {
-    /* Warm paper neutrals (stone hue) instead of cool zinc, with the brand red
-       (BrandMark, now line) as a faint tint on hover/selected states and focus */
+    /* Warm paper neutrals (stone hue). Brand colors come from the logo
+       (BrandMark): deep teal film strip and the amber "picked" frame. --brand is
+       the amber for the now line and today badge, with teal ink on top; the
+       hover/selected tints and focus ring lean teal. */
     --background: 40 33% 99%;
     --foreground: 24 12% 9%;
     --card: 0 0% 100%;
@@ -74,13 +79,15 @@
     --secondary-foreground: 20 14% 12%;
     --muted: 35 22% 94%;
     --muted-foreground: 25 6% 44%;
-    --accent: 4 75% 96%;
-    --accent-foreground: 4 55% 32%;
+    --accent: 170 28% 93%;
+    --accent-foreground: 182 60% 18%;
+    --brand: 37 92% 48%;
+    --brand-foreground: 182 60% 15%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 32 16% 88%;
     --input: 32 16% 86%;
-    --ring: 2 70% 56%;
+    --ring: 182 45% 30%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -91,10 +98,10 @@
     --sidebar-foreground: 24 8% 24%;
     --sidebar-primary: 20 14% 12%;
     --sidebar-primary-foreground: 40 33% 98%;
-    --sidebar-accent: 4 70% 95%;
-    --sidebar-accent-foreground: 4 55% 30%;
+    --sidebar-accent: 170 26% 92%;
+    --sidebar-accent-foreground: 182 60% 17%;
     --sidebar-border: 32 18% 89%;
-    --sidebar-ring: 2 70% 56%;
+    --sidebar-ring: 182 45% 30%;
   }
   .dark {
     --background: 20 10% 5%;
@@ -109,13 +116,15 @@
     --secondary-foreground: 40 20% 96%;
     --muted: 20 7% 14%;
     --muted-foreground: 30 6% 63%;
-    --accent: 2 32% 17%;
-    --accent-foreground: 4 85% 90%;
+    --accent: 182 30% 15%;
+    --accent-foreground: 40 70% 86%;
+    --brand: 38 91% 55%;
+    --brand-foreground: 182 60% 12%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 20 7% 16%;
     --input: 20 7% 18%;
-    --ring: 2 75% 62%;
+    --ring: 38 85% 58%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -123,12 +132,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 20 9% 8%;
     --sidebar-foreground: 35 12% 90%;
-    --sidebar-primary: 2 70% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 2 28% 16%;
-    --sidebar-accent-foreground: 4 85% 90%;
+    --sidebar-primary: 38 91% 55%;
+    --sidebar-primary-foreground: 182 60% 12%;
+    --sidebar-accent: 182 28% 14%;
+    --sidebar-accent-foreground: 40 70% 86%;
     --sidebar-border: 20 7% 16%;
-    --sidebar-ring: 2 75% 62%;
+    --sidebar-ring: 38 85% 58%;
   }
 }
 

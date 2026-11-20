@@ -177,7 +177,7 @@ export function CalendarView(props: { className?: string }) {
 
         {isLoadingFilms && (
           <div role="progressbar" aria-label="載入影片中" className="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden">
-            <div className="h-full w-1/3 animate-loading-bar bg-red-500" />
+            <div className="h-full w-1/3 animate-loading-bar bg-brand" />
           </div>
         )}
       </header>

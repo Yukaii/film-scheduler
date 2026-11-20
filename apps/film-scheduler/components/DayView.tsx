@@ -197,10 +197,10 @@ function VenueColumns({ venues, durationOf, renderBlock, nowFraction, nowLabel }
         <div className="relative flex flex-1">
           {nowFraction !== null && (
             <div
-              className="pointer-events-none absolute inset-x-0 z-[15] h-px bg-red-500"
+              className="pointer-events-none absolute inset-x-0 z-[15] h-px bg-brand"
               style={{ top: VENUE_HEADER_HEIGHT + nowFraction * gridHeight }}
             >
-              <span className="absolute left-1 -translate-y-1/2 rounded bg-red-500 px-1 text-xs text-white tabular-nums">
+              <span className="absolute left-1 -translate-y-1/2 rounded bg-brand px-1 text-xs text-brand-foreground tabular-nums">
                 {nowLabel}
               </span>
             </div>
@@ -286,10 +286,10 @@ function VenueRows({ venues, durationOf, renderBlock, nowFraction, nowLabel }: L
         <div className="relative">
           {nowFraction !== null && (
             <div
-              className="pointer-events-none absolute inset-y-0 z-[15] w-px bg-red-500"
+              className="pointer-events-none absolute inset-y-0 z-[15] w-px bg-brand"
               style={{ left: `calc(var(--venue-w) + (100% - var(--venue-w)) * ${nowFraction})` }}
             >
-              <span className="absolute top-0 -translate-x-1/2 rounded-b bg-red-500 px-1 text-xs text-white tabular-nums">
+              <span className="absolute top-0 -translate-x-1/2 rounded-b bg-brand px-1 text-xs text-brand-foreground tabular-nums">
                 {nowLabel}
               </span>
             </div>

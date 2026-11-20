@@ -734,7 +734,7 @@ export function WeekView({
       {/* Current Time Indicator Line */}
       {nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
         <div
-          className="absolute left-0 w-full h-px bg-red-500 z-10"
+          className="absolute left-0 w-full h-px bg-brand z-10"
           id="now-indicator"
           style={{
             top: `${nowPosition - dayTranslateOffsetY}px`,
@@ -745,7 +745,7 @@ export function WeekView({
                 : "block",
           }}
         >
-          <span className="absolute bg-red-500 text-white text-xs px-1 rounded-b left-2">
+          <span className="absolute bg-brand text-brand-foreground text-xs px-1 rounded-b left-2">
             Now {now.format("HH:mm")}
           </span>
         </div>
@@ -792,7 +792,7 @@ export function WeekView({
                     </span>{" "}
                     <span
                       className={cn("p-0.5", {
-                        "bg-red-500 text-white rounded": isSameDay,
+                        "bg-brand text-brand-foreground rounded": isSameDay,
                         "bg-blue-500 text-white rounded": shouldHighlight && !isSameDay,
                       })}
                     >
