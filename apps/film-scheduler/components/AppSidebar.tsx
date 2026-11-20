@@ -25,7 +25,7 @@ import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
 import { filterFilmsAdvanced } from "@/lib/searchParser";
 import dayjs from "dayjs";
-import { ChevronDown, Star, X, Share2, Info, Compass } from "lucide-react";
+import { ChevronDown, Star, X, Share2, Info, BookOpen } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -425,7 +425,7 @@ export function AppSidebar() {
             </Button>
             <ModeToggle />
             <IconAction label="使用教學" onClick={openOnboardingModal}>
-              <Compass />
+              <BookOpen />
             </IconAction>
             <IconAction label="關於" onClick={openAboutModal}>
               <Info />
