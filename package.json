@@ -12,5 +12,8 @@
   },
   "engines": {
     "node": ">=20.9"
+  },
+  "devDependencies": {
+    "next": "^16.4.6"
   }
 }
