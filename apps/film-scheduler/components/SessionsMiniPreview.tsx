@@ -33,7 +33,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
   const { filmsMap } = useAppContext();
 
   const weeksWithSessions = useMemo(() => {
-    const sortedSession = sessions.sort((a, b) => a.time - b.time);
+    const sortedSession = [...sessions].sort((a, b) => a.time - b.time);
     const firstSession = sortedSession.at(0);
     const lastSession = sortedSession.at(-1);
     const firstDisplayDay = dayjs(firstSession?.time).startOf("week");
@@ -75,23 +75,23 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
   }, [sessions, filmsMap]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="grid grid-cols-7 gap-4 mb-4">
+    <div className="rounded-lg border p-3">
+      <div className="mb-1 grid grid-cols-7 gap-1">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className="font-bold text-center">
+          <div key={day} className="text-center text-[0.7rem] font-medium text-muted-foreground">
             {day}
           </div>
         ))}
       </div>
       {weeksWithSessions.map((week, weekIdx) => (
-        <div key={`week-${weekIdx}`} className="grid grid-cols-7 gap-4 mb-4">
+        <div key={`week-${weekIdx}`} className="mb-1 grid grid-cols-7 gap-1">
           {week.days.map(({ day, sessions, showMonth }) => (
             <div
               key={day.format("YYYY-MM-DD")}
-              className="border border-gray-200 p-1"
+              className="min-h-10 rounded-md bg-muted/40 p-1"
             >
-              {showMonth && <div className="text-xs">{day.format("MMM")}</div>}
-              <div className="font-bold text-sm mb-1">{day.format("D")}</div>
+              {showMonth && <div className="text-[0.65rem] leading-none text-muted-foreground">{day.format("MMM")}</div>}
+              <div className="mb-1 text-xs font-medium tabular-nums">{day.format("D")}</div>
               {sessions.map((session) => {
                 const isSelected = selectedSessionIds.has(session.id);
 
@@ -101,7 +101,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
                       <TooltipTrigger asChild>
                         <div
                           onClick={() => onSelectSession(session.id)}
-                          className={cn("h-4 rounded mb-1 cursor-pointer", {
+                          className={cn("mb-0.5 h-2 cursor-pointer rounded-full", {
                             "dark:bg-violet-500 bg-violet-700": isSelected,
                             "dark:bg-slate-600 bg-slate-300": !isSelected,
                           })}

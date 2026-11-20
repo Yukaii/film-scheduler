@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useSyncExternalStore } from "react";
 import { useCopyToClipboard } from "react-use";
+import dayjs from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,7 +24,7 @@ import {
   generateCalendarICS,
 } from "@/lib/utils";
 import { Session, FilmsMap } from "@/components/types";
-import { ChevronDown, Share, CalendarArrowDown, ClipboardCopy } from "lucide-react";
+import { CalendarArrowDown, Check, ChevronDown, Copy, Share } from "lucide-react";
 import { saveAs } from "file-saver";
 
 interface ShareModalProps {
@@ -36,6 +36,15 @@ interface ShareModalProps {
 
 const noopSubscribe = () => () => {};
 
+function SectionLabel({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
+  const className = "block text-xs font-medium text-muted-foreground";
+  return htmlFor ? (
+    <label htmlFor={htmlFor} className={className}>{children}</label>
+  ) : (
+    <p className={className}>{children}</p>
+  );
+}
+
 export function ShareModal({
   sessions,
   open,
@@ -45,7 +54,8 @@ export function ShareModal({
   const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(
     new Set(),
   );
-  const [state, copyToClipboard] = useCopyToClipboard();
+  const [copyState, copyToClipboard] = useCopyToClipboard();
+  const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   // navigator.share never changes at runtime; false on the server
   const isNativeShareSupported = useSyncExternalStore(
@@ -54,16 +64,20 @@ export function ShareModal({
     () => false,
   );
 
-  const onClose = () => setOpen(false);
-
   // Select every session each time the modal opens (or the sessions change while open)
   const [syncedWith, setSyncedWith] = useState<{ open: boolean; sessions: Session[] } | null>(null);
   if (syncedWith?.open !== open || syncedWith.sessions !== sessions) {
     setSyncedWith({ open, sessions });
     if (open) {
       setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
+      setCopied(false);
     }
   }
+
+  const sortedSessions = useMemo(
+    () => [...sessions].sort((a, b) => a.time - b.time),
+    [sessions],
+  );
 
   const toggleSessionSelection = (sessionId: string) => {
     setSelectedSessionIds((prev) => {
@@ -75,21 +89,18 @@ export function ShareModal({
       }
       return updated;
     });
+    setCopied(false);
   };
 
-  const selectAllSessions = (isSelected?: boolean) => {
-    if (isSelected) {
-      setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
-    } else {
-      setSelectedSessionIds(new Set());
-    }
+  const selectAllSessions = (isSelected: boolean) => {
+    setSelectedSessionIds(isSelected ? new Set(sessions.map((s) => s.id)) : new Set());
+    setCopied(false);
   };
 
-  const selectedSessions = useMemo(() => {
-    return sessions.filter((session) =>
-      selectedSessionIds.has(session.id),
-    );
-  }, [selectedSessionIds, sessions]);
+  const selectedSessions = useMemo(
+    () => sortedSessions.filter((session) => selectedSessionIds.has(session.id)),
+    [selectedSessionIds, sortedSessions],
+  );
 
   const shareUrl = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -98,151 +109,160 @@ export function ShareModal({
     return "";
   }, [selectedSessions]);
 
-  // Function to generate ICS file
+  const hasSelection = selectedSessions.length > 0;
+  const allSelected = sessions.length > 0 && selectedSessionIds.size === sessions.length;
+
+  const handleCopy = () => {
+    copyToClipboard(shareUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleDownloadICS = async () => {
     generateCalendarICS(selectedSessions, filmsMap)
       .then((icsContent) => {
         if (icsContent) {
           const blob = new Blob([icsContent], { type: "text/calendar" });
-          saveAs(blob, "Golden_Horse_Film_Schedule.ics");
+          saveAs(blob, "film_schedule.ics");
         }
       })
       .catch((error) => console.error("Error creating calendar:", error));
   };
 
+  const handleNativeShare = async () => {
+    try {
+      await navigator.share({ title: "我的觀影片單", url: shareUrl });
+    } catch (error) {
+      // AbortError = the user closed the share sheet
+      if ((error as Error).name !== "AbortError") console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[85%] grid-rows-[auto_1fr_auto]">
-        <DialogHeader className="sticky top-0 bg-background">
-          <DialogTitle>分享你的場次</DialogTitle>
+      <DialogContent className="flex max-h-[85dvh] flex-col gap-0 p-0 sm:max-w-md">
+        <DialogHeader className="space-y-1 px-6 pb-4 pt-6 text-left">
+          <DialogTitle>分享片單</DialogTitle>
           <DialogDescription>
-            請選擇您想分享的場次並複製生成的連結或下載 ICS 檔案。
+            把選好的場次傳給朋友，或匯入你的行事曆。
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 overflow-auto">
-          <Collapsible
-            open={isExpanded}
-            onOpenChange={setIsExpanded}
-            className="mb-2"
-          >
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between"
-              >
-                展開預覽以選擇場次
-                <ChevronDown
-                  className={`ml-2 ${isExpanded ? "rotate-180" : ""}`}
-                />
-              </Button>
-            </CollapsibleTrigger>
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 pb-6">
+          {/* 1. What is being shared */}
+          <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className="space-y-2">
+            <SectionLabel>場次</SectionLabel>
+            <div className="flex items-center justify-between rounded-lg border px-3 py-2.5">
+              <p className="text-sm">
+                已選{" "}
+                <span className="font-semibold tabular-nums">{selectedSessions.length}</span>
+                <span className="text-muted-foreground tabular-nums"> / {sessions.length}</span> 場
+              </p>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="-mr-2 h-7 gap-1 text-muted-foreground">
+                  {isExpanded ? "收合" : "選擇"}
+                  <ChevronDown className={isExpanded ? "rotate-180 transition-transform" : "transition-transform"} />
+                </Button>
+              </CollapsibleTrigger>
+            </div>
 
-            <CollapsibleContent>
-              <div className="p-2">
-                <div className="flex items-center mb-2">
+            <CollapsibleContent className="space-y-3">
+              <SessionsMiniPreview
+                sessions={sortedSessions}
+                selectedSessionIds={selectedSessionIds}
+                onSelectSession={toggleSessionSelection}
+              />
+
+              <div className="rounded-lg border">
+                <div className="flex items-center gap-3 border-b px-3 py-2">
                   <Checkbox
-                    id="select-all"
-                    onCheckedChange={(checked) =>
-                      selectAllSessions(Boolean(checked))
-                    }
-                    checked={selectedSessionIds.size === sessions.length}
+                    id="share-select-all"
+                    checked={allSelected}
+                    onCheckedChange={(checked) => selectAllSessions(checked === true)}
                   />
-                  <label htmlFor="select-all" className="ml-2">
+                  <label htmlFor="share-select-all" className="flex-1 cursor-pointer text-sm font-medium">
                     全選
                   </label>
                 </div>
-
-                <SessionsMiniPreview
-                  sessions={sessions}
-                  selectedSessionIds={selectedSessionIds}
-                  onSelectSession={toggleSessionSelection}
-                />
-
-                {sessions.map((session) => {
-                  const film = filmsMap.get(session.filmId);
-                  const sessionId = session.id;
-                  if (!film) return null;
-
-                  return (
-                    <div
-                      key={sessionId}
-                      className="flex items-center space-x-2 mt-1"
-                    >
-                      <Checkbox
-                        id={`checkbox-${sessionId}`}
-                        onCheckedChange={() =>
-                          toggleSessionSelection(sessionId)
-                        }
-                        checked={selectedSessionIds.has(sessionId)}
-                      />
-                      <label htmlFor={`checkbox-${sessionId}`}>
-                        {film.filmTitle} {session.location} -{" "}
-                        {new Date(session.time).toLocaleString()}
-                      </label>
-                    </div>
-                  );
-                })}
+                <ul className="max-h-56 overflow-y-auto py-1">
+                  {sortedSessions.map((session) => {
+                    const film = filmsMap.get(session.filmId);
+                    if (!film) return null;
+                    return (
+                      <li key={session.id}>
+                        <div className="flex items-center gap-3 px-3 py-1.5 hover:bg-muted/50">
+                          <Checkbox
+                            id={`share-${session.id}`}
+                            checked={selectedSessionIds.has(session.id)}
+                            onCheckedChange={() => toggleSessionSelection(session.id)}
+                          />
+                          <label htmlFor={`share-${session.id}`} className="min-w-0 flex-1 cursor-pointer">
+                            <span className="block truncate text-sm">{film.filmTitle}</span>
+                            <span className="block truncate text-xs text-muted-foreground">
+                              <span className="tabular-nums">{dayjs(session.time).format("MM/DD HH:mm")}</span>
+                              {" · "}
+                              {session.location}
+                            </span>
+                          </label>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             </CollapsibleContent>
           </Collapsible>
-        </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Input value={shareUrl} readOnly className="grow" />
-            <Button variant="default" onClick={() => copyToClipboard(shareUrl)}>
-              <ClipboardCopy className="mr-1" />
-              複製到剪貼簿
-            </Button>
-          </div>
-          
-          <DialogFooter className="flex flex-wrap gap-2 justify-end">
-            {isNativeShareSupported && (
+          {/* 2. The link */}
+          <div className="space-y-2">
+            <SectionLabel htmlFor="share-url">分享連結</SectionLabel>
+            <div className="flex gap-2">
+              <Input
+                id="share-url"
+                value={hasSelection ? shareUrl : ""}
+                placeholder="請至少選擇一個場次"
+                readOnly
+                onFocus={(e) => e.currentTarget.select()}
+                className="min-w-0 flex-1 font-mono text-xs text-muted-foreground"
+              />
               <Button
-                variant="default"
-                className="flex-1 sm:flex-none"
-                onClick={async () => {
-                  try {
-                    const shareData: ShareData = {
-                      title: "金馬影展場次分享",
-                      text: "我選的金馬影展場次",
-                      url: shareUrl,
-                    };
-                    await navigator.share(shareData);
-                  } catch (error) {
-                    console.error("Error sharing:", error);
-                  }
-                }}
+                variant="outline"
+                onClick={handleCopy}
+                disabled={!hasSelection}
+                className="w-24 shrink-0"
+                aria-live="polite"
               >
-                <Share className="mr-1" />
-                分享
+                {copied && !copyState.error ? (
+                  <>
+                    <Check className="text-green-600" />
+                    已複製
+                  </>
+                ) : (
+                  <>
+                    <Copy />
+                    複製
+                  </>
+                )}
               </Button>
+            </div>
+            {copyState.error && (
+              <p className="text-xs text-destructive">無法複製：{copyState.error.message}</p>
             )}
-            <Button 
-              variant="default" 
-              className="flex-1 sm:flex-none"
-              onClick={handleDownloadICS}
-            >
-              <CalendarArrowDown className="mr-1" />
-              下載 ICS
-            </Button>
-            <Button 
-              variant="secondary" 
-              className="flex-1 sm:flex-none"
-              onClick={onClose}
-            >
-              關閉
-            </Button>
-          </DialogFooter>
+          </div>
         </div>
 
-        <div>
-          {state.error ? (
-            <p className="text-red-500">無法複製值: {state.error.message}</p>
-          ) : (
-            state.value && <p className="text-green-500">已複製到剪貼簿！</p>
+        {/* 3. Actions */}
+        <div className="flex flex-col-reverse gap-2 border-t bg-muted/30 px-6 py-4 sm:flex-row sm:justify-end sm:rounded-b-lg">
+          {isNativeShareSupported && (
+            <Button variant="outline" onClick={handleNativeShare} disabled={!hasSelection}>
+              <Share />
+              分享…
+            </Button>
           )}
+          <Button onClick={handleDownloadICS} disabled={!hasSelection}>
+            <CalendarArrowDown />
+            下載行事曆 (.ics)
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
