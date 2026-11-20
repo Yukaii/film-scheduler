@@ -36,8 +36,12 @@ class Config {
   static readonly DATA_DIR = path.join(__dirname, 'data');
   
   // Festival dates
-  static readonly FESTIVAL_START_DATE = '2025-06-20';
-  static readonly FESTIVAL_END_DATE = '2025-07-01';
+  // Festival run per edition (inclusive). Add the new year before scraping it; check the dates on
+  // https://www.taipeiff.taipei/tw/movies/schedule
+  static readonly FESTIVAL_DATES: Record<string, [start: string, end: string]> = {
+    '2025': ['2025-06-20', '2025-07-01'],
+    '2026': ['2026-06-26', '2026-07-11'],
+  };
   static readonly HEADERS = {
     'Accept': 'application/json, text/plain, */*',
     'Accept-Language': 'zh-TW,zh;q=0.9',
@@ -522,8 +526,13 @@ class ScheduleService {
       console.log(`Place mapping loaded: ${JSON.stringify(placeMap, null, 2)}`);
       
       // Generate date range for the festival
-      const dates = ParserService.generateDateRange(Config.FESTIVAL_START_DATE, Config.FESTIVAL_END_DATE);
-      console.log(`Fetching schedules for ${dates.length} dates: ${Config.FESTIVAL_START_DATE} to ${Config.FESTIVAL_END_DATE}`);
+      const range = Config.FESTIVAL_DATES[festival.year];
+      if (!range) {
+        throw new Error(`No festival dates configured for ${festival.year}; add them to Config.FESTIVAL_DATES`);
+      }
+      const [startDate, endDate] = range;
+      const dates = ParserService.generateDateRange(startDate, endDate);
+      console.log(`Fetching schedules for ${dates.length} dates: ${startDate} to ${endDate}`);
       
       for (const date of dates) {
         try {
@@ -750,7 +759,10 @@ async function main(options: MainOptions = {}) {
     process.exit(1);
   }
 
-  const year = '2025'; // Define year once
+  // The site only serves the current edition; pass the year explicitly (`node dist/main.js 2026`)
+  // so data never lands in the wrong year's folder.
+  const year = process.argv[2] ?? String(new Date().getFullYear());
+  if (!/^\d{4}$/.test(year)) throw new Error(`Invalid year: ${year}`);
   const festivalIdentifier = 'TAIPEIFF'; // Festival identifier for directory
 
   // Initialize SectionManager with all fetched API categories ONCE.

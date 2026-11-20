@@ -34,6 +34,9 @@ class Config {
   ];
 
   static readonly FESTIVALS: FestivalConfig[] = [
+    { year: '2026', parentId: '715', category: 'FF' },
+    { year: '2026', parentId: '713', category: 'FFF' },
+    { year: '2025', parentId: '676', category: 'FF' },
     { year: '2025', parentId: '674', category: 'FFF' },
     { year: '2024', parentId: '638', category: 'FF' },
     { year: '2023', parentId: '637', category: 'FF' },
@@ -51,6 +54,16 @@ class Config {
   }
 
   static async selectFestival(): Promise<FestivalConfig> {
+    // Non-interactive: `node dist/main.js 2026-FF`
+    const requested = process.argv[2];
+    if (requested) {
+      const match = this.FESTIVALS.find(f => `${f.year}-${f.category}` === requested);
+      if (!match) {
+        throw new Error(`Unknown festival ${requested}. Known: ${this.FESTIVALS.map(f => `${f.year}-${f.category}`).join(', ')}`);
+      }
+      return match;
+    }
+
     const choices = this.FESTIVALS.map(festival => {
       const category = this.CATEGORIES.find(c => c.value === festival.category);
       return {

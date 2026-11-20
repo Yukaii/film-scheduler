@@ -12,7 +12,7 @@ export const CATEGORIES: Category[] = [
 
 // Festival IDs (`<YEAR>-<CATEGORY>`) served by the API. Data for each lives in a
 // scraper package under `src/data/<ID>/` on GitHub main.
-export const FESTIVALS = ['2025-TAIPEIFF', '2025-FFF', '2024-FF'] as const;
+export const FESTIVALS = ['2026-FF', '2026-TAIPEIFF', '2025-TAIPEIFF', '2025-FFF', '2024-FF'] as const;
 
 export function isKnownFestival(id: string): boolean {
   return (FESTIVALS as readonly string[]).includes(id);

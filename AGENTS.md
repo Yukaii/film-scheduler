@@ -29,11 +29,12 @@ raw.githubusercontent.com/Yukaii/film-scheduler/main/packages/<source>/src/data/
 ```
 
 Consequences:
-- **Scraped JSON on `main` is the production data.** Fetches use `cache: "force-cache"`, and
-  `/api/festivals` is prerendered at build time (`dynamic = 'force-static'`). After merging new
-  data, redeploy on Vercel (or purge the data cache) to pick it up. These caching flags are
-  explicit because Next 15+ no longer caches by default. Do not remove them unless you want
-  every request to hit GitHub.
+- **Scraped JSON on `main` is the production data.** GitHub fetches revalidate hourly
+  (`DATA_REVALIDATE_SECONDS` in `lib/githubDataFetcher.ts`, which also bounds its in-memory
+  cache). `/` and `/api/festivals` are prerendered with `revalidate = 3600`; the festival list
+  comes from `getFestivals()` in `lib/festivals.ts` on the server. New data on `main` appears
+  within an hour, or immediately after a redeploy. Keep these explicit: Next 15+ does not cache
+  by default, and without them every request hits GitHub. `revalidate` must stay a literal number.
 - Local `pnpm dev` also reads from GitHub `main`, not from your working tree. Local data edits
   will not show up until they are pushed.
 - Festival IDs are `<YEAR>-<CATEGORY>` (e.g. `2025-FFF`, `2025-TAIPEIFF`). An ID containing
@@ -41,10 +42,17 @@ Consequences:
 
 ### Adding a festival
 
-1. Add it to `FESTIVALS` in the relevant scraper's `src/main.ts`, then build and run:
-   `pnpm --filter @film-scheduler/film-source-golden-horse build && pnpm --filter @film-scheduler/film-source-golden-horse start`.
-   The scraper writes to `dist/data/`. Copy the new festival folder into `src/data/`, because
-   that is the path the app fetches.
+1. Configure and run the scraper **while the festival is running or about to start**. Both sites
+   remove showtimes once a festival ends, and a scrape after that has films but no schedule.
+   - Golden Horse: add `{ year, parentId, category }` to `FESTIVALS` in `src/main.ts`. Get
+     `parentId` from the `parent_list` that `get_class_list` returns for that year and
+     category. Run it with `NODE_ENV=production node dist/main.js 2026-FF`. Without
+     `NODE_ENV=production` it fetches only 10 films.
+   - TaipeiFF: add the edition's dates to `FESTIVAL_DATES` in `src/main.ts` (from
+     taipeiff.taipei/tw/movies/schedule), then run `NODE_ENV=production node dist/main.js 2026`.
+   Both write to `dist/data/<ID>/`. Copy that folder into `src/data/`, which is what the app
+   fetches, **before rebuilding**: the TaipeiFF build wipes `dist/`. Sanity-check that most
+   films have a non-empty `schedule`.
 2. Add the ID to `FESTIVALS` in `apps/film-scheduler/lib/config.ts`. Both API routes read it,
    and `/api/films/[id]` returns 404 for IDs not in the list.
 3. If it is a new category, add it to `CATEGORIES` in the same file.
