@@ -10,9 +10,6 @@ export type AppContextType = {
   films: Film[];
   filmsMap: FilmsMap;
   sections: Section[];
-  setFilms: Dispatch<SetStateAction<Film[]>>;
-  setFilmsMap: Dispatch<SetStateAction<FilmsMap>>;
-  setSections: Dispatch<SetStateAction<Section[]>>;
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
@@ -58,9 +55,6 @@ export const AppContext = React.createContext<AppContextType>({
   films: [],
   filmsMap: new Map(),
   sections: [],
-  setFilms: noop,
-  setFilmsMap: noop,
-  setSections: noop,
   selectedSessions: [],
   previewSessions: [],
   previewFilmId: undefined,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useSyncExternalStore } from "react";
 import { useCopyToClipboard } from "react-use";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,8 @@ interface ShareModalProps {
   filmsMap: FilmsMap;
 }
 
+const noopSubscribe = () => () => {};
+
 export function ShareModal({
   sessions,
   open,
@@ -45,21 +47,23 @@ export function ShareModal({
   );
   const [state, copyToClipboard] = useCopyToClipboard();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isNativeShareSupported, setIsNativeShareSupported] = useState(false);
-
-  useEffect(() => {
-    setIsNativeShareSupported(
-      typeof navigator !== "undefined" && !!navigator.share
-    );
-  }, []);
+  // navigator.share never changes at runtime; false on the server
+  const isNativeShareSupported = useSyncExternalStore(
+    noopSubscribe,
+    () => !!navigator.share,
+    () => false,
+  );
 
   const onClose = () => setOpen(false);
 
-  useEffect(() => {
+  // Select every session each time the modal opens (or the sessions change while open)
+  const [syncedWith, setSyncedWith] = useState<{ open: boolean; sessions: Session[] } | null>(null);
+  if (syncedWith?.open !== open || syncedWith.sessions !== sessions) {
+    setSyncedWith({ open, sessions });
     if (open) {
       setSelectedSessionIds(new Set(sessions.map((s) => s.id)));
     }
-  }, [open, sessions]);
+  }
 
   const toggleSessionSelection = (sessionId: string) => {
     setSelectedSessionIds((prev) => {

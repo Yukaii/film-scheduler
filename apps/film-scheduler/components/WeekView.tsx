@@ -99,13 +99,20 @@ export function WeekView({
   const [isHighlightActive, setIsHighlightActive] = useState(false);
   const [currentHighlightDate, setCurrentHighlightDate] = useState<Date | undefined>(undefined);
 
-  // Effect to manage highlight timeout
-  useEffect(() => {
+  // Start highlighting as soon as a new highlightDate arrives (during render,
+  // so there is no extra un-highlighted frame)
+  const [prevHighlightDate, setPrevHighlightDate] = useState<Date | undefined>(undefined);
+  if (highlightDate !== prevHighlightDate) {
+    setPrevHighlightDate(highlightDate);
     if (highlightDate) {
       setIsHighlightActive(true);
       setCurrentHighlightDate(highlightDate);
-      
-      // Set a timeout to clear the highlight after 2 seconds
+    }
+  }
+
+  // Clear the highlight after a delay
+  useEffect(() => {
+    if (highlightDate) {
       const timer = setTimeout(() => {
         setIsHighlightActive(false);
       }, 1000);
@@ -178,6 +185,40 @@ export function WeekView({
     setDayTranslateOffsetY,
     setVirtualWindowStart,
   });
+
+  const visibleDaysRange = useMemo(() => {
+    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
+    return `${startIndex} to ${startIndex + 7}`;
+  }, [dayTranslateOffsetX, dayWidth]);
+
+  const [visibleStartDay, visibleEndDay] = useMemo(() => {
+    if (weekDays.length === 0) return [null, null];
+    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
+    const endIndex = Math.min(startIndex + 7, weekDays.length);
+
+    if (startIndex >= weekDays.length || endIndex <= 0) {
+      console.warn("Invalid day range");
+      return [null, null];
+    }
+
+    const visibleStartDay = weekDays[Math.max(0, startIndex)];
+    const visibleEndDay = weekDays[Math.min(endIndex - 1, weekDays.length - 1)];
+
+    return [visibleStartDay, visibleEndDay] as const;
+  }, [dayTranslateOffsetX, dayWidth, weekDays]);
+
+  const actualDaysRange = useMemo(() => {
+    if (!visibleStartDay || !visibleEndDay) return "";
+    return `${visibleStartDay.format("MM/DD")} to ${visibleEndDay.format(
+      "MM/DD"
+    )}`;
+  }, [visibleStartDay, visibleEndDay]);
+
+  // Visible day tracking ref for dayWidth changes
+  const visibleStartDayRef = useRef<dayjs.Dayjs | null>(null);
+  useEffect(() => {
+    visibleStartDayRef.current = visibleStartDay;
+  }, [visibleStartDay]);
 
   // Only run this effect when the component mounts or when viewWeekStart changes
   useEffect(() => {
@@ -543,40 +584,6 @@ export function WeekView({
     dragEndPos,
     handleMouseUp,
   ]);
-
-  const visibleDaysRange = useMemo(() => {
-    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
-    return `${startIndex} to ${startIndex + 7}`;
-  }, [dayTranslateOffsetX, dayWidth]);
-
-  const [visibleStartDay, visibleEndDay] = useMemo(() => {
-    if (weekDays.length === 0) return [null, null];
-    const startIndex = Math.floor(dayTranslateOffsetX / dayWidth);
-    const endIndex = Math.min(startIndex + 7, weekDays.length);
-
-    if (startIndex >= weekDays.length || endIndex <= 0) {
-      console.warn("Invalid day range");
-      return [null, null];
-    }
-
-    const visibleStartDay = weekDays[Math.max(0, startIndex)];
-    const visibleEndDay = weekDays[Math.min(endIndex - 1, weekDays.length - 1)];
-
-    return [visibleStartDay, visibleEndDay] as const;
-  }, [dayTranslateOffsetX, dayWidth, weekDays]);
-
-  const actualDaysRange = useMemo(() => {
-    if (!visibleStartDay || !visibleEndDay) return "";
-    return `${visibleStartDay.format("MM/DD")} to ${visibleEndDay.format(
-      "MM/DD"
-    )}`;
-  }, [visibleStartDay, visibleEndDay]);
-
-  // Visible day tracking ref for dayWidth changes
-  const visibleStartDayRef = useRef<dayjs.Dayjs | null>(null);
-  useEffect(() => {
-    visibleStartDayRef.current = visibleStartDay;
-  }, [visibleStartDay]);
 
   return (
     <div

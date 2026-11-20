@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { loadSessionIdsFromUrl } from "@/lib/utils";
 import { Session } from "@/components/types";
 
@@ -69,14 +69,20 @@ export function useSessionImport(availableSessions: Session[]) {
   const { open: importModalOpen, setOpen: setImportModalOpen } =
     useToggle(false);
 
-  useEffect(() => {
-    // Load session ids from the URL and check against available sessions
-    const sessionsFromUrl = loadSessionIdsFromUrl(availableSessions);
+  // Whenever the available sessions change (e.g. films finished loading), check
+  // the URL for shared session ids. Adjusting state during render instead of in
+  // an effect avoids an extra render pass:
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [checkedSessions, setCheckedSessions] = useState<Session[] | null>(null);
+  if (checkedSessions !== availableSessions) {
+    setCheckedSessions(availableSessions);
+    const sessionsFromUrl =
+      typeof window === "undefined" ? [] : loadSessionIdsFromUrl(availableSessions);
     if (sessionsFromUrl.length > 0) {
       setImportSessions(sessionsFromUrl);
       setImportModalOpen(true); // Open modal if there are valid sessions to import
     }
-  }, [availableSessions, setImportModalOpen]);
+  }
 
   // Close the modal and reset the import sessions
   const closeImportModal = () => {
@@ -100,19 +106,31 @@ export function useSessionImport(availableSessions: Session[]) {
   };
 }
 
-const getOnboardingStatus = () => typeof localStorage !== 'undefined' && localStorage.getItem("hasViewedOnboarding") === "true"
+const ONBOARDING_KEY = "hasViewedOnboarding";
+const onboardingListeners = new Set<() => void>();
+
+function subscribeOnboarding(listener: () => void) {
+  onboardingListeners.add(listener);
+  // Also pick up changes made in other tabs
+  window.addEventListener("storage", listener);
+  return () => {
+    onboardingListeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+const getOnboardingStatus = () => localStorage.getItem(ONBOARDING_KEY) === "true";
 
 export function useOnboardingStatus() {
-  const [hasViewedOnboarding, setHasViewedOnboarding] = useState(getOnboardingStatus());
-
-  useEffect(() => {
-    const viewed = getOnboardingStatus();
-    setHasViewedOnboarding(viewed);
-  }, []);
+  const hasViewedOnboarding = useSyncExternalStore(
+    subscribeOnboarding,
+    getOnboardingStatus,
+    () => false,
+  );
 
   const markOnboardingAsViewed = () => {
-    localStorage.setItem("hasViewedOnboarding", "true");
-    setHasViewedOnboarding(true);
+    localStorage.setItem(ONBOARDING_KEY, "true");
+    onboardingListeners.forEach((listener) => listener());
   };
 
   return { hasViewedOnboarding, markOnboardingAsViewed };

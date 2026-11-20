@@ -33,16 +33,33 @@ const ShareModal = dynamic(() =>
   import("@/components/ShareModal").then((m) => m.ShareModal),
 );
 
+// Stable fallbacks so memo dependencies don't change on every render
+const EMPTY_FILMS: Film[] = [];
+const EMPTY_FILMS_MAP: FilmsMap = new Map();
+const EMPTY_SECTIONS: Section[] = [];
+
 interface MainProps {
   festivals: Festival[];
   defaultFestivalId: string;
 }
 
 export default function Main({ festivals, defaultFestivalId }: MainProps) {
-  const [films, setFilms] = useState<Film[]>([]);
-  const [filmsMap, setFilmsMap] = useState<FilmsMap>(new Map());
-  const [sections, setSections] = useState<Section[]>([]);
   const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
+
+  // Single source of truth for festival data. keepPreviousData keeps the old
+  // festival on screen while the newly selected one loads.
+  const { data } = useSWR(
+    currentFestivalId ? ["films", currentFestivalId] : null,
+    ([, festivalId]) => fetchFilms(festivalId),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      keepPreviousData: true,
+    }
+  );
+  const films = data?.films ?? EMPTY_FILMS;
+  const filmsMap = data?.filmsMap ?? EMPTY_FILMS_MAP;
+  const sections = data?.sections ?? EMPTY_SECTIONS;
 
   const [previewFilmId, setPreviewFilmId] = useState<string | undefined>(
     undefined,
@@ -213,30 +230,6 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
     }
   };
 
-  const selectedFestival = useMemo(
-    () => festivals.find((f) => f.id === defaultFestivalId) || festivals[0],
-    [festivals, defaultFestivalId]
-  );
-
-  const { data } = useSWR(
-    [selectedFestival?.id],
-    ([festivalId]) => fetchFilms(festivalId),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-
-  useEffect(() => {
-    if (data?.films) {
-      setFilms(data.films);
-      setFilmsMap(data.filmsMap);
-    }
-    if (data?.sections) {
-      setSections(data.sections);
-    }
-  }, [data?.films, data?.filmsMap, data?.sections, setFilms, setFilmsMap]);
-
   return (
     <div className="flex flex-col w-full">
 
@@ -245,9 +238,6 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           films,
           filmsMap,
           sections,
-          setFilms,
-          setFilmsMap,
-          setSections,
           festivals,
           defaultFestivalId,
           currentFestivalId,

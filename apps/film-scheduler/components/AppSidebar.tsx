@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import useSWR from "swr";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +20,6 @@ import {
 import { ModeToggle } from "./ModeToggle";
 import { SearchInput } from "./SearchInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { fetchFilms } from "@/lib/filmData";
 import { Film, Session } from "./types";
 import {
   cn,
@@ -176,8 +174,6 @@ export function AppSidebar() {
     films,
     festivals,
     defaultFestivalId,
-    setFilms,
-    setFilmsMap,
     sections,
     setPreviewFilmId,
     previewFilmId,
@@ -253,21 +249,6 @@ export function AppSidebar() {
     setCurrentFestivalId(festivalId);
     router.push(`?festival=${festivalId}`);
   };
-  
-  useSWR(
-    currentFestivalId ? ['films', currentFestivalId] : null,
-    () => fetchFilms(currentFestivalId),
-    {
-      revalidateOnFocus: false,
-      onSuccess: (data) => {
-        if (data) {
-          const { films: newFilms, filmsMap: newFilmsMap } = data;
-          setFilms(newFilms);
-          setFilmsMap(newFilmsMap);
-        }
-      },
-    }
-  );
 
   return (
     <Sidebar>
