@@ -93,7 +93,7 @@ export function SessionBlock({
         "border-4 border-solid border-transparent overflow-hidden group/sessionblock",
         "select-none session-block",
         {
-          "opacity-70 hover:cursor-zoom-in bg-slate-600 dark:bg-slate-800 border-slate-600 dark:border-slate-800":
+          "opacity-70 hover:cursor-zoom-in bg-stone-500 dark:bg-stone-700 border-stone-500 dark:border-stone-700":
             !isSelectedSession,
           "opacity-100 dark:bg-violet-900 bg-violet-500 dark:hover:border-white cursor-pointer hover:border-violet-700":
             isSelectedSession,

@@ -103,7 +103,7 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
                           onClick={() => onSelectSession(session.id)}
                           className={cn("mb-0.5 h-2 cursor-pointer rounded-full", {
                             "dark:bg-violet-500 bg-violet-700": isSelected,
-                            "dark:bg-slate-600 bg-slate-300": !isSelected,
+                            "dark:bg-stone-600 bg-stone-300": !isSelected,
                           })}
                         />
                       </TooltipTrigger>
