@@ -7,6 +7,7 @@ import { cn, scrollNowIndicatorIntoView } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
 import { CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { BrandMark } from "./BrandMark";
+import { ViewModeIcon } from "./ViewModeIcon";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -164,12 +165,14 @@ export function CalendarView(props: { className?: string }) {
                 role="radio"
                 aria-checked={viewMode === mode}
                 onClick={() => setViewMode(mode)}
+                title={label}
                 className={cn(
-                  "h-7 rounded-md px-2.5 text-sm whitespace-nowrap sm:px-3 font-medium text-muted-foreground transition-colors hover:text-foreground",
+                  "inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-sm whitespace-nowrap sm:px-2.5 font-medium text-muted-foreground transition-colors hover:text-foreground",
                   viewMode === mode && "bg-background text-foreground shadow-xs",
                 )}
               >
-                {label}
+                <ViewModeIcon mode={mode} days={visibleDays} />
+                <span className="max-sm:sr-only">{label}</span>
               </button>
             ))}
           </div>
