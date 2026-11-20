@@ -90,8 +90,13 @@ export const SessionsMiniPreview: React.FC<MonthViewProps> = ({
               key={day.format("YYYY-MM-DD")}
               className="min-h-10 rounded-md bg-muted/40 p-1"
             >
-              {showMonth && <div className="text-[0.65rem] leading-none text-muted-foreground">{day.format("MMM")}</div>}
-              <div className="mb-1 text-xs font-medium tabular-nums">{day.format("D")}</div>
+              {/* Month shares the date's line so every date sits on the same baseline */}
+              <div className="mb-1 flex items-baseline gap-1 text-xs leading-none">
+                <span className="font-medium tabular-nums">{day.format("D")}</span>
+                {showMonth && (
+                  <span className="truncate text-[0.65rem] text-muted-foreground">{day.format("MMM")}</span>
+                )}
+              </div>
               {sessions.map((session) => {
                 const isSelected = selectedSessionIds.has(session.id);
 
