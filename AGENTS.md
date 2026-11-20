@@ -68,7 +68,13 @@ pnpm build        # builds the web app only (what Vercel runs)
 pnpm build:all    # also builds the scraper packages
 pnpm lint         # oxlint (warnings fail)
 pnpm typecheck    # tsc --noEmit for the app
+pnpm --filter film-scheduler capture:tutorial   # re-shoot the onboarding tutorial images
 ```
+
+`capture:tutorial` drives the app with Playwright (`scripts/capture-tutorial.mjs`) and writes
+light and dark `public/images/onboarding-<n>.png`. Re-run it after UI changes that the tutorial
+shows. It uses the dev server on :4000 (or starts one), needs a festival that still has
+showtimes (`--festival`), and reads `SHARE_ORIGIN` to show a real URL in the share step.
 
 Single package: `pnpm --filter film-scheduler <script>` or
 `pnpm --filter @film-scheduler/film-source-golden-horse <script>`.

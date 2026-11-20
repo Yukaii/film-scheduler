@@ -819,7 +819,7 @@ export function WeekView({
 
       {/* Debug info - shown only in development */}
       {process.env.NODE_ENV === "development" && (
-        <div className="absolute bottom-2 right-2 bg-black/70 text-white p-2 rounded text-xs z-50">
+        <div data-dev-overlay className="absolute bottom-2 right-2 bg-black/70 text-white p-2 rounded text-xs z-50">
           <div>Window size: {virtualWindowSize} days</div>
           <div>Window start: {virtualWindowStart.format("MM/DD")}</div>
           <div>
