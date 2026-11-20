@@ -48,7 +48,8 @@ function Calendar({
         day_button: cn(
           buttonVariants({ variant: "ghost" }),
           "h-8 w-8 p-0 font-normal",
-          "group-data-[today=true]/day:bg-accent group-data-[today=true]/day:text-accent-foreground",
+          // today styling yields to selected styling
+          "group-[[data-today=true]:not([data-selected])]/day:bg-accent group-[[data-today=true]:not([data-selected])]/day:text-accent-foreground",
           "group-data-[selected=true]/day:bg-primary group-data-[selected=true]/day:text-primary-foreground",
           "group-data-[selected=true]/day:hover:bg-primary group-data-[selected=true]/day:hover:text-primary-foreground",
           "group-data-[outside=true]/day:text-muted-foreground group-data-[outside=true]/day:opacity-50",
