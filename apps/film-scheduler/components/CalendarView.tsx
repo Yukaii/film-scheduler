@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "@/components/Icons";
-import dayjs from "@/lib/dayjs";
+import dayjs, { weekdayZh } from "@/lib/dayjs";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn, scrollNowIndicatorIntoView } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
@@ -95,9 +95,15 @@ export function CalendarView(props: { className?: string }) {
   const formatHeaderDate = () => {
     if (viewMode === "week") {
       return viewWeekStart.format("YYYY 年 M 月");
-    } else {
-      return dayjs(currentDate).format("YYYY 年 M 月 D 日");
     }
+    return (
+      <>
+        {/* Phones drop the year so the date and weekday fit beside the controls */}
+        <span className="max-sm:hidden">{dayjs(currentDate).format("YYYY 年")}</span>
+        {dayjs(currentDate).format("M 月 D 日")}
+        <span className="font-normal text-muted-foreground">{weekdayZh(currentDate)}</span>
+      </>
+    );
   };
 
 

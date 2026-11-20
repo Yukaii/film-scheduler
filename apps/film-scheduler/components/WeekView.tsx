@@ -6,7 +6,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import dayjs from "@/lib/dayjs";
+import dayjs, { weekdayZh } from "@/lib/dayjs";
 
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
@@ -746,7 +746,7 @@ export function WeekView({
                         "font-semibold": isSameDay,
                       })}
                     >
-                      {day.format("ddd")}
+                      {weekdayZh(day)}
                     </span>{" "}
                     <span
                       className={cn("p-0.5", {

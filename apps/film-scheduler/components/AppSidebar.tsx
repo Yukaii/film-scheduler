@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Film, Session } from "./types";
 import { cn } from "@/lib/utils";
 import { filterFilmsAdvanced } from "@/lib/searchParser";
-import dayjs from "@/lib/dayjs";
+import dayjs, { weekdayZh } from "@/lib/dayjs";
 import { Star, X, Share2, Info, BookOpen, TriangleAlert } from "lucide-react";
 import { Button } from "./ui/button";
 import { ResizeHandle } from "./ResizeHandle";
@@ -30,7 +30,6 @@ import { usePanelWidth } from "@/hooks/usePanelWidth";
 import { SIDEBAR_SIZE } from "@/lib/panelSizes";
 
 type Tab = "films" | "schedule";
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
 
 function FilmListItem({
   film,
@@ -388,7 +387,7 @@ export function AppSidebar() {
       const d = dayjs(s.time);
       const key = d.format("YYYY-MM-DD");
       if (days.at(-1)?.key !== key) {
-        days.push({ key, label: `${d.format("MM/DD")}（${WEEKDAYS[d.day()]}）`, sessions: [] });
+        days.push({ key, label: `${d.format("MM/DD")}（${weekdayZh(d, { short: true })}）`, sessions: [] });
       }
       days.at(-1)!.sessions.push(s);
     }
