@@ -45,8 +45,9 @@ Consequences:
    `pnpm --filter @film-scheduler/film-source-golden-horse build && pnpm --filter @film-scheduler/film-source-golden-horse start`.
    The scraper writes to `dist/data/`. Copy the new festival folder into `src/data/`, because
    that is the path the app fetches.
-2. Add the ID to the `FESTIVALS` list in `apps/film-scheduler/app/api/festivals/route.ts`.
-3. If it is a new category, add it to `CATEGORIES` in `apps/film-scheduler/lib/config.ts`.
+2. Add the ID to `FESTIVALS` in `apps/film-scheduler/lib/config.ts`. Both API routes read it,
+   and `/api/films/[id]` returns 404 for IDs not in the list.
+3. If it is a new category, add it to `CATEGORIES` in the same file.
 
 ## Commands
 
@@ -70,7 +71,7 @@ and for UI changes run `pnpm dev` and check in a browser (both light and dark th
 and `PageProps` types used in route handlers.
 
 Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat config
-(`eslint.config.mjs`), Tailwind CSS 3 with shadcn/ui. Next 15+ rules apply: route `params` and
+(`eslint.config.mjs`), Tailwind CSS 4 with shadcn/ui, react-day-picker 10. Next 15+ rules apply: route `params` and
 `searchParams` are Promises and must be `await`ed. `next build` no longer runs ESLint.
 
 ## Code conventions (app)
@@ -81,8 +82,17 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat
 - Feature components are PascalCase files in `components/` and use default exports. Shared
   domain types live in `components/types.ts` and `lib/types.ts`.
 - Global client state lives in `contexts/AppContext.tsx`. Hooks go in `hooks/`, pure helpers in `lib/`.
-- Styling is Tailwind with CSS-variable theme tokens (`app/globals.css`, `tailwind.config.ts`).
-  Merge classes with `cn()` from `@/lib/utils`.
+- Styling is Tailwind v4, configured CSS-first in `app/globals.css`: there is no
+  `tailwind.config.*`. Theme tokens are declared in `@theme`, and animations come from
+  `tw-animate-css`. Use v4 class names (`shadow-xs`, `rounded-sm`, `outline-hidden`) and v4
+  variant order, which applies left to right (`hover:group-data-[x]/name:`). Merge classes with
+  `cn()` from `@/lib/utils`.
+- React Compiler lint rules (`react-hooks/set-state-in-effect`, `purity`, `immutability`) are
+  errors. Derive values during render. Read browser APIs (matchMedia, localStorage, navigator)
+  with `useSyncExternalStore`. Use the "adjust state during render" pattern instead of syncing
+  state in effects.
+- Festival data has one owner: the SWR fetch in `components/Main.tsx`. Components read
+  `films`/`filmsMap`/`sections` from `AppContext` and change festival with `setCurrentFestivalId`.
 - Use dayjs for dates, through `@/lib/dayjs` (plugins preconfigured). Session times are stored as
   epoch ms in Asia/Taipei (`+8`).
 - The search mini-language (`AND`/`OR`/`NOT`, prefixes) is parsed in `lib/searchParser.ts`.
@@ -102,12 +112,10 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, ESLint 9 flat
 - `.env.local` (`FALLBACK_COMMIT`) is local-only and must never be committed.
 - CI (`.github/workflows/build.yml`) runs install → lint → app build (includes type check) →
   scraper package builds on Node 22, caching both the pnpm store and `.next/cache`.
-- The `react-hooks/set-state-in-effect`, `immutability` and `purity` lint rules are set to `warn`
-  in `eslint.config.mjs` because existing code violates them. Do not add new violations. When you
-  touch a flagged component, fix its warning.
-- Pinned on purpose: `tailwindcss@3` + `tailwind-merge@2` (v3 needs Tailwind 4) and
-  `react-day-picker@8` (`components/ui/calendar.tsx` targets the v8 API). Upgrade each as its own
-  change, with visual review.
+- ESLint stays on v9 until `eslint-plugin-react` and `eslint-plugin-import`, both pulled in by
+  `eslint-config-next`, support ESLint 10.
+- `components/ui/calendar.tsx` styles day state through `data-*` attributes on the `<td>`
+  (`group/day`). react-day-picker puts modifier attributes on the cell, not on the button.
 - pnpm 11 only runs dependency install scripts listed under `allowBuilds` in
   `pnpm-workspace.yaml`.
 - Do not reintroduce per-package `pnpm-lock.yaml` files. The root lockfile is the only one.
