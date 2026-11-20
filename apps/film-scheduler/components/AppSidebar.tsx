@@ -191,6 +191,22 @@ function SidebarSection({
   );
 }
 
+// Fixed widths (not random) so server and client render the same markup
+const SKELETON_WIDTHS = ["72%", "55%", "80%", "48%", "66%", "58%", "75%", "52%", "69%", "61%"];
+
+function FilmListSkeleton() {
+  return (
+    <ul aria-busy="true" aria-label="載入影片中" className="space-y-0.5">
+      {SKELETON_WIDTHS.map((width, i) => (
+        <li key={i} className="flex h-9 items-center gap-2 px-2.5">
+          <span className="h-3.5 animate-pulse rounded bg-sidebar-accent" style={{ width }} />
+          <span className="ml-auto h-3 w-10 animate-pulse rounded bg-sidebar-accent" />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function EmptyHint({ children }: { children: ReactNode }) {
   return <p className="px-2.5 py-3 text-center text-xs text-muted-foreground">{children}</p>;
 }
@@ -235,6 +251,7 @@ export function AppSidebar() {
     openShareModal,
     openAboutModal,
     openOnboardingModal,
+    isLoadingFilms,
   } = useAppContext();
   const [search, setSearch] = useState("");
   const sortedSelectedSessions = useMemo(
@@ -312,6 +329,8 @@ export function AppSidebar() {
   );
 
   const isFiltering = search.trim().length > 0;
+  // Only on first load; when switching festivals the previous list stays visible
+  const showSkeleton = isLoadingFilms && films.length === 0;
 
   return (
     <Sidebar>
@@ -378,11 +397,13 @@ export function AppSidebar() {
 
         <SidebarSection
           title="影片列表"
-          count={isFiltering ? `${filteredFilms.length}/${films.length}` : films.length}
+          count={showSkeleton ? "…" : isFiltering ? `${filteredFilms.length}/${films.length}` : films.length}
           defaultOpen
           className="min-h-0 flex-1"
         >
-          {filteredFilms.length > 0 ? (
+          {showSkeleton ? (
+            <FilmListSkeleton />
+          ) : filteredFilms.length > 0 ? (
             <ul className="space-y-0.5">{filteredFilms.map(renderFilm)}</ul>
           ) : (
             <EmptyHint>沒有符合條件的影片</EmptyHint>

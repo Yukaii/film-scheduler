@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import React, { useMemo, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { CalendarView } from "@/components/CalendarView";
@@ -44,11 +45,16 @@ interface MainProps {
 }
 
 export default function Main({ festivals, defaultFestivalId }: MainProps) {
-  const [currentFestivalId, setCurrentFestivalId] = useState<string>("");
+  // Resolve the festival on the first render so the films request starts immediately
+  const searchParams = useSearchParams();
+  const [currentFestivalId, setCurrentFestivalId] = useState<string>(() => {
+    const fromUrl = searchParams.get("festival");
+    return fromUrl && festivals.some((f) => f.id === fromUrl) ? fromUrl : defaultFestivalId;
+  });
 
   // Single source of truth for festival data. keepPreviousData keeps the old
   // festival on screen while the newly selected one loads.
-  const { data } = useSWR(
+  const { data, isLoading: isLoadingFilms } = useSWR(
     currentFestivalId ? ["films", currentFestivalId] : null,
     ([, festivalId]) => fetchFilms(festivalId),
     {
@@ -238,6 +244,7 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
           films,
           filmsMap,
           sections,
+          isLoadingFilms,
           festivals,
           defaultFestivalId,
           currentFestivalId,

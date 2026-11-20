@@ -50,6 +50,12 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-loading-bar: loading-bar 1.1s ease-in-out infinite;
+  @keyframes loading-bar {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(300%); }
+  }
 }
 
 @layer base {

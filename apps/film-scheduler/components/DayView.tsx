@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import dayjs from "@/lib/dayjs";
 import { Session } from "./types";
 import { useAppContext } from "@/contexts/AppContext";
+import { Button } from "@/components/ui/button";
 
 const startHour = 10;
 const hoursInDay = 14;
@@ -46,7 +47,19 @@ export function DayView({
     filmsMap,
     addSession,
     removeSession,
+    setCurrentDate,
+    isLoadingFilms,
   } = useAppContext();
+
+  // First day with screenings on/after the viewed day, else the festival's last day
+  const nearestFestivalDay = useMemo(() => {
+    const days = films
+      .flatMap((film) => film.schedule ?? [])
+      .map((session) => dayjs(session.time).startOf("day"))
+      .sort((a, b) => a.valueOf() - b.valueOf());
+    if (days.length === 0) return null;
+    return days.find((d) => !d.isBefore(currentDate, "day")) ?? days[days.length - 1];
+  }, [films, currentDate]);
   const { now, nowHourOffset } = useNowIndicator();
 
   // Get ALL sessions for the current day from all films
@@ -84,9 +97,9 @@ export function DayView({
     <div className="w-full overflow-x-auto">
       {/* Time axis header */}
       <div className="sticky top-0 bg-background z-20 border-b">
-        <div className="flex min-w-[800px] w-full">
+        <div className="flex w-full min-w-[calc(12rem+840px)]">
           {/* Location column header */}
-          <div className="w-48 p-4 border-r font-semibold bg-muted/20 shrink-0">
+          <div className="flex h-10 w-48 shrink-0 items-center border-r bg-muted/20 px-4 text-xs font-medium text-muted-foreground">
             影廳
           </div>
           {/* Time columns */}
@@ -94,7 +107,7 @@ export function DayView({
             {Array.from({ length: hoursInDay }, (_, hour) => (
               <div
                 key={hour}
-                className="flex-1 min-w-[60px] p-2 border-r text-center text-sm bg-background"
+                className="flex h-10 min-w-[60px] flex-1 items-center justify-center border-r bg-background text-xs text-muted-foreground tabular-nums"
               >
                 {dayjs()
                   .hour(startHour + hour)
@@ -106,17 +119,18 @@ export function DayView({
       </div>
 
       {/* Location rows */}
-      <div className="relative">
-        <div className="min-w-[800px] w-full">
+      <div>
+        {/* 12rem venue column + 14 hours × 60px minimum; sessions and the now line are positioned as % of this width */}
+        <div className="relative w-full min-w-[calc(12rem+840px)]">
         {/* Current time indicator */}
-        {isSameDay && nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
+        {isSameDay && locations.length > 0 && nowHourOffset >= 0 && nowHourOffset < hoursInDay && (
           <div
             className="absolute top-0 h-full w-px bg-red-500 z-10"
             style={{
-              left: `calc(192px + ${((nowHourOffset + now.minute() / 60) / hoursInDay) * 100}%)`,
+              left: `calc(12rem + (100% - 12rem) * ${(nowHourOffset + now.minute() / 60) / hoursInDay})`,
             }}
           >
-            <span className="absolute bg-red-500 text-white text-xs px-1 rounded-r -top-1">
+            <span className="absolute top-0 -translate-x-1/2 rounded-b bg-red-500 px-1 text-xs text-white tabular-nums">
               {now.format("HH:mm")}
             </span>
           </div>
@@ -245,8 +259,19 @@ Click to view details • Right-click or Ctrl+click to select/deselect`}
 
       {/* Empty state */}
       {locations.length === 0 && (
-        <div className="flex items-center justify-center h-40 text-muted-foreground">
-          <p>{currentDate.format("M 月 D 日")}沒有場次</p>
+        <div className="flex h-48 flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
+          {isLoadingFilms ? (
+            <p>載入場次中…</p>
+          ) : (
+            <>
+              <p>{currentDate.format("M 月 D 日")}沒有場次</p>
+              {nearestFestivalDay && (
+                <Button variant="outline" size="sm" onClick={() => setCurrentDate(nearestFestivalDay.toDate())}>
+                  前往有場次的日期（{nearestFestivalDay.format("M/D")}）
+                </Button>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

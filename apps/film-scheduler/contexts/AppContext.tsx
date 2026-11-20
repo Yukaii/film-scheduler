@@ -10,6 +10,8 @@ export type AppContextType = {
   films: Film[];
   filmsMap: FilmsMap;
   sections: Section[];
+  /** True while the selected festival's films are being fetched */
+  isLoadingFilms: boolean;
   selectedSessions: Session[];
   previewSessions: Session[];
   previewFilmId: string | undefined;
@@ -55,6 +57,7 @@ export const AppContext = React.createContext<AppContextType>({
   films: [],
   filmsMap: new Map(),
   sections: [],
+  isLoadingFilms: false,
   selectedSessions: [],
   previewSessions: [],
   previewFilmId: undefined,

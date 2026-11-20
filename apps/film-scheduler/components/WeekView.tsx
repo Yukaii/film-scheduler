@@ -36,6 +36,8 @@ const startHour = 10;
 const hoursInDay = 14;
 
 const INITIAL_VIRTUAL_WINDOW_SIZE = 28; // Initial size of the virtual window in days
+// Height of the sticky day-name row; the time column and now-line offset by it
+const DAY_HEADER_HEIGHT = 40;
 
 const TIME_COLUMN_WIDTH = 80; // Width of the time column in pixels
 
@@ -64,7 +66,7 @@ function useNowIndicator() {
   // Calculate the position of the current time indicator
   const nowHourOffset = now.hour() - startHour;
   const nowMinute = now.minute();
-  const nowPosition = nowHourOffset * 60 + nowMinute + 30; // Position of the current time in pixels
+  const nowPosition = nowHourOffset * 60 + nowMinute + DAY_HEADER_HEIGHT; // Position of the current time in pixels
 
   return {
     now,
@@ -600,7 +602,10 @@ export function WeekView({
       data-is-dragging={isDragging}
     >
       {/* Time Labels Column */}
-      <div className="w-full pb-4 py-7 bg-background mb-4 z-10 md:px-4 px-1">
+      <div
+        className="w-full bg-background pb-4 mb-4 z-10 md:px-4 px-1"
+        style={{ paddingTop: DAY_HEADER_HEIGHT }}
+      >
         <div
           className="relative h-[840px] select-none"
           style={{ transform: `translateY(${-dayTranslateOffsetY}px)` }}
@@ -663,9 +668,10 @@ export function WeekView({
                 <TooltipTrigger asChild>
                   <div
                     className={cn(
-                      "md:text-sm pb-2 text-xs text-center h-7 sticky top-0 bg-background z-10 border-solid border-b-2 border-border whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors",
+                      "sticky top-0 z-10 flex items-center justify-center gap-1 border-b bg-background text-xs md:text-sm whitespace-nowrap select-none cursor-pointer hover:bg-muted transition-colors",
                       shouldHighlight && "bg-blue-100 dark:bg-blue-900/50"
                     )}
+                    style={{ height: DAY_HEADER_HEIGHT }}
                     onClick={() => {
                       const startTime = day.hour(10).minute(0).toDate();
                       const endTime = day.hour(23).minute(59).toDate();
@@ -697,7 +703,7 @@ export function WeekView({
 
             <div
               className={cn(
-                "relative h-[840px] border-t border-b border-border",
+                "relative h-[840px] border-b border-border",
                 shouldHighlight && "bg-blue-50/70 dark:bg-blue-950/20"
               )}
               onMouseDown={(e) => handleMouseDown(e, day)}

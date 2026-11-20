@@ -21,7 +21,7 @@ import { Dayjs } from "dayjs";
 type ViewMode = "week" | "day";
 
 export function CalendarView(props: { className?: string }) {
-  const { currentDate, previewSessions, selectedSessions, setCurrentDate, revealFilmDetail, filmsMap } =
+  const { currentDate, previewSessions, selectedSessions, setCurrentDate, revealFilmDetail, filmsMap, isLoadingFilms } =
     useAppContext();
 
   // Add state to track the current view week from infinite scroll
@@ -160,6 +160,12 @@ export function CalendarView(props: { className?: string }) {
             ))}
           </div>
         </div>
+
+        {isLoadingFilms && (
+          <div role="progressbar" aria-label="載入影片中" className="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden">
+            <div className="h-full w-1/3 animate-loading-bar bg-red-500" />
+          </div>
+        )}
       </header>
 
       {/* Conditional rendering based on view mode */}
