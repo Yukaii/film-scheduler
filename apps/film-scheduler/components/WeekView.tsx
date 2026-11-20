@@ -562,14 +562,15 @@ export function WeekView({
     setDragEndPos(posY);
   };
 
-  // Handle mouse move during selection
-  const handleMouseMove = (e: React.MouseEvent, day: dayjs.Dayjs) => {
+  // Handle mouse move during selection. A selection stays on the day it started
+  // on; every column shares the same vertical scale, so any column under the
+  // pointer can update its end (the view may scroll or snap mid-drag).
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
 
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const posY = e.clientY - rect.top;
+    const posY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
 
-    setDragEndDay(day);
     setDragEndPos(posY);
   };
 
@@ -615,59 +616,16 @@ export function WeekView({
     setTimeSelection,
   ]);
 
-  // Handle mouse leave during selection to cancel it
-  const handleMouseLeave = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      setDragStartDay(null);
-      setDragStartPos(null);
-      setDragEndDay(null);
-      setDragEndPos(null);
-    }
-  };
-
-  // Calculate selection overlay position and dimensions
-  const getSelectionStyle = () => {
-    if (
-      !isDragging ||
-      !dragStartDay ||
-      !dragEndDay ||
-      dragStartPos === null ||
-      dragEndPos === null ||
-      !weekviewRect
-    ) {
-      return null;
-    }
-
-    const startDayIndex = weekDays.findIndex((day) =>
-      day.isSame(dragStartDay, "day")
-    );
-    const endDayIndex = weekDays.findIndex((day) =>
-      day.isSame(dragEndDay, "day")
-    );
-
-    if (startDayIndex === -1 || endDayIndex === -1) return null;
-
-    // Get min and max positions without adjusting for scroll
-    const minPosY = Math.min(dragStartPos, dragEndPos) + 30;
-    const maxPosY = Math.max(dragStartPos, dragEndPos) + 30;
-
-    // Calculate horizontal position that accounts for virtual scrolling
-    // The offset in days (from virtual window start) to adjust the grid columns
-    const dayOffset = Math.floor(dayTranslateOffsetX / dayWidth);
-
-    // Calculate position relative to weekViewRef for absolute positioning
-    return {
-      position: "absolute" as const,
-      transform: `translateY(${minPosY - dayTranslateOffsetY}px)`,
-      height: `${maxPosY - minPosY}px`,
-      width: dayWidth + "px",
-      left: (startDayIndex - dayOffset) * dayWidth + timeColumnWidth + "px",
-      zIndex: 40,
-    };
-  };
-
-  const selectionStyle = getSelectionStyle();
+  // The drag selection is drawn inside the day column it started in, so it moves
+  // with that column (scrolling, snapping, resizing) without any position math.
+  const selection =
+    isDragging && dragStartDay && dragStartPos !== null && dragEndPos !== null
+      ? {
+          day: dragStartDay,
+          top: Math.min(dragStartPos, dragEndPos),
+          bottom: Math.max(dragStartPos, dragEndPos),
+        }
+      : null;
 
   // Updated useEffect to also handle window resize for selection overlay
   useEffect(() => {
@@ -812,8 +770,7 @@ export function WeekView({
                 shouldHighlight && "bg-blue-50/70 dark:bg-blue-950/20"
               )}
               onMouseDown={(e) => handleMouseDown(e, day)}
-              onMouseMove={(e) => handleMouseMove(e, day)}
-              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
               style={{ transform: `translateY(${-dayTranslateOffsetY}px)` }}
             >
               {Array.from({ length: hoursInDay }, (_, hour) => (
@@ -841,31 +798,24 @@ export function WeekView({
                     revealFilmDetail={revealFilmDetail}
                   />
                 ))}
+
+              {selection && selection.day.isSame(day, "day") && (
+                <div
+                  className="pointer-events-none absolute inset-x-0 z-30 border-2 border-blue-600 bg-blue-500/30 shadow-lg"
+                  style={{ top: selection.top, height: selection.bottom - selection.top }}
+                >
+                  <div className="absolute -left-2 top-0 rounded-md bg-blue-600 px-2 py-1 text-xs text-white shadow-md">
+                    {dayjs(positionToTime(selection.day, selection.top)).format("HH:mm")}
+                  </div>
+                  <div className="absolute -right-2 bottom-0 rounded-md bg-blue-600 px-2 py-1 text-xs text-white shadow-md">
+                    {dayjs(positionToTime(selection.day, selection.bottom)).format("HH:mm")}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
       })}
-
-      {/* Selection overlay for time selection */}
-      {selectionStyle && (
-        <div
-          className="absolute bg-blue-500/30 border-2 border-blue-600 z-30 pointer-events-none shadow-lg backdrop-blur-[1px]"
-          style={selectionStyle}
-        >
-          <div className="absolute -left-2 top-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
-            {positionToTime(
-              dragStartDay!,
-              Math.min(dragStartPos!, dragEndPos!)
-            ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          </div>
-          <div className="absolute -right-2 bottom-0 px-2 py-1 bg-blue-600 rounded-md text-white text-xs shadow-md">
-            {positionToTime(
-              dragEndDay!,
-              Math.max(dragStartPos!, dragEndPos!)
-            ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          </div>
-        </div>
-      )}
 
       {/* Debug info - shown only in development */}
       {process.env.NODE_ENV === "development" && (
