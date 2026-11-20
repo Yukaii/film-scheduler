@@ -439,7 +439,9 @@ export function AppSidebar() {
       <SidebarHeader className="gap-0 p-0">
         {/* Brand row: same height as the calendar header so the borders line up */}
         <div className="flex h-16 shrink-0 items-center gap-1.5 border-b px-4">
-          <SidebarToggle className="-ml-2" />
+          {/* Mobile sheet: closes the sheet. Desktop: invisible placeholder that keeps
+              room for the pinned toggle (Main) sitting on top of it */}
+          <SidebarToggle className="-ml-2 md:invisible" />
           <BrandMark />
         </div>
 

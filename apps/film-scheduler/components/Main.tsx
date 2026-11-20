@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarToggle } from "@/components/SidebarToggle";
 import { AppSidebar } from "@/components/AppSidebar";
 import { CalendarView } from "@/components/CalendarView";
 import { FilmSidebar } from "@/components/FilmSidebar";
@@ -298,6 +299,9 @@ export default function Main({ festivals, defaultFestivalId }: MainProps) {
         <SidebarProvider
           style={{ "--sidebar-width": panelWidthCss(sidebarWidth) } as React.CSSProperties}
         >
+          {/* Desktop: one toggle pinned to the top-left corner. The sidebar slides
+              out from under it and the header makes room, so it never moves. */}
+          <SidebarToggle className="fixed top-3.5 left-2 z-30 hidden md:inline-flex" />
           <AppSidebar />
           <main className="overflow-hidden w-full">
             {/* Desktop reserves room for the film panel; on mobile it is a bottom sheet over the calendar */}

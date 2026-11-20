@@ -79,7 +79,7 @@ export function CalendarView(props: { className?: string }) {
     }
   };
 
-  const { open, isMobile } = useSidebar();
+  const { open } = useSidebar();
 
   const goToToday = () => {
     const today = new Date();
@@ -103,12 +103,27 @@ export function CalendarView(props: { className?: string }) {
       {/* Height must match the sidebar brand row (h-16) and the WeekView height calc */}
       <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b bg-background px-2 md:px-4">
         <div className="flex min-w-0 items-center gap-0.5 sm:gap-1">
-          {/* On desktop the open sidebar carries the toggle in its brand row, at
-              this same spot; on mobile the sidebar is a sheet, so it lives here */}
-          {(isMobile || !open) && <SidebarToggle className="md:-ml-2" />}
+          {/* Mobile: the sidebar is a sheet, so its toggle lives in the header */}
+          <SidebarToggle className="md:hidden" />
 
-          {/* Mobile shows the brand inside the sidebar sheet; desktop shows it here when the sidebar is collapsed */}
-          {!isMobile && !open && <BrandMark compact className="mr-1" />}
+          {/* Desktop: while the sidebar collapses, this grows from 0 to cover the
+              pinned toggle plus the compact brand, on the sidebar's own timing
+              (200ms linear), so the date controls glide over instead of jumping */}
+          <div
+            className={cn(
+              "hidden shrink-0 items-center overflow-hidden transition-[width,margin] duration-200 ease-linear md:flex",
+              open ? "-mr-1 w-0" : "w-17",
+            )}
+          >
+            <span aria-hidden className="w-8 shrink-0" />
+            <BrandMark
+              compact
+              className={cn(
+                "shrink-0 transition-[opacity,translate] duration-200 ease-out",
+                open ? "-translate-x-2 opacity-0" : "translate-x-0 opacity-100",
+              )}
+            />
+          </div>
 
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => navigate("previous")} aria-label="上一頁">
