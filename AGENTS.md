@@ -116,6 +116,10 @@ Stack: Next.js 16 (Turbopack, App Router), React 19, TypeScript 6, oxlint
   `eslint-config-next` (core-web-vitals + typescript), with oxlint's `correctness` category on.
   Several jsx-a11y rules are switched off there as an accessibility backlog. Re-enable them as you
   fix components. Suppress a rule with `// oxlint-disable-next-line <rule>`.
+- Layout shares a 64px (`h-16`) top row: the sidebar brand row (`AppSidebar`), the calendar
+  header (`CalendarView`) and the film detail panel header (`FilmSidebar`). Their bottom borders
+  form one line, and `WeekView` sizes itself as `calc(100dvh - 4rem)`. Change all four together.
+  Brand identity lives in `components/BrandMark.tsx`.
 - `components/ui/calendar.tsx` styles day state through `data-*` attributes on the `<td>`
   (`group/day`). react-day-picker puts modifier attributes on the cell, not on the button.
 - pnpm 11 only runs dependency install scripts listed under `allowBuilds` in

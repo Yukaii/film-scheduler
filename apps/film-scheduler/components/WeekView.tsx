@@ -591,7 +591,7 @@ export function WeekView({
       style={
         {
           "--day-width": `${dayWidth}px`,
-          height: "calc(100vh - 68px)",
+          height: "calc(100dvh - 4rem)", // minus the h-16 calendar header
           display: "grid",
           gridTemplateColumns: `${timeColumnWidth}px repeat(${virtualWindowSize}, var(--day-width))`,
         } as React.CSSProperties

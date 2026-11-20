@@ -5,7 +5,8 @@ import dayjs from "@/lib/dayjs";
 import { useAppContext } from "@/contexts/AppContext";
 import { cn, scrollNowIndicatorIntoView } from "@/lib/utils";
 import { useSidebar } from "./ui/sidebar";
-import { CalendarIcon, PanelLeftClose, PanelLeftOpen, Calendar as CalendarDaysIcon } from "lucide-react";
+import { CalendarIcon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { BrandMark } from "./BrandMark";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -73,92 +74,93 @@ export function CalendarView(props: { className?: string }) {
 
   const formatHeaderDate = () => {
     if (viewMode === "week") {
-      return viewWeekStart.format("YYYY/MM");
+      return viewWeekStart.format("YYYY 年 M 月");
     } else {
-      return dayjs(currentDate).format("YYYY/MM/DD");
+      return dayjs(currentDate).format("YYYY 年 M 月 D 日");
     }
   };
 
+  const sidebarVisible = isMobile ? openMobile : open;
+
   return (
     <div className={cn("w-full", props.className)}>
-      <div className="py-2 md:py-4 flex justify-between items-center sticky top-0 bg-background z-20 md:px-4 px-2">
-        <div className="flex items-center">
-          <Button variant="ghost" onClick={toggleSidebar}>
-            {(isMobile ? openMobile : open) ? (
-              <PanelLeftClose size={16} />
-            ) : (
-              <PanelLeftOpen size={16} />
-            )}
-          </Button>
-
+      {/* Height must match the sidebar brand row (h-16) and the WeekView height calc */}
+      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b bg-background px-2 md:px-4">
+        <div className="flex min-w-0 items-center gap-0.5 sm:gap-1">
           <Button
             variant="ghost"
-            onClick={() => navigate("previous")}
-            className="mr-2"
+            size="icon"
+            onClick={toggleSidebar}
+            aria-label={sidebarVisible ? "收合側欄" : "展開側欄"}
           >
-            <ChevronLeft className="h-5 w-5" />
+            {sidebarVisible ? <PanelLeftClose /> : <PanelLeftOpen />}
           </Button>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="mx-2">
-                {formatHeaderDate()}{" "}
-                <CalendarIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={currentDate}
-                onSelect={(date) => {
-                  if (date) {
-                    const newWeekStart = dayjs(date).startOf("week");
-                    setViewWeekStart(newWeekStart);
-                    setCurrentDate(date);
-                    setHighlightDate(date);
-                  }
-                }}
-                autoFocus
-              />
-            </PopoverContent>
-          </Popover>
+          {/* Mobile shows the brand inside the sidebar sheet; desktop shows it here when the sidebar is collapsed */}
+          {!isMobile && !open && <BrandMark compact className="mr-1" />}
 
-          <Button
-            variant="ghost"
-            onClick={() => navigate("next")}
-            className="ml-2"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* View Mode Toggle */}
-          <div className="flex border rounded-md">
-            <Button
-              variant={viewMode === "week" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("week")}
-              className="rounded-r-none"
-            >
-              Week
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" onClick={() => navigate("previous")} aria-label="上一頁">
+              <ChevronLeft className="h-5 w-5" />
             </Button>
-            <Button
-              variant={viewMode === "day" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("day")}
-              className="rounded-l-none"
-            >
-              <CalendarDaysIcon className="h-4 w-4 mr-1" />
-              Day
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="gap-2 px-2 text-base font-semibold tabular-nums">
+                  {formatHeaderDate()}
+                  <CalendarIcon className="hidden text-muted-foreground sm:block" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={currentDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      const newWeekStart = dayjs(date).startOf("week");
+                      setViewWeekStart(newWeekStart);
+                      setCurrentDate(date);
+                      setHighlightDate(date);
+                    }
+                  }}
+                  autoFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Button variant="ghost" size="icon" onClick={() => navigate("next")} aria-label="下一頁">
+              <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
+        </div>
 
-          <Button variant="ghost" onClick={goToToday}>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button variant="outline" size="sm" onClick={goToToday}>
             今天
           </Button>
+
+          <div role="radiogroup" aria-label="檢視模式" className="inline-flex rounded-lg bg-muted p-0.5">
+            {([
+              ["week", "週"],
+              ["day", "日"],
+            ] as const).map(([mode, label]) => (
+              <button
+                key={mode}
+                type="button"
+                role="radio"
+                aria-checked={viewMode === mode}
+                onClick={() => setViewMode(mode)}
+                className={cn(
+                  "h-7 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+                  viewMode === mode && "bg-background text-foreground shadow-xs",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Conditional rendering based on view mode */}
       <div className={cn({ "pb-[280px]": viewMode === "day" && dayViewFilmPanelOpen })}>

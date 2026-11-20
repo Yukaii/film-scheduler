@@ -87,7 +87,7 @@ export function DayView({
         <div className="flex min-w-[800px] w-full">
           {/* Location column header */}
           <div className="w-48 p-4 border-r font-semibold bg-muted/20 shrink-0">
-            Location
+            影廳
           </div>
           {/* Time columns */}
           <div className="flex flex-1">
@@ -246,7 +246,7 @@ Click to view details • Right-click or Ctrl+click to select/deselect`}
       {/* Empty state */}
       {locations.length === 0 && (
         <div className="flex items-center justify-center h-40 text-muted-foreground">
-          <p>No sessions scheduled for {currentDate.format("MMMM D, YYYY")}</p>
+          <p>{currentDate.format("M 月 D 日")}沒有場次</p>
         </div>
       )}
     </div>
