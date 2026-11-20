@@ -4,105 +4,87 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { LogoMark } from "./BrandMark";
 
 interface AboutModalProps {
   open: boolean;
   onClose: () => void;
 }
 
+const REPO = "https://github.com/Yukaii/film-scheduler";
+const CONTRIBUTORS = ["Yukaii", "Pastleo"];
+
+/** Quiet underlined link that strengthens on hover; external links open a new tab. */
+function TextLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="inline-flex items-center gap-0.5 font-medium underline decoration-foreground/25 decoration-1 underline-offset-4 transition-colors hover:decoration-foreground focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      {children}
+    </a>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[4.5rem_1fr] gap-3 border-b py-3 last:border-b-0">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="min-w-0">{children}</dd>
+    </div>
+  );
+}
+
 export function AboutModal({ open, onClose }: AboutModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>關於此專案</DialogTitle>
-          <DialogDescription>
-            因為去年排金馬影展馬拉松花了許多時間排片單，今年絕對要優雅的排表！於是就做了這個專案
-          </DialogDescription>
+      <DialogContent className="max-w-md gap-0">
+        <DialogHeader className="flex-row items-center gap-3 space-y-0 text-left">
+          <span className="size-12 shrink-0 overflow-hidden rounded-xl shadow-xs ring-1 ring-black/5 dark:ring-white/10">
+            <LogoMark className="size-full" />
+          </span>
+          <div className="min-w-0">
+            <DialogTitle className="text-lg">Film Scheduler</DialogTitle>
+            <DialogDescription>看電影排程小工具</DialogDescription>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-4 mt-4">
-          {/* GitHub Repository Link */}
-          <section>
-            <h3 className="text-lg font-semibold">GitHub</h3>
-            <p className="text-sm text-muted-foreground">
-              查看此專案的原始碼：
-            </p>
-            <a
-              href="https://github.com/Yukaii/film-scheduler"
-              rel="noreferrer noopener"
-            >
-              <Button variant="link" className="flex items-center mt-2">
-                <ExternalLink className="mr-2" />
-                github.com/Yukaii/film-scheduler
-              </Button>
-            </a>
-          </section>
+        <p className="mt-5 text-sm leading-relaxed text-foreground/85">
+          去年排金馬影展馬拉松，光是排片單就花了好多時間。今年決定要優雅地排表，於是做了這個工具。
+        </p>
 
-          {/* Bugs Report Link */}
-          <section>
-            <h3 className="text-lg font-semibold">問題回報</h3>
-            <p className="text-sm text-muted-foreground">
-              如果遇到任何問題，請前往 GitHub 提交 issue：
-            </p>
-            <a
-              href="https://github.com/Yukaii/film-scheduler/issues"
-              rel="noreferrer noopener"
-            >
-              <Button variant="link" className="flex items-center mt-2">
-                <ExternalLink className="mr-2" />
-                回報問題
-              </Button>
-            </a>
-          </section>
-
-          {/* Contributors */}
-          <section>
-            <h3 className="text-lg font-semibold">貢獻者</h3>
-            <p className="text-sm text-muted-foreground">
-              感謝所有對此專案做出貢獻的成員：
-            </p>
-            <ul className="list-disc ml-5 mt-2 space-y-1 text-sm">
-              <li>
-                <a
-                  href="https://github.com/Yukaii"
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
-                  Yukaii
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/Pastleo"
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
-                  Pastleo
-                </a>
-              </li>
+        <dl className="mt-5 border-t text-sm">
+          <Row label="原始碼">
+            <TextLink href={REPO}>
+              github.com/Yukaii/film-scheduler
+              <ArrowUpRight className="size-3.5 text-muted-foreground" />
+            </TextLink>
+          </Row>
+          <Row label="問題回報">
+            遇到問題？到 GitHub{" "}
+            <TextLink href={`${REPO}/issues`}>
+              開一個 issue
+              <ArrowUpRight className="size-3.5 text-muted-foreground" />
+            </TextLink>
+          </Row>
+          <Row label="貢獻者">
+            <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
+              {CONTRIBUTORS.map((name) => (
+                <li key={name}>
+                  <TextLink href={`https://github.com/${name}`}>{name}</TextLink>
+                </li>
+              ))}
             </ul>
-          </section>
-
-          {/* License */}
-          <section>
-            <h3 className="text-lg font-semibold">授權</h3>
-            <p className="text-sm text-muted-foreground">
-              本專案使用 MIT 授權，歡迎自由使用、分享、改製、貢獻。
-            </p>
-          </section>
-        </div>
-
-        <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>
-            關閉
-          </Button>
-        </DialogFooter>
+          </Row>
+          <Row label="授權">
+            MIT<span className="text-muted-foreground">，歡迎自由使用、分享、改製與貢獻。</span>
+          </Row>
+        </dl>
       </DialogContent>
     </Dialog>
   );
