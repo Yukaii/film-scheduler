@@ -49,7 +49,7 @@ export function findSessionIndex(
  * @returns {Session[]} - A new array containing unique sessions from both arrays.
  */
 export function joinSessions(array1: Session[], array2: Session[]): Session[] {
-  const sessionIdSet = new Set<string>(...array1.map(s => s.id));
+  const sessionIdSet = new Set(array1.map((s) => s.id));
 
   const resultArray = [...array1]
 
