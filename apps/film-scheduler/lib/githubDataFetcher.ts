@@ -1,3 +1,6 @@
+// Festival JSON on GitHub main is re-fetched at most hourly (Next data cache + ISR)
+export const DATA_REVALIDATE_SECONDS = 3600;
+
 interface GithubConfig {
   owner: string;
   repo: string;
@@ -14,7 +17,7 @@ interface FestivalData {
 
 class GithubDataFetcher {
   private static instance: GithubDataFetcher;
-  private data: Record<string, FestivalData> = {};
+  private data: Record<string, { value: FestivalData; fetchedAt: number }> = {};
   private config: GithubConfig;
 
   private constructor() {
@@ -47,7 +50,7 @@ class GithubDataFetcher {
     try {
       // Try main branch first
       const mainUrl = this.getGithubRawUrl(path, true);
-      const mainResponse = await fetch(mainUrl, { cache: "force-cache" });
+      const mainResponse = await fetch(mainUrl, { next: { revalidate: DATA_REVALIDATE_SECONDS } });
       if (mainResponse.ok) {
         return await mainResponse.json();
       }
@@ -55,7 +58,7 @@ class GithubDataFetcher {
       // Fallback to specific commit if available
       if (this.config.fallbackCommit) {
         const fallbackUrl = this.getGithubRawUrl(path, false);
-        const fallbackResponse = await fetch(fallbackUrl, { cache: "force-cache" });
+        const fallbackResponse = await fetch(fallbackUrl, { next: { revalidate: DATA_REVALIDATE_SECONDS } });
         if (fallbackResponse.ok) {
           return await fallbackResponse.json();
         }
@@ -77,8 +80,9 @@ class GithubDataFetcher {
   }
 
   public async getFestivalData(festivalId: string): Promise<FestivalData> {
-    if (this.data[festivalId]) {
-      return this.data[festivalId];
+    const cached = this.data[festivalId];
+    if (cached && Date.now() - cached.fetchedAt < DATA_REVALIDATE_SECONDS * 1000) {
+      return cached.value;
     }
 
     // Determine which data source to use based on festival ID
@@ -98,13 +102,14 @@ class GithubDataFetcher {
         this.fetchJsonWithFallback<Record<string, string[]>>(`${basePath}/film_sections_map.json`, {})
       ]);
 
-      this.data[festivalId] = {
+      const value: FestivalData = {
         filmDetailsCache: filmDetails,
         sectionsCache: sections,
         filmSectionsMap: filmSectionsMap
       };
+      this.data[festivalId] = { value, fetchedAt: Date.now() };
 
-      return this.data[festivalId];
+      return value;
     } catch (error) {
       console.error(`Failed to fetch festival data for ${festivalId}:`, error);
       throw error;
